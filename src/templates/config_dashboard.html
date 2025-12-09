@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Trading Config Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            padding: 40px;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 16px 24px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            color: #64748b;
+            background: transparent;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateY(-1px);
+        }
+        
+        .tab i {
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .config-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .config-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .config-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+        }
+        
+        .config-card h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .config-card h3 i {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group input:read-only {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #28a745;
+        }
+        
+        .status-offline {
+            background: #dc3545;
+        }
+        
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .history-item .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .history-item .change {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideInFromRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-indicator.status-online {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-rocket"></i> Trading Config Dashboard</h1>
+                <p>Real-time Parameter Management & Monitoring</p>
+                <div style="margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 20px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="status-indicator status-online" id="statusIndicator"></span>
+                        <span id="statusText">Config Monitor: Online</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-clock" style="color: rgba(255,255,255,0.8);"></i>
+                        <span id="currentTime" style="color: rgba(255,255,255,0.9);"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('current')">
+                    <i class="fas fa-cog"></i> Current Config
+                </div>
+                <div class="tab" onclick="showTab('trading')">
+                    <i class="fas fa-chart-line"></i> Trading Positions
+                </div>
+                <div class="tab" onclick="showTab('history')">
+                    <i class="fas fa-history"></i> Change History
+                </div>
+                <div class="tab" onclick="showTab('monitor')">
+                    <i class="fas fa-broadcast-tower"></i> Live Monitor
+                </div>
+            </div>
+            
+            <!-- Current Config Tab -->
+            <div id="current" class="tab-content active">
+                <h2>Current Configuration</h2>
+                <div id="currentConfig" class="loading">
+                    <div class="spinner"></div>
+                    Loading current configuration...
+                </div>
+            </div>
+            
+            <!-- Trading Positions Tab -->
+            <div id="trading" class="tab-content">
+                <h2>Trading Positions & P&L</h2>
+                <div id="tradingStatus" class="alert alert-success" style="margin-bottom: 20px;">
+                    <strong>Market Status:</strong> <span id="marketStatus">Loading...</span> | 
+                    <strong>Active Trades:</strong> <span id="activeTrades">0</span> | 
+                    <strong>Total P&L:</strong> <span id="totalPnl">₹0.00</span>
+                </div>
+                <div id="tradingPositions" class="loading">
+                    <div class="spinner"></div>
+                    Loading trading positions...
+                </div>
+            </div>
+            
+            <!-- History Tab -->
+            <div id="history" class="tab-content">
+                <h2>Configuration Change History</h2>
+                <button class="btn btn-success" onclick="exportHistory()">Export History</button>
+                <div id="configHistory" class="loading">
+                    <div class="spinner"></div>
+                    Loading change history...
+                </div>
+            </div>
+            
+            <!-- Live Monitor Tab -->
+            <div id="monitor" class="tab-content">
+                <h2><i class="fas fa-broadcast-tower"></i> Live Parameter Monitor</h2>
+                <div id="liveMonitor">
+                    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                        <i class="fas fa-eye" style="color: #667eea; font-size: 2em; margin-bottom: 10px;"></i>
+                        <p style="color: #64748b; font-weight: 500;">Real-time monitoring of configuration changes...</p>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Only actual parameter changes will be displayed here</p>
+                    </div>
+                    <div id="liveUpdates"></div>
+                    <div id="noUpdatesMessage" style="display: none; text-align: center; padding: 40px; color: #94a3b8;">
+                        <i class="fas fa-check-circle" style="font-size: 3em; margin-bottom: 15px; color: #10b981;"></i>
+                        <h3>No Recent Changes</h3>
+                        <p>All parameters are stable. Changes will appear here when detected.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentConfig = {};
+        let updateInterval;
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentConfig();
+            loadTradingPositions();
+            loadConfigHistory();
+            startLiveMonitoring();
+            startClock();
+        });
+        
+        // Start real-time clock
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour12: true,
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                document.getElementById('currentTime').textContent = timeString;
+            }
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+        
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Load current configuration
+        async function loadCurrentConfig() {
+            try {
+                const response = await fetch('/api/config/current');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    currentConfig = data.config;
+                    displayCurrentConfig(data.config);
+                } else {
+                    showAlert('Error loading configuration: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to load configuration: ' + error.message, 'error');
+            }
+        }
+        
+        // Display current configuration
+        function displayCurrentConfig(config) {
+            const container = document.getElementById('currentConfig');
+            let html = '<div class="config-grid">';
+            
+            // Icon mapping for different parameters
+            const paramIcons = {
+                'VIX_HEDGE_POINTS_CANDR': 'fas fa-calendar-alt',
+                'HEDGE_TRIGGER_POINTS_STRANGLE': 'fas fa-shield-alt',
+                'TARGET_DELTA_LOW': 'fas fa-arrow-down',
+                'TARGET_DELTA_HIGH': 'fas fa-arrow-up',
+                'VIX_DELTA_LOW': 'fas fa-chart-area',
+                'VIX_DELTA_HIGH': 'fas fa-chart-line',
+                'VIX_DELTA_THRESHOLD': 'fas fa-balance-scale',
+                'DELTA_MONITORING_THRESHOLD': 'fas fa-eye',
+                'INITIAL_PROFIT_BOOKING': 'fas fa-coins',
+                'SECOND_PROFIT_BOOKING': 'fas fa-money-bill-wave',
+                'STOP_LOSS_CONFIG': 'fas fa-stop-circle'
+            };
+            
+            for (const [param, value] of Object.entries(config)) {
+                const icon = paramIcons[param] || 'fas fa-cog';
+                const displayValue = formatValue(value);
+                
+                html += `
+                    <div class="config-card">
+                        <h3><i class="${icon}"></i> ${param}</h3>
+                        <div class="form-group">
+                            <label>Current Value:</label>
+                            <input type="text" id="input_${param}" value="${displayValue}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>New Value:</label>
+                            <input type="text" id="new_${param}" placeholder="Enter new value">
+                        </div>
+                        <button class="btn" onclick="updateParameter('${param}')">
+                            <i class="fas fa-sync-alt"></i> Update
+                        </button>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Update parameter
+        async function updateParameter(paramName) {
+            const newValueInput = document.getElementById(`new_${paramName}`);
+            const newValue = newValueInput.value.trim();
+            
+            if (!newValue) {
+                showAlert('Please enter a new value', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/config/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        parameter: paramName,
+                        value: newValue
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showAlert(`Successfully updated ${paramName} to ${newValue}`, 'success');
+                    newValueInput.value = '';
+                    loadCurrentConfig(); // Refresh current config
+                    loadConfigHistory(); // Refresh history
+                } else {
+                    showAlert('Error updating parameter: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to update parameter: ' + error.message, 'error');
+            }
+        }
+        
+        // Load trading positions
+        async function loadTradingPositions() {
+            try {
+                const response = await fetch('/api/trading/positions');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayTradingPositions(data.positions, data.total_pnl);
+                } else {
+                    showAlert('Error loading trading positions: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to load trading positions: ' + error.message, 'error');
+            }
+        }
+        
+        // Display trading positions
+        function displayTradingPositions(positions, totalPnl) {
+            const container = document.getElementById('tradingPositions');
+            
+            if (positions.length === 0) {
+                container.innerHTML = '<p>No active trading positions found.</p>';
+                return;
+            }
+            
+            let html = '<div class="positions-table">';
+            html += '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">';
+            html += '<thead><tr style="background: #f8f9fa;">';
+            html += '<th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Instrument</th>';
+            html += '<th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Qty</th>';
+            html += '<th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Avg Price</th>';
+            html += '<th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">LTP</th>';
+            html += '<th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">P&L</th>';
+            html += '<th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Change %</th>';
+            html += '</tr></thead><tbody>';
+            
+            positions.forEach(position => {
+                const pnlColor = position.pnl >= 0 ? '#28a745' : '#dc3545';
+                const changeColor = position.day_change_percentage >= 0 ? '#28a745' : '#dc3545';
+                
+                html += '<tr style="border-bottom: 1px solid #dee2e6;">';
+                html += `<td style="padding: 12px;">${position.instrument}</td>`;
+                html += `<td style="padding: 12px; text-align: center;">${position.quantity}</td>`;
+                html += `<td style="padding: 12px; text-align: center;">₹${position.average_price.toFixed(2)}</td>`;
+                html += `<td style="padding: 12px; text-align: center;">₹${position.last_price.toFixed(2)}</td>`;
+                html += `<td style="padding: 12px; text-align: center; color: ${pnlColor}; font-weight: bold;">₹${position.pnl.toFixed(2)}</td>`;
+                html += `<td style="padding: 12px; text-align: center; color: ${changeColor}; font-weight: bold;">${position.day_change_percentage.toFixed(2)}%</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            html += `<div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: right;">`;
+            html += `<strong style="font-size: 1.2em; color: ${totalPnl >= 0 ? '#28a745' : '#dc3545'};">Total P&L: ₹${totalPnl.toFixed(2)}</strong>`;
+            html += '</div>';
+            html += '</div>';
+            
+            container.innerHTML = html;
+            
+            // Update status bar
+            document.getElementById('activeTrades').textContent = positions.length;
+            document.getElementById('totalPnl').textContent = `₹${totalPnl.toFixed(2)}`;
+            document.getElementById('totalPnl').style.color = totalPnl >= 0 ? '#28a745' : '#dc3545';
+        }
+        
+        // Load configuration history
+        async function loadConfigHistory() {
+            try {
+                const response = await fetch('/api/config/history');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayConfigHistory(data.history);
+                } else {
+                    showAlert('Error loading history: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to load history: ' + error.message, 'error');
+            }
+        }
+        
+        // Display configuration history
+        function displayConfigHistory(history) {
+            const container = document.getElementById('configHistory');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p>No configuration changes recorded.</p>';
+                return;
+            }
+            
+            let html = '';
+            history.reverse().forEach(change => {
+                html += `
+                    <div class="history-item">
+                        <div class="timestamp">${change.timestamp}</div>
+                        <div class="change">${change.parameter}: ${change.old_value} → ${change.new_value}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Export history
+        async function exportHistory() {
+            try {
+                const response = await fetch('/api/config/export');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showAlert(`History exported to ${data.filename}`, 'success');
+                } else {
+                    showAlert('Error exporting history: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to export history: ' + error.message, 'error');
+            }
+        }
+        
+        // Start live monitoring
+        function startLiveMonitoring() {
+            updateInterval = setInterval(async () => {
+                try {
+                    // Check config changes
+                    const response = await fetch('/api/config/current');
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        // Check for changes
+                        const newConfig = data.config;
+                        const changes = findChanges(currentConfig, newConfig);
+                        
+                        if (changes.length > 0) {
+                            displayLiveUpdates(changes);
+                            currentConfig = newConfig;
+                        }
+                    }
+                    
+                    // Auto-refresh trading positions
+                    loadTradingPositions();
+                    
+                } catch (error) {
+                    console.error('Live monitoring error:', error);
+                }
+            }, 5000); // Check every 5 seconds
+        }
+        
+        // Find changes between configs
+        function findChanges(oldConfig, newConfig) {
+            const changes = [];
+            
+            for (const [key, newValue] of Object.entries(newConfig)) {
+                // Only add to changes if there's an actual difference
+                if (oldConfig[key] !== newValue && newValue !== undefined && newValue !== null) {
+                    // Additional check: don't show changes for empty or undefined old values on first load
+                    if (oldConfig[key] !== undefined && oldConfig[key] !== null) {
+                        changes.push({
+                            parameter: key,
+                            oldValue: oldConfig[key],
+                            newValue: newValue,
+                            timestamp: new Date().toLocaleTimeString()
+                        });
+                    }
+                }
+            }
+            
+            return changes;
+        }
+        
+        // Display live updates
+        function displayLiveUpdates(changes) {
+            const container = document.getElementById('liveUpdates');
+            const noUpdatesMessage = document.getElementById('noUpdatesMessage');
+            
+            if (changes.length === 0) {
+                // Show "no updates" message if no changes
+                noUpdatesMessage.style.display = 'block';
+                return;
+            } else {
+                // Hide "no updates" message if there are changes
+                noUpdatesMessage.style.display = 'none';
+            }
+            
+            changes.forEach(change => {
+                const updateDiv = document.createElement('div');
+                updateDiv.className = 'history-item';
+                updateDiv.style.animation = 'slideInFromRight 0.5s ease-out';
+                
+                // Format values properly for display
+                let oldValueStr = formatValue(change.oldValue);
+                let newValueStr = formatValue(change.newValue);
+                
+                updateDiv.innerHTML = `
+                    <div class="timestamp">
+                        <i class="fas fa-clock"></i> ${change.timestamp} - LIVE UPDATE
+                    </div>
+                    <div class="change">
+                        <strong>${change.parameter}:</strong> ${oldValueStr} → ${newValueStr}
+                    </div>
+                `;
+                
+                container.insertBefore(updateDiv, container.firstChild);
+                
+                // Remove old updates (keep last 10)
+                while (container.children.length > 10) {
+                    container.removeChild(container.lastChild);
+                }
+            });
+        }
+        
+        // Format values for display
+        function formatValue(value) {
+            if (value === null || value === undefined) {
+                return 'null';
+            }
+            
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    return `[${value.join(', ')}]`;
+                } else {
+                    // For objects like STOP_LOSS_CONFIG, show key-value pairs
+                    const pairs = Object.entries(value).map(([key, val]) => `${key}: ${val}`);
+                    return `{${pairs.join(', ')}}`;
+                }
+            }
+            
+            return String(value);
+        }
+        
+        // Show alert
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.querySelector('.content').insertBefore(alertDiv, document.querySelector('.tabs'));
+            
+            // Remove alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        });
+    </script>
+</body>
+</html>
