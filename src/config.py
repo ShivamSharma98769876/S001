@@ -100,5 +100,5 @@ INITIAL_PROFIT_BOOKING = 32
 SECOND_PROFIT_BOOKING = 40
 
 # Dashboard Configuration
-DASHBOARD_HOST = '127.0.0.1'  # Dashboard host address
+DASHBOARD_HOST = '0.0.0.0'  # Dashboard host address
 DASHBOARD_PORT = 8080  # Dashboard port number 
