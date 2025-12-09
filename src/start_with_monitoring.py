@@ -16,12 +16,12 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # Import dashboard configuration
 try:
     import config
-    DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '127.0.0.1')
-    DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 5000)
+    DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '0.0.0.0')
+    DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 8080)
 except (ImportError, AttributeError):
     # Fallback defaults if config not available
-    DASHBOARD_HOST = '127.0.0.1'
-    DASHBOARD_PORT = 5000
+    DASHBOARD_HOST = '0.0.0.0'
+    DASHBOARD_PORT = 8080
 
 def setup_logging():
     """Setup logging for the monitoring system"""
