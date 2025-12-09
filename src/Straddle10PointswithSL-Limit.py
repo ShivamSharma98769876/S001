@@ -2483,10 +2483,10 @@ def main():
     print("API CREDENTIALS SETUP")
     print("=" * 60)
     
-    Input_account = input("Account: ").strip()
-    Input_api_key = input("Api_key: ").strip()
-    Input_api_secret = input("Api_Secret: ").strip()
-    Input_request_token = input("Request_Token: ").strip()
+    # Input_account = input("Account: ").strip()
+    # Input_api_key = input("Api_key: ").strip()
+    # Input_api_secret = input("Api_Secret: ").strip()
+    # Input_request_token = input("Request_Token: ").strip()
     
     api_key = Input_api_key
     api_secret = Input_api_secret
