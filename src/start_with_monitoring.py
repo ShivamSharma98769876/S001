@@ -13,6 +13,16 @@ from datetime import datetime
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import dashboard configuration
+try:
+    import config
+    DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '127.0.0.1')
+    DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 5000)
+except (ImportError, AttributeError):
+    # Fallback defaults if config not available
+    DASHBOARD_HOST = '127.0.0.1'
+    DASHBOARD_PORT = 5000
+
 def setup_logging():
     """Setup logging for the monitoring system"""
     logging.basicConfig(
@@ -28,8 +38,9 @@ def start_config_dashboard():
     """Start the web dashboard in a separate thread"""
     try:
         from config_dashboard import start_dashboard
-        logging.info("[DASHBOARD] Starting web dashboard...")
-        start_dashboard(host='127.0.0.1', port=5000, debug=False)
+        logging.info(f"[DASHBOARD] Starting web dashboard on {DASHBOARD_HOST}:{DASHBOARD_PORT}...")
+        # Pass None to use config values from config_dashboard.py
+        start_dashboard(host=None, port=None, debug=False)
     except Exception as e:
         logging.error(f"[DASHBOARD] Failed to start dashboard: {e}")
 
@@ -55,7 +66,7 @@ def main():
     # Give dashboard time to start
     time.sleep(2)
     
-    print("\nWeb Dashboard: http://127.0.0.1:5000")
+    print(f"\nWeb Dashboard: http://{DASHBOARD_HOST}:{DASHBOARD_PORT}")
     print("Config Monitor: Active")
     print("Auto-reload: Enabled")
     print("\n" + "=" * 60)
@@ -63,7 +74,33 @@ def main():
     try:
         # Import and run the main strategy
         import importlib.util
-        spec = importlib.util.spec_from_file_location("strategy", "Straddle10PointswithSL-Limit.py")
+        
+        # Get the correct path to the strategy file
+        # Strategy file is at: PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py
+        script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        strategy_file = os.path.join(script_dir, 'src', 'Straddle10PointswithSL-Limit.py')
+        
+        # Fallback to absolute path if relative doesn't work
+        if not os.path.exists(strategy_file):
+            abs_path = r'C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py'
+            if os.path.exists(abs_path):
+                strategy_file = abs_path
+            else:
+                # Last fallback: check old location
+                old_path = os.path.join(script_dir, 'Straddle10PointswithSL-Limit.py')
+                if os.path.exists(old_path):
+                    strategy_file = old_path
+        
+        if not os.path.exists(strategy_file):
+            logging.error(f"[STARTUP] Strategy file not found. Checked:")
+            logging.error(f"  1. {os.path.join(script_dir, 'src', 'Straddle10PointswithSL-Limit.py')}")
+            logging.error(f"  2. {abs_path if 'abs_path' in locals() else 'N/A'}")
+            logging.error(f"  3. {os.path.join(script_dir, 'Straddle10PointswithSL-Limit.py')}")
+            logging.error("[STARTUP] Please ensure the strategy file exists at one of these locations.")
+            return
+        
+        logging.info(f"[STARTUP] Loading strategy from: {strategy_file}")
+        spec = importlib.util.spec_from_file_location("strategy", strategy_file)
         strategy_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(strategy_module)
         strategy_main = strategy_module.main

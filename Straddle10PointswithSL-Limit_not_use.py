@@ -1685,7 +1685,7 @@ def place_order(strike, transaction_type, is_amo, quantity):
             order_type=kite.ORDER_TYPE_MARKET,
             price=limit_price,
             product=kite.PRODUCT_NRML,
-            tag="Automation"
+            tag="S0001"
         )
         logging.info(f"Order placed successfully. ID: {order_id}, LTP : {ltp}")
         return order_id
@@ -1708,7 +1708,7 @@ def place_stop_loss_order(strike, transaction_type, stop_loss_price, quantity):
             order_type=kite.ORDER_TYPE_SL,
             trigger_price=stop_loss_price,
             product=kite.PRODUCT_NRML,
-            tag="Automation"
+            tag="S0001"
         )
         logging.info(f"Stop-loss order placed successfully. ID: {order_id}")
         return order_id

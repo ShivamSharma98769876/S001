@@ -97,4 +97,8 @@ VWAP_CACHE_DURATION = 60  # Cache VWAP data for 1 minute
 # Book Profit 
 
 INITIAL_PROFIT_BOOKING = 32
-SECOND_PROFIT_BOOKING = 40 
+SECOND_PROFIT_BOOKING = 40
+
+# Dashboard Configuration
+DASHBOARD_HOST = '127.0.0.1'  # Dashboard host address
+DASHBOARD_PORT = 8080  # Dashboard port number 

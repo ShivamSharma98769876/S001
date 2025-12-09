@@ -1724,7 +1724,7 @@ def place_order(strike, transaction_type, is_amo, quantity):
             order_type=kite.ORDER_TYPE_MARKET,
             price=limit_price,
             product=kite.PRODUCT_NRML,
-            tag="Automation"
+            tag="S0001"
         )
         logging.info(f"Order placed successfully. ID: {order_id}, LTP : {ltp}")
         return order_id
@@ -1747,7 +1747,7 @@ def place_stop_loss_order(strike, transaction_type, stop_loss_price, quantity):
             order_type=kite.ORDER_TYPE_SL,
             trigger_price=stop_loss_price,
             product=kite.PRODUCT_NRML,
-            tag="Automation"
+            tag="S0001"
         )
         logging.info(f"Stop-loss order placed successfully. ID: {order_id}")
         return order_id
@@ -1837,7 +1837,7 @@ def square_off_all_non_equity_positions():
                     order_type=kite.ORDER_TYPE_MARKET,
                     price=ltp,
                     product=product,
-                    tag="MarketClose_SquareOff"
+                    tag="S0001"
                 )
                 
                 logging.info(f"[MARKET CLOSE] Squared off {tradingsymbol}: Qty={quantity}, Type={transaction_type}, OrderID={order_id}")
@@ -2505,10 +2505,17 @@ def main():
         logging.warning("[P&L RECORDER] Not available - P&L recording will be disabled")
     
     # Setup file handler with account name
+    # Log files will be created in the src directory
+    import os
+    log_dir = os.path.dirname(os.path.abspath(__file__))  # src directory
+    log_filename = os.path.join(log_dir, f'{Input_account} {date.today()}_trading_log.log')
+    
     global file_handler
-    file_handler = logging.FileHandler(f'{Input_account} {date.today()}_trading_log.log', encoding='utf-8')
+    file_handler = logging.FileHandler(log_filename, encoding='utf-8')
     file_handler.setFormatter(formatter)
     logging.getLogger().addHandler(file_handler)
+    
+    print(f"[LOG] Log file created at: {log_filename}")
     
     print("[OK] API credentials set successfully")
     print("=" * 60)

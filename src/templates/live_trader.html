@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Trader - Zero Touch Strangle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .header-title i {
+            font-size: 32px;
+            color: var(--primary-color);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.connected {
+            background: var(--success-color);
+            box-shadow: 0 0 8px var(--success-color);
+        }
+
+        .status-dot.disconnected {
+            background: var(--danger-color);
+            box-shadow: 0 0 8px var(--danger-color);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge.authenticated {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-badge.not-authenticated {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .status-badge.engine-running {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-badge.engine-stopped {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .header-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Status Cards Row */
+        .status-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .status-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .status-card.success {
+            border-left-color: var(--success-color);
+        }
+
+        .status-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .status-card.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .status-card-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .status-card-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .panel-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .pyramiding-config {
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .pyramiding-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pyramiding-item:last-child {
+            border-bottom: none;
+        }
+
+        .pyramiding-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .pyramiding-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Logs Section */
+        .logs-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .logs-container {
+            background: #0a0e1a;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 4px 0;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+        }
+
+        .log-entry.success {
+            color: #34d399;
+        }
+
+        .log-entry.warning {
+            color: #fbbf24;
+        }
+
+        .log-entry.error {
+            color: #f87171;
+        }
+
+        .log-timestamp {
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--danger-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            color: var(--danger-color);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">
+                    <i class="fas fa-play-circle"></i>
+                    <h1>Live Trader</h1>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="status-indicator" id="connectionStatus">
+                    <span class="status-dot disconnected" id="connectionDot"></span>
+                    <span id="connectionText">Disconnected</span>
+                </div>
+                <div class="status-badge not-authenticated" id="kiteStatus">
+                    <i class="fas fa-plug"></i>
+                    <span>Kite: Not Connected</span>
+                </div>
+                <div class="status-badge engine-stopped" id="engineStatus">
+                    <i class="fas fa-cog"></i>
+                    <span>Engine: Stopped</span>
+                </div>
+                <a href="/" class="header-btn primary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="status-cards">
+            <div class="status-card">
+                <div class="status-card-label">Connection</div>
+                <div class="status-card-value" id="connectionStatusValue">Disconnected</div>
+            </div>
+            <div class="status-card success" id="engineStatusCard">
+                <div class="status-card-label">Engine Status</div>
+                <div class="status-card-value" id="engineStatusValue">Stopped</div>
+            </div>
+            <div class="status-card" id="kiteStatusCard">
+                <div class="status-card-label">Kite Connectivity</div>
+                <div class="status-card-value" id="kiteStatusValue">Not Connected</div>
+            </div>
+            <div class="status-card">
+                <div class="status-card-label">Trading Segment</div>
+                <div class="status-card-value" id="tradingSegmentValue">NIFTY</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Configuration Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-cog"></i> Trading Configuration</h2>
+                </div>
+                
+                <form id="liveTraderForm">
+                    <div class="form-group">
+                        <label for="callQuantity">Call Quantity</label>
+                        <input type="number" id="callQuantity" name="callQuantity" min="1" value="50" required>
+                        <small>Number of call options to trade</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="putQuantity">Put Quantity</label>
+                        <input type="number" id="putQuantity" name="putQuantity" min="1" value="50" required>
+                        <small>Number of put options to trade</small>
+                    </div>
+
+                    <!-- Pyramiding Configuration (Miniature) -->
+                    <div class="pyramiding-config">
+                        <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+                            <i class="fas fa-layer-group"></i> Pyramiding Configuration
+                        </div>
+                        <div class="pyramiding-item">
+                            <span class="pyramiding-label">Segment:</span>
+                            <span class="pyramiding-value" id="pyramidingSegment">NIFTY</span>
+                        </div>
+                        <div class="pyramiding-item">
+                            <span class="pyramiding-label">Call Qty:</span>
+                            <span class="pyramiding-value" id="pyramidingCallQty">50</span>
+                        </div>
+                        <div class="pyramiding-item">
+                            <span class="pyramiding-label">Put Qty:</span>
+                            <span class="pyramiding-value" id="pyramidingPutQty">50</span>
+                        </div>
+                    </div>
+
+                    <div class="error-message" id="errorMessage"></div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-success" id="startBtn">
+                            <i class="fas fa-play"></i> Start Live Trader
+                        </button>
+                        <button type="button" class="btn btn-danger" id="stopBtn" onclick="stopLiveTrader()" disabled>
+                            <i class="fas fa-stop"></i> Stop Live Trader
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-info-circle"></i> Strategy Information</h2>
+                </div>
+                <div style="color: var(--text-secondary); line-height: 1.8;">
+                    <p><strong>Strategy:</strong> Zero Touch Strangle</p>
+                    <p><strong>Description:</strong> An advanced zero touch options engine that automates the full lifecycle of a short strangle: entry, stop loss placement, re entry after SL hits, and continuous delta based rebalancing.</p>
+                    <p style="margin-top: 16px;"><strong>Features:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 8px;">
+                        <li>Automated entry and exit</li>
+                        <li>Dynamic stop loss management</li>
+                        <li>Delta-based rebalancing</li>
+                        <li>Real-time position monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Trading Logs -->
+        <div class="logs-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-terminal"></i> Live Trading Logs</h2>
+                <button class="btn btn-success" onclick="refreshLogs()" style="flex: 0; padding: 8px 16px;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="logs-container" id="logsContainer">
+                <div class="log-entry info">
+                    <span class="log-timestamp">[--:--:--]</span>
+                    <span>Waiting for logs...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isRunning = false;
+        let logsInterval = null;
+        let lastLogText = null; // Track the last log line we've displayed (for tail-like behavior)
+        let isInitialLoad = true; // Track if this is the first load
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkStatus();
+            loadLogs();
+            
+            // Set up form submission
+            document.getElementById('liveTraderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                startLiveTrader();
+            });
+
+            // Update pyramiding config when quantities change
+            document.getElementById('callQuantity').addEventListener('input', updatePyramidingConfig);
+            document.getElementById('putQuantity').addEventListener('input', updatePyramidingConfig);
+
+            // Auto-refresh status every 5 seconds
+            setInterval(checkStatus, 5000);
+            
+            // Auto-refresh logs every 3 seconds
+            logsInterval = setInterval(loadLogs, 3000);
+        });
+
+        function updatePyramidingConfig() {
+            const callQty = document.getElementById('callQuantity').value;
+            const putQty = document.getElementById('putQuantity').value;
+            document.getElementById('pyramidingCallQty').textContent = callQty || '50';
+            document.getElementById('pyramidingPutQty').textContent = putQty || '50';
+        }
+
+        async function checkStatus() {
+            try {
+                // Check authentication
+                const authResponse = await fetch('/api/auth/status');
+                const authData = await authResponse.json();
+                
+                // Update Kite status
+                const kiteStatus = document.getElementById('kiteStatus');
+                const kiteStatusValue = document.getElementById('kiteStatusValue');
+                const kiteStatusCard = document.getElementById('kiteStatusCard');
+                
+                if (authData.authenticated) {
+                    kiteStatus.className = 'status-badge authenticated';
+                    kiteStatus.innerHTML = '<i class="fas fa-plug"></i><span>Kite: Connected</span>';
+                    kiteStatusValue.textContent = 'Connected';
+                    kiteStatusCard.className = 'status-card success';
+                } else {
+                    kiteStatus.className = 'status-badge not-authenticated';
+                    kiteStatus.innerHTML = '<i class="fas fa-plug"></i><span>Kite: Not Connected</span>';
+                    kiteStatusValue.textContent = 'Not Connected';
+                    kiteStatusCard.className = 'status-card danger';
+                }
+
+                // Check connection
+                const connectionDot = document.getElementById('connectionDot');
+                const connectionText = document.getElementById('connectionText');
+                const connectionStatusValue = document.getElementById('connectionStatusValue');
+                
+                if (authData.authenticated) {
+                    connectionDot.className = 'status-dot connected';
+                    connectionText.textContent = 'Connected';
+                    connectionStatusValue.textContent = 'Connected';
+                } else {
+                    connectionDot.className = 'status-dot disconnected';
+                    connectionText.textContent = 'Disconnected';
+                    connectionStatusValue.textContent = 'Disconnected';
+                }
+
+                // Check engine status
+                const engineStatus = document.getElementById('engineStatus');
+                const engineStatusValue = document.getElementById('engineStatusValue');
+                const engineStatusCard = document.getElementById('engineStatusCard');
+                
+                if (isRunning) {
+                    engineStatus.className = 'status-badge engine-running';
+                    engineStatus.innerHTML = '<i class="fas fa-cog fa-spin"></i><span>Engine: Running</span>';
+                    engineStatusValue.textContent = 'Running';
+                    engineStatusCard.className = 'status-card success';
+                } else {
+                    engineStatus.className = 'status-badge engine-stopped';
+                    engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
+                    engineStatusValue.textContent = 'Stopped';
+                    engineStatusCard.className = 'status-card danger';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        async function startLiveTrader() {
+            const callQuantity = parseInt(document.getElementById('callQuantity').value);
+            const putQuantity = parseInt(document.getElementById('putQuantity').value);
+            const errorEl = document.getElementById('errorMessage');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+
+            if (!callQuantity || callQuantity <= 0) {
+                errorEl.textContent = 'Please enter a valid Call Quantity';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            if (!putQuantity || putQuantity <= 0) {
+                errorEl.textContent = 'Please enter a valid Put Quantity';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            try {
+                errorEl.classList.remove('show');
+                startBtn.disabled = true;
+                startBtn.innerHTML = '<span class="loading-spinner"></span> Starting...';
+
+                const response = await fetch('/api/live-trader/start', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        callQuantity: callQuantity,
+                        putQuantity: putQuantity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    isRunning = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Live Trader';
+                    checkStatus();
+                    addLog('success', 'Live Trader started successfully!');
+                } else {
+                    errorEl.textContent = data.error || 'Failed to start Live Trader';
+                    errorEl.classList.add('show');
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Live Trader';
+                }
+            } catch (error) {
+                console.error('Start error:', error);
+                errorEl.textContent = 'Error: ' + error.message;
+                errorEl.classList.add('show');
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Live Trader';
+            }
+        }
+
+        async function stopLiveTrader() {
+            const stopBtn = document.getElementById('stopBtn');
+            const startBtn = document.getElementById('startBtn');
+
+            try {
+                stopBtn.disabled = true;
+                stopBtn.innerHTML = '<span class="loading-spinner"></span> Stopping...';
+
+                const response = await fetch('/api/strategy/stop', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    isRunning = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    stopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Live Trader';
+                    checkStatus();
+                    addLog('warning', 'Live Trader stopped');
+                } else {
+                    stopBtn.disabled = false;
+                    stopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Live Trader';
+                    addLog('error', 'Error stopping Live Trader: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Stop error:', error);
+                stopBtn.disabled = false;
+                stopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Live Trader';
+                addLog('error', 'Error stopping Live Trader: ' + error.message);
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                // Get logs from strategy process
+                const response = await fetch('/api/live-trader/logs');
+                const data = await response.json();
+                
+                if (data.success && data.logs && data.logs.length > 0) {
+                    const logsContainer = document.getElementById('logsContainer');
+                    
+                    // Check if user is at bottom before updating
+                    const wasAtBottom = logsContainer.scrollHeight - logsContainer.scrollTop <= logsContainer.clientHeight + 50;
+                    
+                    // Show log file path if available (only once)
+                    if (data.log_file_path && !logsContainer.querySelector('.log-path-info')) {
+                        const pathInfo = document.createElement('div');
+                        pathInfo.className = 'log-path-info';
+                        pathInfo.style.cssText = 'padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 4px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary);';
+                        pathInfo.innerHTML = `<i class="fas fa-file-alt"></i> Log File: <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">${data.log_file_path}</code>`;
+                        logsContainer.insertBefore(pathInfo, logsContainer.firstChild);
+                    }
+                    
+                    // On first load, show all logs
+                    if (isInitialLoad) {
+                        logsContainer.innerHTML = '';
+                        // Re-add path info
+                        if (data.log_file_path) {
+                            const pathInfo = document.createElement('div');
+                            pathInfo.className = 'log-path-info';
+                            pathInfo.style.cssText = 'padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 4px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary);';
+                            pathInfo.innerHTML = `<i class="fas fa-file-alt"></i> Log File: <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">${data.log_file_path}</code>`;
+                            logsContainer.appendChild(pathInfo);
+                        }
+                        
+                        // Add all logs on first load
+                        data.logs.forEach(log => {
+                            const entry = parseLogEntry(log);
+                            logsContainer.appendChild(entry);
+                        });
+                        
+                        lastLogText = data.logs[data.logs.length - 1]; // Store last log
+                        isInitialLoad = false;
+                        
+                        // Scroll to bottom on first load
+                        setTimeout(() => {
+                            logsContainer.scrollTop = logsContainer.scrollHeight;
+                        }, 100);
+                    } else {
+                        // On subsequent loads, only append new logs (tail behavior)
+                        let startIndex = 0;
+                        
+                        // Find where we left off
+                        if (lastLogText) {
+                            startIndex = data.logs.findIndex(log => log === lastLogText);
+                            if (startIndex === -1) {
+                                // Last log not found, might be a new file or cleared, start from end
+                                startIndex = Math.max(0, data.logs.length - 50); // Show last 50 if can't find
+                            } else {
+                                startIndex += 1; // Start from next log after last one we saw
+                            }
+                        }
+                        
+                        // Append only new logs
+                        const newLogs = data.logs.slice(startIndex);
+                        if (newLogs.length > 0) {
+                            newLogs.forEach(log => {
+                                const entry = parseLogEntry(log);
+                                logsContainer.appendChild(entry); // Always append to bottom
+                            });
+                            
+                            // Update last log text
+                            lastLogText = data.logs[data.logs.length - 1];
+                            
+                            // Limit to last 1000 logs to prevent memory issues
+                            const allLogEntries = logsContainer.querySelectorAll('.log-entry:not(.log-path-info)');
+                            if (allLogEntries.length > 1000) {
+                                const toRemove = allLogEntries.length - 1000;
+                                const pathInfo = logsContainer.querySelector('.log-path-info');
+                                for (let i = 0; i < toRemove; i++) {
+                                    // Remove from top (after path info)
+                                    if (pathInfo && pathInfo.nextSibling) {
+                                        pathInfo.nextSibling.remove();
+                                    } else if (logsContainer.firstChild && logsContainer.firstChild !== pathInfo) {
+                                        logsContainer.firstChild.remove();
+                                    }
+                                }
+                            }
+                            
+                            // Auto-scroll to bottom only if user was already at bottom
+                            if (wasAtBottom) {
+                                setTimeout(() => {
+                                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                                }, 50);
+                            }
+                        }
+                    }
+                } else if (data.success && data.logs && data.logs.length === 0) {
+                    const logsContainer = document.getElementById('logsContainer');
+                    if (isInitialLoad || logsContainer.children.length === 0 || (logsContainer.children.length === 1 && logsContainer.querySelector('.log-path-info'))) {
+                        logsContainer.innerHTML = '<div class="log-entry info"><span>No logs available yet. Logs will appear here once the strategy starts running.</span></div>';
+                        isInitialLoad = true;
+                        lastLogText = null;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        function parseLogEntry(logText) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            // Extract timestamp from log line if present (format: YYYY-MM-DD HH:MM:SS,mmm)
+            let timestamp = '';
+            let logMessage = logText;
+            
+            // Try to parse timestamp from log format: "2025-12-09 10:32:00,048 - INFO - ..."
+            const timestampMatch = logText.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})/);
+            if (timestampMatch) {
+                timestamp = timestampMatch[1].replace(',', '.');
+                // Extract the actual log message (everything after timestamp and level)
+                const messageMatch = logText.match(/^.*? - \w+ - (.*)$/);
+                if (messageMatch) {
+                    logMessage = messageMatch[1];
+                } else {
+                    // If pattern doesn't match, show full log
+                    logMessage = logText;
+                }
+            } else {
+                // Fallback to current time if no timestamp in log
+                timestamp = new Date().toLocaleTimeString();
+            }
+            
+            const timestampSpan = document.createElement('span');
+            timestampSpan.className = 'log-timestamp';
+            timestampSpan.textContent = `[${timestamp}]`;
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = logMessage || logText;
+            
+            // Determine log level from log text
+            const logLower = logText.toLowerCase();
+            if (logLower.includes('error') || logLower.includes('critical') || logLower.includes('exception')) {
+                entry.className += ' error';
+            } else if (logLower.includes('warning') || logLower.includes('warn')) {
+                entry.className += ' warning';
+            } else if (logLower.includes('success') || logLower.includes('started') || logLower.includes('completed')) {
+                entry.className += ' success';
+            } else if (logLower.includes('info')) {
+                entry.className += ' info';
+            } else {
+                entry.className += ' info'; // Default to info
+            }
+            
+            entry.appendChild(timestampSpan);
+            entry.appendChild(textSpan);
+            
+            return entry;
+        }
+
+        function addLog(level, message) {
+            const logsContainer = document.getElementById('logsContainer');
+            const entry = parseLogEntry(message);
+            logsContainer.appendChild(entry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function refreshLogs() {
+            // Reset to force full refresh when manually refreshing
+            isInitialLoad = true;
+            lastLogText = null;
+            loadLogs();
+        }
+    </script>
+</body>
+</html>
+

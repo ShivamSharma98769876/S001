@@ -253,7 +253,7 @@ class KiteClient:
                 order_type=self.kite.ORDER_TYPE_MARKET,
                 price=ltp,
                 product=self.kite.PRODUCT_NRML,
-                tag="Automation"
+                tag="S0001"
             )
             logging.info(f"Order placed successfully. ID: {order_id}, LTP: {ltp}")
             return order_id
@@ -277,7 +277,7 @@ class KiteClient:
                 order_type=self.kite.ORDER_TYPE_SL,
                 trigger_price=stop_loss_price,
                 product=self.kite.PRODUCT_NRML,
-                tag="Automation"
+                tag="S0001"
             )
             logging.info(f"Stop-loss order placed successfully. ID: {order_id}")
             return order_id
