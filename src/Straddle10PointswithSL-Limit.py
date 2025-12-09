@@ -2531,8 +2531,8 @@ def main():
     print("=" * 60)
     
     try:
-        call_quantity = int(input("Enter Call Quantity: ").strip())
-        put_quantity = int(input("Enter Put Quantity: ").strip())
+        # call_quantity = int(input("Enter Call Quantity: ").strip())
+        # put_quantity = int(input("Enter Put Quantity: ").strip())
         
         print(f"[OK] Call Quantity: {call_quantity}")
         print(f"[OK] Put Quantity: {put_quantity}")
