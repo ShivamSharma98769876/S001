@@ -70,6 +70,7 @@ strategy_running = False
 kite_client_global = None
 kite_api_key = None
 kite_api_secret = None
+account_holder_name = None  # Store account holder name from profile
 
 # Global trading credentials (for main trading script)
 trading_credentials = {
@@ -92,12 +93,6 @@ def dashboard():
     from environment import is_azure_environment
     
     # Always show the landing page first
-    # Check if credentials are set (for displaying status)
-    credentials_set = False
-    if is_azure_environment():
-        global trading_credentials
-        credentials_set = trading_credentials['set']
-    
     # Get API key for authentication link (if available)
     api_key = None
     try:
@@ -110,11 +105,15 @@ def dashboard():
     except:
         pass
     
-    # Pass credentials status to template so it can show appropriate UI
+    # Get account holder name if authenticated
+    global account_holder_name
+    account_name_display = account_holder_name if account_holder_name else None
+    
+    # Pass account name to template
     return render_template('config_dashboard.html', 
                          api_key=api_key, 
-                         credentials_set=credentials_set,
-                         is_azure=is_azure_environment())
+                         is_azure=is_azure_environment(),
+                         account_holder_name=account_name_display)
 
 @app.route('/credentials')
 def credentials_input():
@@ -932,8 +931,9 @@ def start_live_trader():
         api_secret = kite_client_global.api_secret
         access_token = kite_client_global.access_token
         
-        # Get account name (default to 'TRADING_ACCOUNT')
-        account = getattr(kite_client_global, 'account', 'TRADING_ACCOUNT') or 'TRADING_ACCOUNT'
+        # Get account name from authenticated client (use account_holder_name if available)
+        global account_holder_name
+        account = account_holder_name or getattr(kite_client_global, 'account', 'TRADING_ACCOUNT') or 'TRADING_ACCOUNT'
         
         # Get the strategy file path
         # Use the correct path: PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py
@@ -1055,25 +1055,43 @@ def start_live_trader():
         strategy_thread.start()
         
         # Give it a moment to start
-        time.sleep(0.5)
+        time.sleep(1.0)
         
         # Check if process started successfully
-        if strategy_process is None or (strategy_process.poll() is not None and strategy_process.returncode != 0):
+        if strategy_process is None:
             strategy_running = False
+            logging.error("[LIVE TRADER] Strategy process is None after start attempt")
             return jsonify({
                 'success': False,
-                'error': 'Failed to start strategy process'
+                'error': 'Failed to start strategy process - process is None'
             }), 500
         
+        # Check if process has already terminated with error
+        if strategy_process.poll() is not None:
+            returncode = strategy_process.returncode
+            strategy_running = False
+            error_msg = f'Strategy process exited immediately with code {returncode}'
+            logging.error(f"[LIVE TRADER] {error_msg}")
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 500
+        
+        # Process started successfully
+        logging.info("[LIVE TRADER] Strategy process started successfully")
         return jsonify({
             'success': True,
-            'message': 'Live Trader started successfully'
+            'message': 'Live Trader started successfully',
+            'process_id': strategy_process.pid if strategy_process else None
         })
         
     except Exception as e:
+        logging.error(f"[LIVE TRADER] Error starting Live Trader: {e}")
+        import traceback
+        logging.error(f"[LIVE TRADER] Traceback: {traceback.format_exc()}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': f'Failed to start Live Trader: {str(e)}'
         }), 500
 
 @app.route('/api/strategy/stop', methods=['POST'])
@@ -1135,12 +1153,18 @@ def auth_status():
         has_access_token = False
         
         # Check global kite client first
+        global account_holder_name
         if kite_client_global and hasattr(kite_client_global, 'kite'):
             try:
                 # Try to get profile to verify authentication
-                kite_client_global.kite.profile()
+                profile = kite_client_global.kite.profile()
                 authenticated = True
                 has_access_token = kite_client_global.access_token is not None
+                
+                # Update account holder name if available
+                if profile:
+                    account_holder_name = profile.get('user_name') or profile.get('user_id') or account_holder_name or 'Trading Account'
+                    kite_client_global.account = account_holder_name
             except:
                 authenticated = False
                 has_access_token = kite_client_global.access_token is not None
@@ -1157,7 +1181,8 @@ def auth_status():
         
         return jsonify({
             'authenticated': authenticated,
-            'has_access_token': has_access_token
+            'has_access_token': has_access_token,
+            'account_name': account_holder_name if authenticated else None
         })
     except Exception as e:
         return jsonify({
@@ -1224,11 +1249,19 @@ def authenticate():
             )
             
             # Verify authentication by getting profile
-            kite_client_global.kite.profile()
+            profile = kite_client_global.kite.profile()
+            
+            # Extract and store account holder name
+            global account_holder_name
+            account_holder_name = profile.get('user_name') or profile.get('user_id') or 'Trading Account'
+            kite_client_global.account = account_holder_name  # Update account name in client
+            
+            logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
             return jsonify({
                 'success': True,
-                'message': 'Authentication successful'
+                'message': 'Authentication successful',
+                'account_name': account_holder_name
             })
         except Exception as e:
             return jsonify({
@@ -1277,7 +1310,14 @@ def set_access_token():
             )
             
             # Verify the token works by getting profile
-            kite_client_global.kite.profile()
+            profile = kite_client_global.kite.profile()
+            
+            # Extract and store account holder name
+            global account_holder_name
+            account_holder_name = profile.get('user_name') or profile.get('user_id') or 'Trading Account'
+            kite_client_global.account = account_holder_name  # Update account name in client
+            
+            logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
             # Store API key if provided
             if data.get('api_key'):
@@ -1286,7 +1326,8 @@ def set_access_token():
             return jsonify({
                 'success': True,
                 'message': 'Connected successfully',
-                'authenticated': True
+                'authenticated': True,
+                'account_name': account_holder_name
             })
         except Exception as e:
             return jsonify({

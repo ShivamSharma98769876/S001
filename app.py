@@ -946,19 +946,6 @@ def start_bot(api_key, api_secret, request_token, account, call_quantity, put_qu
                 with col3:
                     st.metric("Trend", f"{vix_summary['trend_direction']} {vix_summary['trend']}")
                 
-                # Market sentiment
-                current_vix = vix_summary['current_vix']
-                if current_vix:
-                    if current_vix < 15:
-                        sentiment = "🟢 Low Volatility (Bullish)"
-                    elif current_vix < 25:
-                        sentiment = "🟡 Moderate Volatility (Neutral)"
-                    elif current_vix < 35:
-                        sentiment = "🟠 High Volatility (Caution)"
-                    else:
-                        sentiment = "🔴 Very High Volatility (Bearish)"
-                    
-                    st.info(f"**Market Sentiment:** {sentiment}")
         except Exception as e:
             st.warning(f"Could not fetch VIX data: {e}")
         

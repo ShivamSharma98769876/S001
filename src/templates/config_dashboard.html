@@ -907,6 +907,12 @@
                 </div>
                 </div>
             <div class="header-controls">
+                {% if account_holder_name %}
+                <div class="account-name-display" style="margin-right: 15px; padding: 8px 16px; background: rgba(102, 126, 234, 0.2); border-radius: 6px; border: 1px solid rgba(102, 126, 234, 0.3);">
+                    <i class="fas fa-user" style="margin-right: 8px;"></i>
+                    <span id="accountNameDisplay" style="font-weight: 600; color: var(--text-primary);">{{ account_holder_name }}</span>
+                </div>
+                {% endif %}
                 <div class="status-indicator" id="connectionStatus">
                     <span class="status-dot connected" id="connectionDot"></span>
                     <span id="connectionText">Connected</span>
@@ -923,21 +929,6 @@
                 </a>
             </div>
         </div>
-        
-        <!-- Credentials Banner (Azure) -->
-        {% if is_azure and not credentials_set %}
-        <div id="credentialsBanner" class="credentials-banner" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 24px; border-radius: 8px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">
-            <div style="flex: 1;">
-                <strong><i class="fas fa-exclamation-triangle"></i> Trading Credentials Required</strong>
-                <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.95;">
-                    Please enter your trading credentials to start the bot. Click the button below to set them up.
-                </p>
-            </div>
-            <a href="/credentials" class="header-btn" style="background: white; color: #d97706; margin-left: 20px; text-decoration: none;">
-                <i class="fas fa-key"></i> Enter Credentials
-            </a>
-        </div>
-        {% endif %}
         
         <!-- Description -->
         <div class="description-box">
@@ -1377,11 +1368,6 @@
             setInterval(checkAuthStatus, 10000);
             setInterval(checkConnectivity, 5000);
             
-            // Check if credentials are set (for Azure) - show banner if needed
-            {% if is_azure and not credentials_set %}
-            // On Azure and credentials not set - show notification banner
-            showCredentialsBanner();
-            {% else %}
             // Auto-show auth modal if not authenticated after 2 seconds
             setTimeout(async () => {
                 try {
@@ -1395,7 +1381,6 @@
                     console.error('Error checking initial auth:', error);
                 }
             }, 2000);
-            {% endif %}
         });
         
         // Theme Management
@@ -1704,7 +1689,25 @@
                     })
                 });
                 
-                const data = await response.json();
+                // Check if response is OK and has content
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error: ${response.status} - ${errorText}`);
+                }
+                
+                // Get response text first to check if it's valid JSON
+                const responseText = await response.text();
+                if (!responseText || responseText.trim() === '') {
+                    throw new Error('Empty response from server');
+                }
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (jsonError) {
+                    console.error('Invalid JSON response:', responseText);
+                    throw new Error(`Invalid response from server: ${jsonError.message}`);
+                }
                 
                 if (data.success) {
                     hideLiveTraderModal();
@@ -1969,11 +1972,22 @@
                         authStatusEl.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
                         authStatusEl.onclick = null;
                         authStatusEl.style.cursor = 'default';
+                        
+                        // Update account name display if available
+                        if (data.account_name) {
+                            updateAccountNameDisplay(data.account_name);
+                        }
                     } else {
                         authStatusEl.className = 'status-badge not-authenticated';
                         authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
                         authStatusEl.onclick = showAuthModal;
                         authStatusEl.style.cursor = 'pointer';
+                        
+                        // Hide account name if not authenticated
+                        const accountNameContainer = document.querySelector('.account-name-display');
+                        if (accountNameContainer) {
+                            accountNameContainer.style.display = 'none';
+                        }
                     }
                 }
             } catch (error) {
@@ -1983,6 +1997,37 @@
                     authStatusEl.className = 'status-badge not-authenticated';
                     authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
                     authStatusEl.onclick = showAuthModal;
+                }
+            }
+        }
+        
+        function updateAccountNameDisplay(accountName) {
+            const accountNameDisplay = document.getElementById('accountNameDisplay');
+            const headerControls = document.querySelector('.header-controls');
+            
+            if (accountName) {
+                if (accountNameDisplay) {
+                    accountNameDisplay.textContent = accountName;
+                } else {
+                    // Create account name display if it doesn't exist
+                    if (headerControls) {
+                        const accountDiv = document.createElement('div');
+                        accountDiv.className = 'account-name-display';
+                        accountDiv.style.cssText = 'margin-right: 15px; padding: 8px 16px; background: rgba(102, 126, 234, 0.2); border-radius: 6px; border: 1px solid rgba(102, 126, 234, 0.3); display: flex; align-items: center;';
+                        accountDiv.innerHTML = `<i class="fas fa-user" style="margin-right: 8px;"></i><span id="accountNameDisplay" style="font-weight: 600; color: var(--text-primary);">${accountName}</span>`;
+                        const connectionStatus = document.getElementById('connectionStatus');
+                        if (connectionStatus) {
+                            headerControls.insertBefore(accountDiv, connectionStatus);
+                        } else {
+                            headerControls.insertBefore(accountDiv, headerControls.firstChild);
+                        }
+                    }
+                }
+                
+                // Show the container
+                const accountNameContainer = accountNameDisplay ? accountNameDisplay.closest('.account-name-display') : document.querySelector('.account-name-display');
+                if (accountNameContainer) {
+                    accountNameContainer.style.display = 'flex';
                 }
             }
         }
@@ -2052,21 +2097,6 @@
             if (accessTokenApiKey) accessTokenApiKey.value = '';
         }
         
-        function showCredentialsBanner() {
-            // Banner is already shown in HTML if conditions are met
-            const banner = document.getElementById('credentialsBanner');
-            if (banner) {
-                banner.style.display = 'flex';
-            }
-        }
-        
-        function hideCredentialsBanner() {
-            const banner = document.getElementById('credentialsBanner');
-            if (banner) {
-                banner.style.display = 'none';
-            }
-        }
-        
         function switchAuthTab(tab) {
             const accessTokenTab = document.getElementById('tabAccessToken');
             const requestTokenTab = document.getElementById('tabRequestToken');
@@ -2123,6 +2153,10 @@
                 
                 if (data.success) {
                     hideAuthModal();
+                    // Update account name display if provided
+                    if (data.account_name) {
+                        updateAccountNameDisplay(data.account_name);
+                    }
                     checkAuthStatus();
                     checkConnectivity();
                     // Show success notification
@@ -2200,6 +2234,10 @@
                 
                 if (data.success) {
                     hideAuthModal();
+                    // Update account name display if provided
+                    if (data.account_name) {
+                        updateAccountNameDisplay(data.account_name);
+                    }
                     checkAuthStatus();
                     checkConnectivity();
                     // Show success notification

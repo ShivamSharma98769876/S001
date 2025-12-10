@@ -2952,17 +2952,6 @@ def display_vix_analysis():
                 # Display individual VIX values
                 print(f"[HISTORY] Last {VIX_HISTORICAL_DAYS} days VIX: {', '.join([f'{v:.2f}' for v in all_vix_values])}")
                 
-                # Market sentiment based on VIX
-                if current_vix_display < 15:
-                    sentiment = "[LOW] Low Volatility (Bullish)"
-                elif current_vix_display < 25:
-                    sentiment = "[MODERATE] Moderate Volatility (Neutral)"
-                elif current_vix_display < 35:
-                    sentiment = "[HIGH] High Volatility (Caution)"
-                else:
-                    sentiment = "[VERY HIGH] Very High Volatility (Bearish)"
-                
-                print(f"[SENTIMENT] {sentiment}")
                 
                 # Display VIX-based delta recommendation
                 try:

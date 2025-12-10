@@ -41,7 +41,7 @@ def get_log_directory():
     os.makedirs(log_dir, exist_ok=True)
     return log_dir
 
-def setup_azure_logging(logger_name='root'):
+def setup_azure_logging(logger_name='root', account_name=None):
     """
     Setup logging for Azure App Service
     Azure automatically captures stdout/stderr, so we configure both file and console logging
@@ -59,8 +59,12 @@ def setup_azure_logging(logger_name='root'):
     console_handler.setFormatter(formatter)
     console_handler.setLevel(logging.INFO)
     
-    # File handler for persistent logs
-    log_file = os.path.join(log_dir, 'trading_bot.log')
+    # File handler for persistent logs - use account name if provided
+    from datetime import date
+    if account_name:
+        log_file = os.path.join(log_dir, f'{account_name} {date.today()}_trading_log.log')
+    else:
+        log_file = os.path.join(log_dir, 'trading_bot.log')
     file_handler = logging.FileHandler(log_file, encoding='utf-8')
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
@@ -112,13 +116,17 @@ def setup_logging(account_name=None, logger_name='root'):
     Universal logging setup that works in both local and Azure environments
     """
     if is_azure_environment():
-        logger, log_file = setup_azure_logging(logger_name)
+        logger, log_file = setup_azure_logging(logger_name, account_name=account_name)
         logging.info(f"[ENV] Running in Azure App Service - Logs: {log_file}")
         logging.info(f"[ENV] Azure Log Stream: Available via Azure Portal > Log stream")
+        if account_name:
+            logging.info(f"[ENV] Account name: {account_name}")
         return logger, log_file
     else:
         logger, log_file = setup_local_logging(account_name=account_name, logger_name=logger_name)
         logging.info(f"[ENV] Running locally - Log file: {log_file}")
+        if account_name:
+            logging.info(f"[ENV] Account name: {account_name}")
         return logger, log_file
 
 def get_config_value(key, default=None):

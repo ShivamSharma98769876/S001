@@ -8,8 +8,7 @@ from datetime import datetime, time
 from config import (
     TARGET_DELTA_LOW, TARGET_DELTA_HIGH, MAX_STOP_LOSS_TRIGGER,
     MARKET_START_TIME, MARKET_END_TIME, TRADING_START_TIME,
-    STOP_LOSS_CONFIG, HEDGE_TRIGGER_POINTS, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING,
-    GREEKS_ANALYSIS_ENABLED, GREEKS_ANALYSIS_INTERVAL
+    STOP_LOSS_CONFIG, HEDGE_TRIGGER_POINTS, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
 )
 from src.kite_client import KiteClient
 from src.options_calculator import OptionsCalculator
@@ -17,8 +16,6 @@ from src.vix_calculator import VIXCalculator
 from src.vix_delta_manager import VIXDeltaManager
 
 # Greek analysis removed - not needed for core trading functionality
-    logging.warning("Greeks Sentiment Analyzer not available. Sentiment analysis will be skipped.")
-
 
 class TradingBot:
     def __init__(self, api_key, api_secret, request_token, account, call_quantity, put_quantity):
