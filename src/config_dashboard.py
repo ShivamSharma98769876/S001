@@ -87,15 +87,16 @@ def set_config_monitor(monitor):
 
 @app.route('/')
 def dashboard():
-    """Main dashboard page"""
-    # Check if running on Azure and credentials not set - redirect to credentials page
+    """Main dashboard page - Zero Touch Strangle landing page"""
     import os
     from environment import is_azure_environment
     
+    # Always show the landing page first
+    # Check if credentials are set (for displaying status)
+    credentials_set = False
     if is_azure_environment():
         global trading_credentials
-        if not trading_credentials['set']:
-            return redirect(url_for('credentials_input'))
+        credentials_set = trading_credentials['set']
     
     # Get API key for authentication link (if available)
     api_key = None
@@ -109,7 +110,11 @@ def dashboard():
     except:
         pass
     
-    return render_template('config_dashboard.html', api_key=api_key)
+    # Pass credentials status to template so it can show appropriate UI
+    return render_template('config_dashboard.html', 
+                         api_key=api_key, 
+                         credentials_set=credentials_set,
+                         is_azure=is_azure_environment())
 
 @app.route('/credentials')
 def credentials_input():

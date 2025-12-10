@@ -62,6 +62,21 @@ No code changes needed - it works in both environments!
 
 See [NETWORK_CONFIGURATION.md](NETWORK_CONFIGURATION.md) for detailed network settings.
 
+## Running Locally
+
+**Main file to run**: `src/start_with_monitoring.py`
+
+```bash
+python src/start_with_monitoring.py
+```
+
+This will:
+- Start the web dashboard at `http://localhost:8080`
+- Prompt for credentials via CLI
+- Start the trading bot with all features
+
+See [LOCAL_RUN_GUIDE.md](LOCAL_RUN_GUIDE.md) for detailed local run instructions.
+
 ## Full Documentation
 
 See [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md) for complete guide.

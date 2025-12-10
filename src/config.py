@@ -15,7 +15,7 @@ EXPIRY_DAY = NIFTY_EXPIRY_DAY  # Default expiry day for the underlying
 
 # Market Hours
 MARKET_START_TIME = time(9, 15)
-MARKET_END_TIME = time(14, 50)
+MARKET_END_TIME = time(23, 50)
 TRADING_START_TIME = time(9, 40)
 
 # Stop Loss Configuration by Day
