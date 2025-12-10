@@ -2,6 +2,7 @@
 StockSage Configuration file for the AI-Powered Options Trading Bot
 """
 from datetime import time
+import os
 
 # Trading Parameters
 TARGET_DELTA_LOW = 0.29  # Lower bound for target delta
@@ -101,4 +102,6 @@ SECOND_PROFIT_BOOKING = 40
 
 # Dashboard Configuration
 DASHBOARD_HOST = '0.0.0.0'  # Dashboard host address
-DASHBOARD_PORT = 8080  # Dashboard port number 
+# Port will be auto-detected from Azure environment or use default
+import os
+DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))  # Dashboard port number 

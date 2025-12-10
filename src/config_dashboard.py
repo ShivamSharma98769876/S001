@@ -11,6 +11,7 @@ import subprocess
 from datetime import datetime, timedelta
 import threading
 import time
+import logging
 
 # Add parent directory to path for config imports
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,13 +31,28 @@ try:
         # Fallback to direct import if src is not in path
         import config
     
-    DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '127.0.0.1')
-    DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 5000)
+    DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '0.0.0.0')
+    DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 8080)
+    
+    # Check for Azure environment - Azure provides port via HTTP_PLATFORM_PORT
+    if os.getenv('HTTP_PLATFORM_PORT'):
+        DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT'))
+        print(f"[CONFIG] Azure environment detected - using port from HTTP_PLATFORM_PORT: {DASHBOARD_PORT}")
+    elif os.getenv('PORT'):  # Alternative Azure port variable
+        DASHBOARD_PORT = int(os.getenv('PORT'))
+        print(f"[CONFIG] Azure environment detected - using port from PORT: {DASHBOARD_PORT}")
+    
     print(f"[CONFIG] Loaded dashboard config: host={DASHBOARD_HOST}, port={DASHBOARD_PORT}")
 except (ImportError, AttributeError) as e:
     # Fallback defaults if config not available
-    DASHBOARD_HOST = '127.0.0.1'
-    DASHBOARD_PORT = 5000
+    DASHBOARD_HOST = '0.0.0.0'
+    # Check for Azure port
+    if os.getenv('HTTP_PLATFORM_PORT'):
+        DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT'))
+    elif os.getenv('PORT'):
+        DASHBOARD_PORT = int(os.getenv('PORT'))
+    else:
+        DASHBOARD_PORT = 8080
     print(f"[CONFIG] Using default config (import error: {e}): host={DASHBOARD_HOST}, port={DASHBOARD_PORT}")
 
 app = Flask(__name__)
@@ -55,6 +71,15 @@ kite_client_global = None
 kite_api_key = None
 kite_api_secret = None
 
+# Global trading credentials (for main trading script)
+trading_credentials = {
+    'account': None,
+    'api_key': None,
+    'api_secret': None,
+    'request_token': None,
+    'set': False
+}
+
 def set_config_monitor(monitor):
     """Set the global config monitor reference"""
     global config_monitor
@@ -63,6 +88,15 @@ def set_config_monitor(monitor):
 @app.route('/')
 def dashboard():
     """Main dashboard page"""
+    # Check if running on Azure and credentials not set - redirect to credentials page
+    import os
+    from environment import is_azure_environment
+    
+    if is_azure_environment():
+        global trading_credentials
+        if not trading_credentials['set']:
+            return redirect(url_for('credentials_input'))
+    
     # Get API key for authentication link (if available)
     api_key = None
     try:
@@ -71,12 +105,16 @@ def dashboard():
             api_key = kite_api_key
         else:
             # Try to get from environment or config
-            import os
             api_key = os.getenv('KITE_API_KEY')
     except:
         pass
     
     return render_template('config_dashboard.html', api_key=api_key)
+
+@app.route('/credentials')
+def credentials_input():
+    """Credentials input page for Azure"""
+    return render_template('credentials_input.html')
 
 @app.route('/api/config/current')
 def get_current_config():
@@ -354,6 +392,76 @@ def get_trading_positions():
             'status': 'error',
             'message': str(e)
         }), 500
+
+@app.route('/api/trading/set-credentials', methods=['POST'])
+def set_trading_credentials():
+    """Set credentials for the main trading script (used on Azure)"""
+    try:
+        global trading_credentials
+        
+        data = request.get_json()
+        
+        account = data.get('account', '').strip()
+        api_key = data.get('api_key', '').strip()
+        api_secret = data.get('api_secret', '').strip()
+        request_token = data.get('request_token', '').strip()
+        
+        if not all([account, api_key, api_secret, request_token]):
+            return jsonify({
+                'success': False,
+                'error': 'All fields are required: account, api_key, api_secret, request_token'
+            }), 400
+        
+        # Store credentials
+        trading_credentials = {
+            'account': account,
+            'api_key': api_key,
+            'api_secret': api_secret,
+            'request_token': request_token,
+            'set': True
+        }
+        
+        logging.info(f"[CREDENTIALS] Credentials set for account: {account}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Credentials set successfully'
+        })
+    except Exception as e:
+        logging.error(f"[CREDENTIALS] Error setting credentials: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/trading/credentials-status', methods=['GET'])
+def get_credentials_status():
+    """Check if credentials are set"""
+    global trading_credentials
+    return jsonify({
+        'credentials_set': trading_credentials['set'],
+        'account': trading_credentials['account'] if trading_credentials['set'] else None
+    })
+
+@app.route('/api/trading/get-credentials', methods=['GET'])
+def get_trading_credentials():
+    """Get credentials for the main trading script (internal use)"""
+    global trading_credentials
+    if trading_credentials['set']:
+        return jsonify({
+            'success': True,
+            'credentials': {
+                'account': trading_credentials['account'],
+                'api_key': trading_credentials['api_key'],
+                'api_secret': trading_credentials['api_secret'],
+                'request_token': trading_credentials['request_token']
+            }
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'error': 'Credentials not set'
+        }), 404
 
 @app.route('/api/trading/status')
 def get_trading_status():

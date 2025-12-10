@@ -16,6 +16,9 @@ if parent_dir not in sys.path:
 
 from config import *  # Import all configuration parameters
 
+# Import environment detection and logging utilities
+from environment import is_azure_environment, setup_logging, get_config_value
+
 # Import config monitoring system
 from config_monitor import initialize_config_monitor, start_config_monitoring, stop_config_monitoring, get_config_monitor
 
@@ -2483,10 +2486,75 @@ def main():
     print("API CREDENTIALS SETUP")
     print("=" * 60)
     
-    # Input_account = input("Account: ").strip()
-    # Input_api_key = input("Api_key: ").strip()
-    # Input_api_secret = input("Api_Secret: ").strip()
-    # Input_request_token = input("Request_Token: ").strip()
+    # Check if running in Azure - get credentials from web interface
+    if is_azure_environment():
+        logging.info("[ENV] Azure environment detected - waiting for credentials from web interface")
+        logging.info("[ENV] Please visit the web interface to enter credentials")
+        
+        # Try to get credentials from dashboard API
+        max_retries = 60  # Wait up to 5 minutes (60 * 5 seconds)
+        retry_count = 0
+        credentials_set = False
+        
+        while retry_count < max_retries and not credentials_set:
+            try:
+                import requests
+                # Try to get credentials from local dashboard
+                dashboard_port = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))
+                response = requests.get(
+                    f'http://localhost:{dashboard_port}/api/trading/get-credentials',
+                    timeout=2
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get('success') and data.get('credentials'):
+                        creds = data['credentials']
+                        Input_account = creds.get('account')
+                        Input_api_key = creds.get('api_key')
+                        Input_api_secret = creds.get('api_secret')
+                        Input_request_token = creds.get('request_token')
+                        credentials_set = True
+                        logging.info(f"[ENV] Credentials retrieved from web interface for account: {Input_account}")
+                        break
+            except Exception as e:
+                # Credentials not set yet, wait and retry
+                if retry_count % 12 == 0:  # Log every minute
+                    logging.info(f"[ENV] Waiting for credentials... ({retry_count * 5} seconds)")
+                time_module.sleep(5)  # Wait 5 seconds before retry
+                retry_count += 1
+        
+        if not credentials_set:
+            logging.error("[ENV] Credentials not set via web interface!")
+            logging.error("[ENV] Please visit the web interface to enter credentials")
+            logging.error("[ENV] The application will continue waiting, but trading will not start until credentials are provided")
+            # Don't raise error, just log - let the user know they need to set credentials
+            # The app can continue running and checking for credentials
+    else:
+        # Local environment - prompt for credentials via CLI
+        if not Input_account:
+            Input_account = input("Account: ").strip()
+        if not Input_api_key:
+            Input_api_key = input("Api_key: ").strip()
+        if not Input_api_secret:
+            Input_api_secret = input("Api_Secret: ").strip()
+        if not Input_request_token:
+            Input_request_token = input("Request_Token: ").strip()
+    
+    # Validate credentials are provided
+    if not all([Input_account, Input_api_key, Input_api_secret, Input_request_token]):
+        if is_azure_environment():
+            # On Azure, credentials should have been retrieved above
+            # If we reach here, they weren't set - log and return
+            logging.warning("[ENV] Credentials not yet available. Please set them via the web interface.")
+            logging.warning("[ENV] Visit the web interface URL to enter credentials.")
+            logging.warning("[ENV] The application will continue running, but trading will not start until credentials are provided.")
+            # Return early - don't start trading without credentials
+            return
+        else:
+            error_msg = "Missing required API credentials. Please provide all credentials."
+            logging.error(error_msg)
+            raise ValueError(error_msg)
     
     api_key = Input_api_key
     api_secret = Input_api_secret
@@ -2504,18 +2572,24 @@ def main():
     else:
         logging.warning("[P&L RECORDER] Not available - P&L recording will be disabled")
     
-    # Setup file handler with account name
-    # Log files will be created in the src directory
+    # Setup logging for both local and Azure environments
     import os
-    log_dir = os.path.dirname(os.path.abspath(__file__))  # src directory
-    log_filename = os.path.join(log_dir, f'{Input_account} {date.today()}_trading_log.log')
+    logger, log_filename = setup_logging(account_name=Input_account)
     
+    # Also add file handler to existing logger for backward compatibility
     global file_handler
-    file_handler = logging.FileHandler(log_filename, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-    logging.getLogger().addHandler(file_handler)
+    if log_filename and os.path.exists(log_filename):
+        # File handler is already added by setup_logging, but we keep reference
+        file_handler = None
+        for handler in logging.getLogger().handlers:
+            if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_filename:
+                file_handler = handler
+                break
     
     print(f"[LOG] Log file created at: {log_filename}")
+    if is_azure_environment():
+        print(f"[LOG] Azure Log Stream: View logs in Azure Portal > Log stream")
+        print(f"[LOG] Azure Log Files: Available in /home/LogFiles directory")
     
     print("[OK] API credentials set successfully")
     print("=" * 60)

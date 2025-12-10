@@ -13,6 +13,16 @@ from datetime import datetime
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Import environment utilities
+try:
+    from environment import is_azure_environment, setup_logging, get_log_directory
+except ImportError:
+    # Fallback if environment module not available
+    def is_azure_environment():
+        return any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME'])
+    def get_log_directory():
+        return os.path.dirname(os.path.abspath(__file__))
+
 # Import dashboard configuration
 try:
     import config
@@ -25,14 +35,32 @@ except (ImportError, AttributeError):
 
 def setup_logging():
     """Setup logging for the monitoring system"""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler('config_monitoring.log'),
-            logging.StreamHandler()
-        ]
-    )
+    if is_azure_environment():
+        # Use environment-aware logging for Azure
+        try:
+            from environment import setup_logging as setup_env_logging
+            logger, log_file = setup_env_logging(logger_name='config_monitor')
+            logging.info(f"[ENV] Azure environment detected - Logs: {log_file}")
+        except ImportError:
+            # Fallback to basic logging
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                handlers=[logging.StreamHandler()]
+            )
+    else:
+        # Local environment - use file and console
+        log_dir = get_log_directory()
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = os.path.join(log_dir, 'config_monitoring.log')
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_file, encoding='utf-8'),
+                logging.StreamHandler()
+            ]
+        )
 
 def start_config_dashboard():
     """Start the web dashboard in a separate thread"""
