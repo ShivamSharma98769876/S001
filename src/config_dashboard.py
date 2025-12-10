@@ -1315,14 +1315,14 @@ def authenticate():
                 'message': 'Authentication successful',
                 'account_name': account_holder_name
             })
-                except Exception as e:
-                    logger.error("[AUTH] Authentication failed: {}".format(str(e)))
-                    import traceback
-                    logger.error("[AUTH] Traceback: {}".format(traceback.format_exc()))
-                    return jsonify({
-                        'success': False,
-                        'error': f'Authentication failed: {str(e)}'
-                    }), 401
+        except Exception as e:
+            logger.error("[AUTH] Authentication failed: {}".format(str(e)))
+            import traceback
+            logger.error("[AUTH] Traceback: {}".format(traceback.format_exc()))
+            return jsonify({
+                'success': False,
+                'error': f'Authentication failed: {str(e)}'
+            }), 401
         
     except Exception as e:
         return jsonify({
