@@ -2002,32 +2002,50 @@
         }
         
         function updateAccountNameDisplay(accountName) {
+            if (!accountName) return;
+            
             const accountNameDisplay = document.getElementById('accountNameDisplay');
             const headerControls = document.querySelector('.header-controls');
             
-            if (accountName) {
-                if (accountNameDisplay) {
-                    accountNameDisplay.textContent = accountName;
-                } else {
-                    // Create account name display if it doesn't exist
-                    if (headerControls) {
-                        const accountDiv = document.createElement('div');
-                        accountDiv.className = 'account-name-display';
-                        accountDiv.style.cssText = 'margin-right: 15px; padding: 8px 16px; background: rgba(102, 126, 234, 0.2); border-radius: 6px; border: 1px solid rgba(102, 126, 234, 0.3); display: flex; align-items: center;';
-                        accountDiv.innerHTML = `<i class="fas fa-user" style="margin-right: 8px;"></i><span id="accountNameDisplay" style="font-weight: 600; color: var(--text-primary);">${accountName}</span>`;
-                        const connectionStatus = document.getElementById('connectionStatus');
-                        if (connectionStatus) {
-                            headerControls.insertBefore(accountDiv, connectionStatus);
-                        } else {
-                            headerControls.insertBefore(accountDiv, headerControls.firstChild);
-                        }
-                    }
-                }
-                
-                // Show the container
-                const accountNameContainer = accountNameDisplay ? accountNameDisplay.closest('.account-name-display') : document.querySelector('.account-name-display');
+            if (accountNameDisplay) {
+                // Update existing display
+                accountNameDisplay.textContent = accountName;
+                const accountNameContainer = accountNameDisplay.closest('.account-name-display');
                 if (accountNameContainer) {
                     accountNameContainer.style.display = 'flex';
+                }
+            } else {
+                // Create account name display if it doesn't exist
+                if (headerControls) {
+                    // Check if account name display already exists
+                    let accountNameContainer = headerControls.querySelector('.account-name-display');
+                    
+                    if (!accountNameContainer) {
+                        // Create new container
+                        accountNameContainer = document.createElement('div');
+                        accountNameContainer.className = 'account-name-display';
+                        accountNameContainer.style.cssText = 'margin-right: 15px; padding: 8px 16px; background: rgba(102, 126, 234, 0.2); border-radius: 6px; border: 1px solid rgba(102, 126, 234, 0.3); display: flex; align-items: center;';
+                        accountNameContainer.innerHTML = `<i class="fas fa-user" style="margin-right: 8px;"></i><span id="accountNameDisplay" style="font-weight: 600; color: var(--text-primary);">${accountName}</span>`;
+                        
+                        // Try to insert before connectionStatus, but verify it's a child first
+                        const connectionStatus = document.getElementById('connectionStatus');
+                        if (connectionStatus && connectionStatus.parentNode === headerControls) {
+                            headerControls.insertBefore(accountNameContainer, connectionStatus);
+                        } else if (headerControls.firstChild) {
+                            // Insert at the beginning if connectionStatus is not a direct child
+                            headerControls.insertBefore(accountNameContainer, headerControls.firstChild);
+                        } else {
+                            // Just append if no children exist
+                            headerControls.appendChild(accountNameContainer);
+                        }
+                    } else {
+                        // Update existing container
+                        const span = accountNameContainer.querySelector('#accountNameDisplay');
+                        if (span) {
+                            span.textContent = accountName;
+                        }
+                        accountNameContainer.style.display = 'flex';
+                    }
                 }
             }
         }
