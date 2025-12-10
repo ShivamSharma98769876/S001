@@ -57,6 +57,18 @@ except (ImportError, AttributeError) as e:
 
 app = Flask(__name__)
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Console output
+        logging.FileHandler('dashboard.log', encoding='utf-8')  # File output
+    ]
+)
+logger = logging.getLogger(__name__)
+logger.info("[DASHBOARD] Dashboard application initialized")
+
 # Global config monitor reference
 config_monitor = None
 
@@ -803,8 +815,13 @@ def start_strategy():
 def live_trader_page():
     """Live Trader dedicated page"""
     try:
-        return render_template('live_trader.html')
+        # Get account holder name if authenticated
+        global account_holder_name
+        account_name_display = account_holder_name if account_holder_name else None
+        
+        return render_template('live_trader.html', account_holder_name=account_name_display)
     except Exception as e:
+        logging.error(f"[LIVE TRADER] Error loading page: {e}")
         return f"Error loading Live Trader page: {str(e)}", 500
 
 @app.route('/api/live-trader/logs', methods=['GET'])
@@ -903,11 +920,27 @@ def start_live_trader():
     try:
         global strategy_process, strategy_running, kite_client_global, kite_api_key, kite_api_secret
         
+        # Check if process is actually running, not just the flag
         if strategy_running:
-            return jsonify({
-                'success': False,
-                'error': 'Strategy is already running'
-            }), 400
+            # Verify the process is actually still running
+            if strategy_process is not None:
+                poll_result = strategy_process.poll()
+                if poll_result is None:
+                    # Process is still running
+                    logging.warning("[LIVE TRADER] Strategy process is still running (PID: {})".format(strategy_process.pid))
+                    return jsonify({
+                        'success': False,
+                        'error': 'Strategy is already running'
+                    }), 400
+                else:
+                    # Process has terminated but flag wasn't reset
+                    logging.warning("[LIVE TRADER] Strategy process terminated (return code: {}) but flag was still True. Resetting flag.".format(poll_result))
+                    strategy_running = False
+                    strategy_process = None
+            else:
+                # Flag is True but process is None - reset flag
+                logging.warning("[LIVE TRADER] Strategy flag is True but process is None. Resetting flag.")
+                strategy_running = False
         
         data = request.get_json()
         call_quantity = data.get('callQuantity')
@@ -1100,11 +1133,25 @@ def stop_strategy():
     try:
         global strategy_bot, strategy_process, strategy_running
         
-        if not strategy_running:
+        # Check actual process status
+        actual_running = False
+        if strategy_process is not None:
+            poll_result = strategy_process.poll()
+            if poll_result is None:
+                actual_running = True
+            else:
+                # Process already terminated
+                logging.info("[STRATEGY] Process already terminated with return code: {}".format(poll_result))
+                strategy_running = False
+                strategy_process = None
+        
+        if not actual_running and not strategy_running:
             return jsonify({
                 'status': 'error',
                 'message': 'Strategy is not running'
             }), 400
+        
+        logging.info("[STRATEGY] Stopping strategy (PID: {})".format(strategy_process.pid if strategy_process else 'N/A'))
         
         # Stop TradingBot if running
         if strategy_bot:
@@ -1163,11 +1210,16 @@ def auth_status():
                 
                 # Update account holder name if available
                 if profile:
-                    account_holder_name = profile.get('user_name') or profile.get('user_id') or account_holder_name or 'Trading Account'
+                    new_account_name = profile.get('user_name') or profile.get('user_id') or account_holder_name or 'Trading Account'
+                    if new_account_name != account_holder_name:
+                        logging.info("[AUTH] Account holder name updated: {} -> {}".format(account_holder_name, new_account_name))
+                    account_holder_name = new_account_name
                     kite_client_global.account = account_holder_name
-            except:
+                logging.debug("[AUTH] Authentication verified successfully for account: {}".format(account_holder_name))
+            except Exception as e:
                 authenticated = False
                 has_access_token = kite_client_global.access_token is not None
+                logging.warning("[AUTH] Authentication check failed: {}. Token may have expired.".format(str(e)))
         
         # Also check bot's kite client
         if not authenticated and strategy_bot and hasattr(strategy_bot, 'kite_client'):
@@ -1263,11 +1315,14 @@ def authenticate():
                 'message': 'Authentication successful',
                 'account_name': account_holder_name
             })
-        except Exception as e:
-            return jsonify({
-                'success': False,
-                'error': f'Authentication failed: {str(e)}'
-            }), 401
+                except Exception as e:
+                    logger.error("[AUTH] Authentication failed: {}".format(str(e)))
+                    import traceback
+                    logger.error("[AUTH] Traceback: {}".format(traceback.format_exc()))
+                    return jsonify({
+                        'success': False,
+                        'error': f'Authentication failed: {str(e)}'
+                    }), 401
         
     except Exception as e:
         return jsonify({

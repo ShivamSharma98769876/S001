@@ -419,6 +419,11 @@
                 <div class="header-title">
                     <i class="fas fa-play-circle"></i>
                     <h1>Live Trader</h1>
+                    {% if account_holder_name %}
+                    <span class="account-name-display" style="margin-left: 15px; font-size: 1.1em; color: var(--text-secondary);">
+                        <i class="fas fa-user"></i> {{ account_holder_name }}
+                    </span>
+                    {% endif %}
                 </div>
             </div>
             <div class="header-controls">
@@ -622,7 +627,15 @@
                     connectionStatusValue.textContent = 'Disconnected';
                 }
 
-                // Check engine status
+                // Check engine status from server
+                try {
+                    const statusResponse = await fetch('/api/live-trader/status');
+                    const statusData = await statusResponse.json();
+                    isRunning = statusData.running || false;
+                } catch (error) {
+                    console.error('Error checking engine status:', error);
+                }
+                
                 const engineStatus = document.getElementById('engineStatus');
                 const engineStatusValue = document.getElementById('engineStatusValue');
                 const engineStatusCard = document.getElementById('engineStatusCard');
@@ -637,6 +650,11 @@
                     engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
                     engineStatusValue.textContent = 'Stopped';
                     engineStatusCard.className = 'status-card danger';
+                }
+                
+                // Update account name if available
+                if (authData.account_name) {
+                    updateAccountNameDisplay(authData.account_name);
                 }
             } catch (error) {
                 console.error('Error checking status:', error);
@@ -894,6 +912,29 @@
             return entry;
         }
 
+        function updateAccountNameDisplay(accountName) {
+            if (!accountName) return;
+            
+            const headerTitle = document.querySelector('.header-title');
+            if (!headerTitle) return;
+            
+            let accountNameDisplay = headerTitle.querySelector('.account-name-display');
+            if (accountNameDisplay) {
+                // Update existing display
+                const span = accountNameDisplay.querySelector('span') || accountNameDisplay;
+                if (span) {
+                    span.textContent = accountName;
+                }
+            } else {
+                // Create new display
+                accountNameDisplay = document.createElement('span');
+                accountNameDisplay.className = 'account-name-display';
+                accountNameDisplay.style.cssText = 'margin-left: 15px; font-size: 1.1em; color: var(--text-secondary);';
+                accountNameDisplay.innerHTML = `<i class="fas fa-user"></i> ${accountName}`;
+                headerTitle.appendChild(accountNameDisplay);
+            }
+        }
+        
         function addLog(level, message) {
             const logsContainer = document.getElementById('logsContainer');
             const entry = parseLogEntry(message);

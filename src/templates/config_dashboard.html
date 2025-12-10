@@ -1990,6 +1990,20 @@
                         }
                     }
                 }
+                
+                // Also update connection status to match authentication
+                const connectionStatus = document.getElementById('connectionStatus');
+                const connectionDot = document.getElementById('connectionDot');
+                const connectionText = document.getElementById('connectionText');
+                if (connectionStatus && connectionDot && connectionText) {
+                    if (data.authenticated) {
+                        connectionDot.className = 'status-dot connected';
+                        connectionText.textContent = 'Connected';
+                    } else {
+                        connectionDot.className = 'status-dot disconnected';
+                        connectionText.textContent = 'Disconnected';
+                    }
+                }
             } catch (error) {
                 console.error('Error checking auth status:', error);
                 const authStatusEl = document.getElementById('authStatus');
