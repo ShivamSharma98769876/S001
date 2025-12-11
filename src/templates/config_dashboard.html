@@ -2415,7 +2415,8 @@
                     if (data.account_name) {
                         updateAccountNameDisplay(data.account_name);
                     }
-                    checkAuthStatus();
+                    // Immediately update auth status (don't wait for polling)
+                    await checkAuthStatus();
                     checkConnectivity();
                     // Show success notification
                     showNotification('Successfully connected with access token!', 'success');
@@ -2500,7 +2501,9 @@
                     if (data.account_name) {
                         updateAccountNameDisplay(data.account_name);
                     }
-                    checkAuthStatus();
+                    // Immediately update auth status (don't wait for polling)
+                    await                     // Immediately update auth status (don't wait for polling)
+                    await checkAuthStatus();
                     checkConnectivity();
                     // Show success notification
                     showNotification('Successfully authenticated!', 'success');

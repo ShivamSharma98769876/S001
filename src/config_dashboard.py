@@ -1269,7 +1269,22 @@ def get_live_trader_logs():
                                 logging.info(f"[LOGS] Found Azure log file (account match): {log_path}")
                     else:
                         logging.warning(f"[LOGS] No account-specific logs found. Account variations tried: {sanitized_variations_for_matching}")
-                        logging.info(f"[LOGS] Available log files: {[os.path.basename(f) for f in azure_logs_all[:10]]}")  # Show first 10
+                        if azure_logs_all:
+                            available_files = [os.path.basename(f) for f in azure_logs_all[:20]]  # Show first 20
+                            logging.info(f"[LOGS] Available log files ({len(azure_logs_all)} total): {available_files}")
+                            # Also log full paths for debugging
+                            logging.info(f"[LOGS] Full paths of available files: {azure_logs_all[:10]}")
+                        else:
+                            logging.info(f"[LOGS] No trading log files found in Azure log directory: {azure_log_dir}")
+                            # Check if directory exists and list what's there
+                            if os.path.exists(azure_log_dir):
+                                try:
+                                    all_files = os.listdir(azure_log_dir)
+                                    logging.info(f"[LOGS] All files in {azure_log_dir}: {all_files}")
+                                except Exception as e:
+                                    logging.warning(f"[LOGS] Could not list directory: {e}")
+                            else:
+                                logging.warning(f"[LOGS] Azure log directory does not exist: {azure_log_dir}")
                     
                     # Fallback: any trading logs if still none
                     if not log_files and azure_logs_all:
@@ -1462,14 +1477,25 @@ def get_live_trader_logs():
             'log_files': log_files_read if log_files_read else log_files[:5]  # Show up to 5 file paths
         }
         
-        # Add log file path to logs for visibility (prepend to show at top)
+        # Add log file path and debug info to logs for visibility
         if log_files and log_files[0]:
             log_path_msg = f"[LOG SETUP] Log file path: {log_files[0]}"
             # Check if already in logs to avoid duplicates
             if not any(log_path_msg in log for log in unique_logs):
                 unique_logs.insert(0, log_path_msg)
-                response_data['logs'] = unique_logs[-500:]
+            
+            # Add info about log file search
+            if response_data.get('log_files_found', 0) > 0:
+                search_info = f"[LOG SETUP] Found {response_data['log_files_found']} log file(s), read {response_data['log_files_read']} successfully"
+                if search_info not in unique_logs:
+                    unique_logs.insert(1, search_info)
+        else:
+            # No log files found - add helpful message
+            no_logs_msg = f"[LOG SETUP] No log files found yet. Logs will appear here once the strategy starts running."
+            if no_logs_msg not in unique_logs:
+                unique_logs.insert(0, no_logs_msg)
         
+        response_data['logs'] = unique_logs[-500:]
         return jsonify(response_data)
     except Exception as e:
         import traceback
