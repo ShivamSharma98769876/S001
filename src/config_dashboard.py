@@ -84,6 +84,7 @@ kite_client_global = None
 kite_api_key = None
 kite_api_secret = None
 account_holder_name = None  # Store account holder name from profile
+strategy_account_name = None  # Store account name used when starting strategy (for log retrieval)
 
 # Global trading credentials (for main trading script)
 trading_credentials = {
@@ -860,18 +861,41 @@ def get_live_trader_logs():
         # Try to find log files
         log_files = []
         
-        # Get account name from global account_holder_name or kite_client_global
-        global account_holder_name
+        # Get account name - CRITICAL: Use strategy_account_name first (account used when starting strategy)
+        # This ensures we match the log file that was actually created
+        global account_holder_name, strategy_account_name
         account = None
-        if account_holder_name:
+        
+        # Priority 1: Use account name from strategy start (most accurate for log matching)
+        if strategy_account_name:
+            account = strategy_account_name
+            logging.info(f"[LOGS] Using strategy account name for log matching: {account}")
+        # Priority 2: Use account holder name from profile
+        elif account_holder_name:
             account = account_holder_name
+            logging.info(f"[LOGS] Using account holder name for log matching: {account}")
+        # Priority 3: Use account from kite client
         elif kite_client_global and hasattr(kite_client_global, 'account'):
             account = kite_client_global.account or 'TRADING_ACCOUNT'
+            logging.info(f"[LOGS] Using kite client account for log matching: {account}")
         else:
             account = 'TRADING_ACCOUNT'
+            logging.info(f"[LOGS] Using default account name for log matching: {account}")
         
-        logging.info(f"[LOGS] Looking for log files for account: {account}, date: {today}")
+        logging.info(f"[LOGS] Looking for log files for account: '{account}', date: {today}")
         logging.info(f"[LOGS] Checking directories: src_dir={src_dir}, src_logs_dir={src_logs_dir}")
+        
+        # Also try variations of account name (in case of spaces or formatting differences)
+        account_variations = [account]
+        if account and ' ' in account:
+            # Try without spaces
+            account_variations.append(account.replace(' ', ''))
+            # Try with underscores
+            account_variations.append(account.replace(' ', '_'))
+        # Try account holder name if different
+        if account_holder_name and account_holder_name != account:
+            account_variations.append(account_holder_name)
+        logging.info(f"[LOGS] Will try matching with account name variations: {account_variations}")
         
         # Check multiple locations for log files
         # 1. PRIORITY: src/logs directory (where logs are actually saved locally)
@@ -935,31 +959,76 @@ def get_live_trader_logs():
         if is_azure_environment():
             azure_log_dir = get_log_directory()
             logging.info(f"[LOGS] Azure environment detected - checking log directory: {azure_log_dir}")
+            logging.info(f"[LOGS] Account name for matching: '{account}'")
             
             if os.path.exists(azure_log_dir):
                 try:
-                    # Check for today's log file first (highest priority)
-                    azure_log = os.path.join(azure_log_dir, f'{account} {today}_trading_log.log')
-                    if os.path.exists(azure_log):
-                        # Insert at beginning for priority (Azure logs should be checked first in Azure)
-                        log_files.insert(0, azure_log)
-                        logging.info(f"[LOGS] Found Azure log file (today): {azure_log}")
+                    # List all files for debugging
+                    all_files = os.listdir(azure_log_dir)
+                    logging.info(f"[LOGS] Files in Azure log directory: {all_files}")
                     
-                    # Check for any log files in Azure log directory matching account name
+                    # PRIORITY 1: Check for today's log file with account name variations (highest priority)
+                    for account_var in account_variations:
+                        if account_var:
+                            azure_log_today = os.path.join(azure_log_dir, f'{account_var} {today}_trading_log.log')
+                            if os.path.exists(azure_log_today):
+                                # Insert at beginning for priority (Azure logs should be checked first in Azure)
+                                if azure_log_today not in log_files:
+                                    log_files.insert(0, azure_log_today)
+                                    logging.info(f"[LOGS] Found Azure log file (today, exact match): {azure_log_today}")
+                                break  # Found today's log, no need to check other variations
+                    
+                    # PRIORITY 2: Check for any log files matching account name (most recent first)
+                    # Try all account name variations
+                    account_matching_files = []
                     for f in os.listdir(azure_log_dir):
-                        if f.endswith('_trading_log.log') and account in f:
-                            log_path = os.path.join(azure_log_dir, f)
+                        # Only match files that end with _trading_log.log
+                        # Exclude dashboard.log, config_monitoring.log, etc.
+                        if (f.endswith('_trading_log.log') and 
+                            'dashboard' not in f.lower() and 
+                            'config' not in f.lower() and
+                            'monitoring' not in f.lower()):
+                            # Check if file matches any account name variation
+                            matches_account = False
+                            for account_var in account_variations:
+                                if account_var and account_var in f:
+                                    matches_account = True
+                                    break
+                            
+                            if matches_account:
+                                log_path = os.path.join(azure_log_dir, f)
+                                if log_path not in log_files:
+                                    account_matching_files.append(log_path)
+                                    logging.info(f"[LOGS] Found matching log file: {f} (matched account variation)")
+                    
+                    # Sort by modification time (most recent first) and add to log_files
+                    if account_matching_files:
+                        account_matching_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                        for log_path in account_matching_files:
                             if log_path not in log_files:
                                 log_files.append(log_path)
-                                logging.info(f"[LOGS] Found Azure log file: {log_path}")
+                                logging.info(f"[LOGS] Found Azure log file (account match): {log_path}")
                     
-                    # Also check for any trading log files (fallback if account name doesn't match)
-                    for f in os.listdir(azure_log_dir):
-                        if f.endswith('_trading_log.log'):
-                            log_path = os.path.join(azure_log_dir, f)
-                            if log_path not in log_files:
+                    # PRIORITY 3: Fallback - check for any trading log files (but exclude dashboard/config logs)
+                    # Only if no account-specific logs found - this ensures we show logs even if account name doesn't match exactly
+                    if not log_files:
+                        logging.warning(f"[LOGS] No account-specific logs found, trying fallback: any trading log files")
+                        fallback_files = []
+                        for f in os.listdir(azure_log_dir):
+                            # Only include actual trading logs, exclude dashboard/config logs
+                            if (f.endswith('_trading_log.log') and 
+                                'dashboard' not in f.lower() and 
+                                'config' not in f.lower() and
+                                'monitoring' not in f.lower()):
+                                log_path = os.path.join(azure_log_dir, f)
+                                fallback_files.append((log_path, os.path.getmtime(log_path)))
+                        
+                        # Sort by modification time (most recent first) and add
+                        if fallback_files:
+                            fallback_files.sort(key=lambda x: x[1], reverse=True)
+                            for log_path, _ in fallback_files:
                                 log_files.append(log_path)
-                                logging.info(f"[LOGS] Found Azure log file (any): {log_path}")
+                                logging.info(f"[LOGS] Found Azure log file (fallback, any trading log): {log_path}")
                 except Exception as e:
                     logging.warning(f"[LOGS] Error reading Azure log directory {azure_log_dir}: {e}")
                     import traceback
@@ -977,7 +1046,11 @@ def get_live_trader_logs():
                         logging.info(f"[LOGS] Trying alternative Azure log path: {alt_path}")
                         try:
                             for f in os.listdir(alt_path):
-                                if f.endswith('_trading_log.log') and account in f:
+                                # Only match actual trading logs with account name
+                                if (f.endswith('_trading_log.log') and 
+                                    account in f and 
+                                    'dashboard' not in f.lower() and 
+                                    'config' not in f.lower()):
                                     log_path = os.path.join(alt_path, f)
                                     if log_path not in log_files:
                                         log_files.append(log_path)
@@ -1020,16 +1093,39 @@ def get_live_trader_logs():
             })
         
         # Read last 500 lines from log files (increased to show more logs)
+        # Prioritize: read from first file (most relevant) first, then others
         all_lines = []
+        log_files_read = []
         for log_path in log_files:
             try:
+                logging.info(f"[LOGS] Attempting to read log file: {log_path}")
+                if not os.path.exists(log_path):
+                    logging.warning(f"[LOGS] Log file does not exist: {log_path}")
+                    continue
+                    
+                # Check file size
+                file_size = os.path.getsize(log_path)
+                logging.info(f"[LOGS] Log file size: {file_size} bytes")
+                
                 with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
                     lines = f.readlines()
                     # Get last 500 lines from each file to show more detailed logs
-                    all_lines.extend(lines[-500:])
+                    file_lines = lines[-500:] if len(lines) > 500 else lines
+                    all_lines.extend(file_lines)
+                    log_files_read.append(log_path)
+                    logging.info(f"[LOGS] Successfully read {len(file_lines)} lines from {log_path} (total lines in file: {len(lines)})")
+            except PermissionError as e:
+                logging.error(f"[LOGS] Permission denied reading log file {log_path}: {e}")
             except Exception as e:
-                print(f"Error reading log file {log_path}: {e}")
+                logging.error(f"[LOGS] Error reading log file {log_path}: {e}")
+                import traceback
+                logging.error(f"[LOGS] Traceback: {traceback.format_exc()}")
                 pass
+        
+        if log_files_read:
+            logging.info(f"[LOGS] Successfully read from {len(log_files_read)} log file(s): {log_files_read}")
+        else:
+            logging.warning(f"[LOGS] No log files were successfully read from {len(log_files)} attempted file(s)")
         
         # Show ALL logs (remove filtering to display complete log details)
         # Sort by timestamp if available, otherwise keep order
@@ -1067,21 +1163,33 @@ def live_trader_status():
         # Check actual process status
         actual_running = False
         if strategy_process is not None:
-            poll_result = strategy_process.poll()
-            if poll_result is None:
-                # Process is still running
-                actual_running = True
-            else:
-                # Process has terminated
-                logging.info(f"[LIVE TRADER STATUS] Process terminated with return code: {poll_result}")
+            try:
+                poll_result = strategy_process.poll()
+                if poll_result is None:
+                    # Process is still running
+                    actual_running = True
+                    logging.debug(f"[LIVE TRADER STATUS] Process is running (PID: {strategy_process.pid})")
+                else:
+                    # Process has terminated
+                    logging.info(f"[LIVE TRADER STATUS] Process terminated with return code: {poll_result}")
+                    strategy_running = False
+                    strategy_process = None
+                    actual_running = False
+            except Exception as poll_error:
+                # Process object might be invalid
+                logging.warning(f"[LIVE TRADER STATUS] Error polling process: {poll_error}")
                 strategy_running = False
                 strategy_process = None
+                actual_running = False
+        else:
+            # No process object, definitely not running
+            actual_running = False
+            strategy_running = False
         
         # Update strategy_running flag to match actual state
-        if actual_running:
-            strategy_running = True
-        else:
-            strategy_running = False
+        strategy_running = actual_running
+        
+        logging.debug(f"[LIVE TRADER STATUS] Returning status - running: {actual_running}, strategy_running: {strategy_running}")
         
         return jsonify({
             'running': actual_running,
@@ -1090,6 +1198,8 @@ def live_trader_status():
         })
     except Exception as e:
         logging.error(f"[LIVE TRADER STATUS] Error: {e}")
+        import traceback
+        logging.error(f"[LIVE TRADER STATUS] Traceback: {traceback.format_exc()}")
         return jsonify({
             'running': False,
             'strategy_running': False,
@@ -1170,8 +1280,10 @@ def start_live_trader():
         access_token = kite_client_global.access_token
         
         # Get account name from authenticated client (use account_holder_name if available)
-        global account_holder_name
-        account = account_holder_name or getattr(kite_client_global, 'account', 'TRADING_ACCOUNT') or 'TRADING_ACCOUNT'
+        # CRITICAL: Use the account name that was used when starting the strategy for log matching
+        global account_holder_name, strategy_account_name
+        # Prefer strategy_account_name (account used when starting) for log retrieval
+        account = strategy_account_name or account_holder_name or getattr(kite_client_global, 'account', 'TRADING_ACCOUNT') or 'TRADING_ACCOUNT'
         
         # Get the strategy file path
         # Use the correct path: PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py
@@ -1218,6 +1330,11 @@ def start_live_trader():
             global strategy_process, strategy_running
             try:
                 strategy_running = True
+                
+                # Store the account name used for this strategy run (for log retrieval)
+                global strategy_account_name
+                strategy_account_name = account
+                logging.info(f"[LIVE TRADER] Starting strategy with account name: {account} (will be used for log file matching)")
                 
                 # Prepare input string for stdin (matching the exact order of input() calls)
                 inputs = f"{account}\n{api_key}\n{api_secret}\n{access_token}\n{call_quantity}\n{put_quantity}\n"

@@ -431,6 +431,10 @@
                     <span class="status-dot disconnected" id="connectionDot"></span>
                     <span id="connectionText">Disconnected</span>
                 </div>
+                <div class="status-badge not-authenticated" id="authStatus" onclick="showAuthModal()" style="cursor: pointer;">
+                    <i class="fas fa-lock"></i>
+                    <span id="authStatusText">Not Authenticated</span>
+                </div>
                 <div class="status-badge not-authenticated" id="kiteStatus">
                     <i class="fas fa-plug"></i>
                     <span>Kite: Not Connected</span>
@@ -657,6 +661,25 @@
                     kiteStatusValue.textContent = 'Not Connected';
                     kiteStatusCard.className = 'status-card danger';
                 }
+                
+                // CRITICAL: Update authentication button to match Kite connectivity
+                // If Kite is connected, authentication button should be green (authenticated)
+                const authButton = document.getElementById('authStatus');
+                if (authButton) {
+                    if (authData.authenticated) {
+                        authButton.className = 'status-badge authenticated';
+                        authButton.innerHTML = '<i class="fas fa-check-circle"></i><span>Authenticated</span>';
+                        authButton.onclick = null;
+                        authButton.style.cursor = 'default';
+                        authButton.style.pointerEvents = 'none';
+                    } else {
+                        authButton.className = 'status-badge not-authenticated';
+                        authButton.innerHTML = '<i class="fas fa-lock"></i><span>Not Authenticated</span>';
+                        authButton.onclick = showAuthModal;
+                        authButton.style.cursor = 'pointer';
+                        authButton.style.pointerEvents = 'auto';
+                    }
+                }
 
                 // Check connection
                 const connectionDot = document.getElementById('connectionDot');
@@ -683,8 +706,11 @@
                         // Update isRunning to match server state
                         isRunning = actualRunning;
                         console.log('[STATUS] Engine status from server:', actualRunning ? 'Running' : 'Stopped');
+                        console.log('[STATUS] Full status data:', statusData);
                     } else {
                         console.error('[STATUS] Failed to get engine status:', statusResponse.status);
+                        const errorText = await statusResponse.text();
+                        console.error('[STATUS] Error response:', errorText);
                     }
                 } catch (error) {
                     console.error('[STATUS] Error checking engine status:', error);
@@ -696,11 +722,20 @@
                 const startBtn = document.getElementById('startBtn');
                 const stopBtn = document.getElementById('stopBtn');
                 
+                // CRITICAL: Update engine status in BOTH header and status card
                 if (actualRunning) {
-                    engineStatus.className = 'status-badge engine-running';
-                    engineStatus.innerHTML = '<i class="fas fa-cog fa-spin"></i><span>Engine: Running</span>';
-                    engineStatusValue.textContent = 'Running';
-                    engineStatusCard.className = 'status-card success';
+                    // Update header badge
+                    if (engineStatus) {
+                        engineStatus.className = 'status-badge engine-running';
+                        engineStatus.innerHTML = '<i class="fas fa-cog fa-spin"></i><span>Engine: Running</span>';
+                    }
+                    // Update status card
+                    if (engineStatusValue) {
+                        engineStatusValue.textContent = 'Running';
+                    }
+                    if (engineStatusCard) {
+                        engineStatusCard.className = 'status-card success';
+                    }
                     // Update button states - CRITICAL: Disable start button when running
                     if (startBtn) {
                         startBtn.disabled = true;
@@ -713,10 +748,18 @@
                         stopBtn.style.cursor = 'pointer';
                     }
                 } else {
-                    engineStatus.className = 'status-badge engine-stopped';
-                    engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
-                    engineStatusValue.textContent = 'Stopped';
-                    engineStatusCard.className = 'status-card danger';
+                    // Update header badge
+                    if (engineStatus) {
+                        engineStatus.className = 'status-badge engine-stopped';
+                        engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
+                    }
+                    // Update status card
+                    if (engineStatusValue) {
+                        engineStatusValue.textContent = 'Stopped';
+                    }
+                    if (engineStatusCard) {
+                        engineStatusCard.className = 'status-card danger';
+                    }
                     // Update button states - Enable start button when stopped
                     if (startBtn) {
                         startBtn.disabled = false;
@@ -1192,6 +1235,11 @@
             isInitialLoad = true;
             lastLogText = null;
             loadLogs();
+        }
+        
+        function showAuthModal() {
+            // Redirect to main dashboard for authentication
+            window.location.href = '/';
         }
     </script>
 </body>

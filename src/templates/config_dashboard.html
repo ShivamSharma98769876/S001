@@ -2026,15 +2026,21 @@
                 }
                 const data = await response.json();
                 
+                console.log('[AUTH STATUS] Response:', data);
+                
+                // Check if authenticated - handle both 'authenticated' and 'status' fields
+                const isAuthenticated = data.authenticated === true || (data.status === 'success' && data.authenticated === true);
+                
                 const authStatusEl = document.getElementById('authStatus');
                 const authStatusText = document.getElementById('authStatusText');
                 
-                if (authStatusEl && authStatusText) {
-                    if (data.authenticated) {
+                if (authStatusEl) {
+                    if (isAuthenticated) {
                         authStatusEl.className = 'status-badge authenticated';
                         authStatusEl.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
                         authStatusEl.onclick = null;
                         authStatusEl.style.cursor = 'default';
+                        authStatusEl.style.pointerEvents = 'none';
                         
                         // Update account name display if available
                         if (data.account_name) {
@@ -2045,12 +2051,18 @@
                         authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
                         authStatusEl.onclick = showAuthModal;
                         authStatusEl.style.cursor = 'pointer';
+                        authStatusEl.style.pointerEvents = 'auto';
                         
                         // Hide account name if not authenticated
                         const accountNameContainer = document.querySelector('.account-name-display');
                         if (accountNameContainer) {
                             accountNameContainer.style.display = 'none';
                         }
+                    }
+                    
+                    // Also update text element if it exists separately
+                    if (authStatusText) {
+                        authStatusText.textContent = isAuthenticated ? 'Authenticated' : 'Not Authenticated';
                     }
                 }
                 
@@ -2059,7 +2071,7 @@
                 const connectionDot = document.getElementById('connectionDot');
                 const connectionText = document.getElementById('connectionText');
                 if (connectionStatus && connectionDot && connectionText) {
-                    if (data.authenticated) {
+                    if (isAuthenticated) {
                         connectionDot.className = 'status-dot connected';
                         connectionText.textContent = 'Connected';
                     } else {
@@ -2072,6 +2084,7 @@
                 // This is a duplicate check to ensure button state is always correct
                 // The button state should match the authenticated status
                 const authButton = document.getElementById('authStatus');
+                const authStatusText = document.getElementById('authStatusText');
                 if (authButton) {
                     if (data.authenticated) {
                         authButton.className = 'status-badge authenticated';
@@ -2079,12 +2092,34 @@
                         authButton.onclick = null;
                         authButton.style.cursor = 'default';
                         authButton.style.pointerEvents = 'none';
+                        // Also update text element if it exists separately
+                        if (authStatusText) {
+                            authStatusText.textContent = 'Authenticated';
+                        }
                     } else {
                         authButton.className = 'status-badge not-authenticated';
                         authButton.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
                         authButton.onclick = showAuthModal;
                         authButton.style.cursor = 'pointer';
                         authButton.style.pointerEvents = 'auto';
+                        // Also update text element if it exists separately
+                        if (authStatusText) {
+                            authStatusText.textContent = 'Not Authenticated';
+                        }
+                    }
+                }
+                
+                // Also verify connection status matches authentication
+                const connectionStatus = document.getElementById('connectionStatus');
+                const connectionDot = document.getElementById('connectionDot');
+                const connectionText = document.getElementById('connectionText');
+                if (connectionStatus && connectionDot && connectionText) {
+                    if (data.authenticated) {
+                        connectionDot.className = 'status-dot connected';
+                        connectionText.textContent = 'Connected';
+                    } else {
+                        connectionDot.className = 'status-dot disconnected';
+                        connectionText.textContent = 'Disconnected';
                     }
                 }
             } catch (error) {
