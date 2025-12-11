@@ -885,6 +885,37 @@
             }
         }
     </style>
+    <script>
+        // Ensure showAuthModal is available immediately, even before DOMContentLoaded
+        function showAuthModal(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            console.log('[AUTH MODAL] showAuthModal called (early)');
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                console.log('[AUTH MODAL] Modal element found, showing...');
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+                modal.style.zIndex = '10000';
+                const firstInput = modal.querySelector('input');
+                if (firstInput) {
+                    setTimeout(() => firstInput.focus(), 100);
+                }
+            } else {
+                console.error('[AUTH MODAL] Modal element not found!');
+                // If modal not found, wait for DOM to load
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(showAuthModal, 100);
+                    });
+                }
+            }
+        }
+        // Make it globally available
+        window.showAuthModal = showAuthModal;
+    </script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -1408,11 +1439,23 @@
             setupDateFilter();
             initializeChart();
             startAutoRefresh();
-            checkAuthStatus();
-            checkConnectivity();
+            
+            // Check auth status first, then connectivity (auth status takes priority)
+            checkAuthStatus().then(() => {
+                // After auth status is checked, update connectivity to match
+                checkConnectivity();
+            });
+            
             // Check auth status every 5 seconds to keep button and label in sync
             setInterval(checkAuthStatus, 5000);
-            setInterval(checkConnectivity, 5000);
+            // Check connectivity less frequently and only if auth is OK
+            setInterval(() => {
+                const authStatusEl = document.getElementById('authStatus');
+                const isAuth = authStatusEl && authStatusEl.classList.contains('authenticated');
+                if (isAuth) {
+                    checkConnectivity();
+                }
+            }, 10000);
             
             // Auto-show auth modal if not authenticated after 2 seconds
             setTimeout(async () => {
@@ -2039,6 +2082,7 @@
                         authStatusEl.className = 'status-badge authenticated';
                         authStatusEl.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
                         authStatusEl.onclick = null;
+                        authStatusEl.removeAttribute('onclick'); // Remove inline onclick
                         authStatusEl.style.cursor = 'default';
                         authStatusEl.style.pointerEvents = 'none';
                         
@@ -2048,8 +2092,16 @@
                         }
                     } else {
                         authStatusEl.className = 'status-badge not-authenticated';
+                        // CRITICAL: Preserve onclick before updating innerHTML
+                        authStatusEl.setAttribute('onclick', 'showAuthModal()');
                         authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
-                        authStatusEl.onclick = showAuthModal;
+                        // CRITICAL: Set onclick handler after innerHTML update (innerHTML removes event handlers)
+                        authStatusEl.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('[AUTH BUTTON] Clicked, opening modal...');
+                            showAuthModal();
+                        };
                         authStatusEl.style.cursor = 'pointer';
                         authStatusEl.style.pointerEvents = 'auto';
                         
@@ -2066,7 +2118,8 @@
                     }
                 }
                 
-                // Also update connection status to match authentication
+                // CRITICAL: Update connection status to match authentication status
+                // Connection status should ALWAYS match authentication status
                 const connectionStatus = document.getElementById('connectionStatus');
                 const connectionDot = document.getElementById('connectionDot');
                 const connectionText = document.getElementById('connectionText');
@@ -2084,37 +2137,39 @@
                 // This is a duplicate check to ensure button state is always correct
                 // The button state should match the authenticated status
                 const authButton = document.getElementById('authStatus');
-                const authStatusText = document.getElementById('authStatusText');
-                if (authButton) {
-                    if (data.authenticated) {
+                if (authButton && authButton !== authStatusEl) {
+                    // Only update if it's a different element
+                    if (isAuthenticated) {
                         authButton.className = 'status-badge authenticated';
                         authButton.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
                         authButton.onclick = null;
+                        authButton.removeAttribute('onclick');
                         authButton.style.cursor = 'default';
                         authButton.style.pointerEvents = 'none';
-                        // Also update text element if it exists separately
-                        if (authStatusText) {
-                            authStatusText.textContent = 'Authenticated';
-                        }
                     } else {
                         authButton.className = 'status-badge not-authenticated';
+                        // CRITICAL: Preserve onclick before updating innerHTML
+                        authButton.setAttribute('onclick', 'showAuthModal()');
                         authButton.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
-                        authButton.onclick = showAuthModal;
+                        // CRITICAL: Set onclick handler after innerHTML update
+                        authButton.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('[AUTH BUTTON] Clicked, opening modal...');
+                            showAuthModal();
+                        };
                         authButton.style.cursor = 'pointer';
                         authButton.style.pointerEvents = 'auto';
-                        // Also update text element if it exists separately
-                        if (authStatusText) {
-                            authStatusText.textContent = 'Not Authenticated';
-                        }
                     }
                 }
                 
-                // Also verify connection status matches authentication
+                // CRITICAL: Ensure connection status ALWAYS matches authentication status
+                // Override any connectivity check results with authentication status
                 const connectionStatus = document.getElementById('connectionStatus');
                 const connectionDot = document.getElementById('connectionDot');
                 const connectionText = document.getElementById('connectionText');
                 if (connectionStatus && connectionDot && connectionText) {
-                    if (data.authenticated) {
+                    if (isAuthenticated) {
                         connectionDot.className = 'status-dot connected';
                         connectionText.textContent = 'Connected';
                     } else {
@@ -2184,6 +2239,27 @@
         
         async function checkConnectivity() {
             try {
+                // CRITICAL: First check authentication status - connectivity should match auth
+                const authResponse = await fetch('/api/auth/status');
+                if (authResponse.ok) {
+                    const authData = await authResponse.json();
+                    const isAuthenticated = authData.authenticated === true;
+                    
+                    // If not authenticated, set connection to disconnected immediately
+                    if (!isAuthenticated) {
+                        const connectionStatus = document.getElementById('connectionStatus');
+                        const connectionDot = document.getElementById('connectionDot');
+                        const connectionText = document.getElementById('connectionText');
+                        if (connectionStatus && connectionDot && connectionText) {
+                            connectionDot.className = 'status-dot disconnected';
+                            connectionText.textContent = 'Disconnected';
+                            connectionStatus.title = 'Not Authenticated';
+                        }
+                        return; // Don't check connectivity if not authenticated
+                    }
+                }
+                
+                // Only check connectivity if authenticated
                 const response = await fetch('/api/connectivity');
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -2195,7 +2271,11 @@
                 const connectionText = document.getElementById('connectionText');
                 
                 if (connectionStatus && connectionDot && connectionText) {
-                    if (data.connected && data.api_connected) {
+                    // Only update if authenticated (double-check)
+                    const authStatusEl = document.getElementById('authStatus');
+                    const isAuth = authStatusEl && authStatusEl.classList.contains('authenticated');
+                    
+                    if (isAuth && data.connected && data.api_connected) {
                         connectionDot.className = 'status-dot connected';
                         connectionText.textContent = 'Connected';
                         connectionStatus.title = data.status_message || 'System Connected';
@@ -2214,11 +2294,36 @@
             }
         }
         
-        function showAuthModal() {
+        function showAuthModal(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            console.log('[AUTH MODAL] showAuthModal called');
             const modal = document.getElementById('authModal');
             if (modal) {
+                console.log('[AUTH MODAL] Modal element found, showing...');
                 modal.classList.add('active');
+                // Also ensure modal is visible
+                modal.style.display = 'flex';
+                modal.style.zIndex = '10000';
+                // Focus the first input field
+                const firstInput = modal.querySelector('input');
+                if (firstInput) {
+                    setTimeout(() => firstInput.focus(), 100);
+                }
+            } else {
+                console.error('[AUTH MODAL] Modal element not found!');
+                alert('Authentication modal not found. Please refresh the page.');
             }
+        }
+        
+        // Ensure showAuthModal is available globally immediately
+        window.showAuthModal = showAuthModal;
+        
+        // Also make it available before DOMContentLoaded
+        if (typeof window !== 'undefined') {
+            window.showAuthModal = showAuthModal;
         }
         
         function hideAuthModal() {
