@@ -928,8 +928,8 @@
                     </div>
                 <div class="header-controls">
                     <i class="fas fa-cog theme-icon" style="cursor: pointer;"></i>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="autoTradeToggle" checked>
+                    <label class="toggle-switch" for="autoTradeToggle" title="Enable or disable auto trading">
+                        <input type="checkbox" id="autoTradeToggle" aria-label="Auto Trade toggle" title="Enable or disable auto trading" checked>
                         <span class="toggle-slider"></span>
                     </label>
                     <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme">
@@ -1097,12 +1097,12 @@
                 <form id="authFormAccessToken" onsubmit="authenticateWithAccessToken(event)">
                     <div class="form-group">
                         <label for="accessTokenApiKey">API Key (Optional)</label>
-                        <input type="text" id="accessTokenApiKey" placeholder="Enter API key (if not configured)">
+                        <input type="text" id="accessTokenApiKey" placeholder="Enter API key (if not configured)" title="API key (optional if already configured)" aria-label="API key optional">
                         <small>Only needed if API key is not configured in the system</small>
                     </div>
                     <div class="form-group">
                         <label for="accessTokenInput">Access Token</label>
-                        <input type="text" id="accessTokenInput" placeholder="Enter your access token" required>
+                        <input type="text" id="accessTokenInput" placeholder="Enter your access token" title="Access token" aria-label="Access token" required>
                         <small>
                             Use this if you already have a saved access token from a previous session.
                         </small>
@@ -1127,17 +1127,17 @@
                 <form id="authFormRequestToken" onsubmit="authenticateWithRequestToken(event)">
                     <div class="form-group">
                         <label for="apiKeyInput">API Key</label>
-                        <input type="text" id="apiKeyInput" placeholder="Enter your API key" required oninput="updateKiteLoginLink()">
+                        <input type="text" id="apiKeyInput" placeholder="Enter your API key" title="API key" aria-label="API key" required oninput="updateKiteLoginLink()">
                         <small>Your Kite Connect API key</small>
                     </div>
                     <div class="form-group">
                         <label for="apiSecretInput">API Secret</label>
-                        <input type="password" id="apiSecretInput" placeholder="Enter your API secret" required>
+                        <input type="password" id="apiSecretInput" placeholder="Enter your API secret" title="API secret" aria-label="API secret" required>
                         <small>Your Kite Connect API secret</small>
                     </div>
                     <div class="form-group">
                         <label for="requestTokenInput">Request Token</label>
-                        <input type="text" id="requestTokenInput" placeholder="Enter request token" required>
+                        <input type="text" id="requestTokenInput" placeholder="Enter request token" title="Request token" aria-label="Request token" required>
                         <small>
                             Get your request token from: 
                             <a href="https://kite.trade/connect/login{% if api_key %}?api_key={{ api_key }}{% endif %}" target="_blank" id="kiteLoginLink">
@@ -2165,16 +2165,16 @@
                 
                 // CRITICAL: Ensure connection status ALWAYS matches authentication status
                 // Override any connectivity check results with authentication status
-                const connectionStatus = document.getElementById('connectionStatus');
-                const connectionDot = document.getElementById('connectionDot');
-                const connectionText = document.getElementById('connectionText');
-                if (connectionStatus && connectionDot && connectionText) {
+                const connectionStatus2 = connectionStatus || document.getElementById('connectionStatus');
+                const connectionDot2 = connectionDot || document.getElementById('connectionDot');
+                const connectionText2 = connectionText || document.getElementById('connectionText');
+                if (connectionStatus2 && connectionDot2 && connectionText2) {
                     if (isAuthenticated) {
-                        connectionDot.className = 'status-dot connected';
-                        connectionText.textContent = 'Connected';
+                        connectionDot2.className = 'status-dot connected';
+                        connectionText2.textContent = 'Connected';
                     } else {
-                        connectionDot.className = 'status-dot disconnected';
-                        connectionText.textContent = 'Disconnected';
+                        connectionDot2.className = 'status-dot disconnected';
+                        connectionText2.textContent = 'Disconnected';
                     }
                 }
             } catch (error) {
