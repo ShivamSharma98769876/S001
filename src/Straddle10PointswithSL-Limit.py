@@ -17,7 +17,7 @@ if parent_dir not in sys.path:
 from config import *  # Import all configuration parameters
 
 # Import environment detection and logging utilities
-from environment import is_azure_environment, setup_logging, get_config_value
+from environment import is_azure_environment, setup_logging, get_config_value, sanitize_account_name_for_filename
 
 # Import config monitoring system
 from config_monitor import initialize_config_monitor, start_config_monitoring, stop_config_monitoring, get_config_monitor
@@ -2613,24 +2613,44 @@ def main():
         
         # Also add file handler to existing logger for backward compatibility
         global file_handler
-        if log_filename and os.path.exists(log_filename):
-            # File handler is already added by setup_logging, but we keep reference
-            file_handler = None
-            for handler in logging.getLogger().handlers:
-                if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_filename:
-                    file_handler = handler
-                    break
+        file_handler = None
+        if log_filename:
+            # Check if file exists (it should after setup_logging)
+            if os.path.exists(log_filename):
+                # File handler is already added by setup_logging, but we keep reference
+                for handler in logging.getLogger().handlers:
+                    if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_filename:
+                        file_handler = handler
+                        break
+            else:
+                # File doesn't exist - log warning
+                warning_msg = f"[LOG] Warning: Log file was not created at {log_filename}"
+                print(warning_msg)
+                logging.warning(warning_msg)
         
         # Log the file path prominently
-        log_msg = f"[LOG] Log file created at: {log_filename}"
-        print(log_msg)
-        logging.info(log_msg)
+        if log_filename:
+            log_msg = f"[LOG] Log file path: {log_filename}"
+            print(log_msg)
+            logging.info(log_msg)
+            
+            # Verify file exists
+            if os.path.exists(log_filename):
+                file_size = os.path.getsize(log_filename)
+                print(f"[LOG] Log file exists, size: {file_size} bytes")
+                logging.info(f"[LOG] Log file exists, size: {file_size} bytes")
+            else:
+                print(f"[LOG] WARNING: Log file does not exist at {log_filename}")
+                logging.warning(f"[LOG] WARNING: Log file does not exist at {log_filename}")
         
         if is_azure_environment():
             azure_msg = f"[LOG] Azure Log Stream: View logs in Azure Portal > Log stream"
             print(azure_msg)
             logging.info(azure_msg)
-            azure_files_msg = f"[LOG] Azure Log Files: Available in /home/LogFiles directory"
+            if log_filename:
+                azure_files_msg = f"[LOG] Azure Log Files: Available at {log_filename}"
+            else:
+                azure_files_msg = f"[LOG] Azure Log Files: Directory /tmp/{sanitize_account_name_for_filename(Input_account) if Input_account else 'logs'}/logs/"
             print(azure_files_msg)
             logging.info(azure_files_msg)
         

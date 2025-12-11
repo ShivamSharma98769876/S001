@@ -108,20 +108,38 @@ def setup_azure_logging(logger_name='root', account_name=None):
         log_file = os.path.join(log_dir, 'trading_bot.log')
     # Ensure directory exists before creating file handler
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.INFO)
     
-    # Add handlers
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-    logger.setLevel(logging.INFO)
-    
-    # Log the file path where logs are being written
-    logger.info(f"[LOG SETUP] Log file created at: {log_file}")
-    logger.info(f"[LOG SETUP] Log directory: {log_dir}")
-    print(f"[LOG SETUP] Log file will be written to: {log_file}")
-    print(f"[LOG SETUP] Log directory: {log_dir}")
+    # Create file handler
+    try:
+        file_handler = logging.FileHandler(log_file, encoding='utf-8', mode='a')  # 'a' for append mode
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.INFO)
+        
+        # Add handlers
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
+        logger.setLevel(logging.INFO)
+        
+        # Force file creation by writing an initial log message
+        # This ensures the file exists immediately
+        logger.info(f"[LOG SETUP] Log file created at: {log_file}")
+        logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+        file_handler.flush()  # Force write to disk
+        
+        print(f"[LOG SETUP] Log file created at: {log_file}")
+        print(f"[LOG SETUP] Log directory: {log_dir}")
+        print(f"[LOG SETUP] File exists: {os.path.exists(log_file)}")
+        
+    except Exception as e:
+        error_msg = f"[LOG SETUP] Failed to create log file {log_file}: {e}"
+        print(error_msg)
+        logging.error(error_msg)
+        import traceback
+        logging.error(traceback.format_exc())
+        # Fallback: try to create at least console logging
+        logger.addHandler(console_handler)
+        logger.setLevel(logging.INFO)
+        return logger, None
     
     return logger, log_file
 
@@ -157,20 +175,38 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     
     # Ensure directory exists before creating file handler
     os.makedirs(os.path.dirname(log_filename), exist_ok=True)
-    file_handler = logging.FileHandler(log_filename, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.INFO)
     
-    # Add handlers
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-    logger.setLevel(logging.INFO)
-    
-    # Log the file path where logs are being written
-    logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
-    logger.info(f"[LOG SETUP] Log directory: {log_dir}")
-    print(f"[LOG SETUP] Log file will be written to: {log_filename}")
-    print(f"[LOG SETUP] Log directory: {log_dir}")
+    # Create file handler
+    try:
+        file_handler = logging.FileHandler(log_filename, encoding='utf-8', mode='a')  # 'a' for append mode
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.INFO)
+        
+        # Add handlers
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
+        logger.setLevel(logging.INFO)
+        
+        # Force file creation by writing an initial log message
+        # This ensures the file exists immediately
+        logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
+        logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+        file_handler.flush()  # Force write to disk
+        
+        print(f"[LOG SETUP] Log file created at: {log_filename}")
+        print(f"[LOG SETUP] Log directory: {log_dir}")
+        print(f"[LOG SETUP] File exists: {os.path.exists(log_filename)}")
+        
+    except Exception as e:
+        error_msg = f"[LOG SETUP] Failed to create log file {log_filename}: {e}"
+        print(error_msg)
+        logging.error(error_msg)
+        import traceback
+        logging.error(traceback.format_exc())
+        # Fallback: try to create at least console logging
+        logger.addHandler(console_handler)
+        logger.setLevel(logging.INFO)
+        return logger, None
     
     return logger, log_filename
 
