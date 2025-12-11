@@ -1232,11 +1232,33 @@ def get_live_trader_logs():
                     # Collect all trading logs (recursive)
                     azure_logs_all = collect_logs_from_dir(azure_log_dir)
                     
-                    # Filter account-specific
+                    # Filter account-specific - use sanitized names for matching
                     account_matching_files = []
+                    sanitized_variations_for_matching = []
+                    for acc in account_variations:
+                        if acc:
+                            sanitized_variations_for_matching.append(sanitize_account_name_for_filename(acc))
+                            sanitized_variations_for_matching.append(acc.split()[0] if ' ' in acc else acc)  # First name
+                            sanitized_variations_for_matching.append(acc.replace(' ', '_'))
+                            sanitized_variations_for_matching.append(acc.replace(' ', ''))
+                    
+                    # Remove duplicates
+                    sanitized_variations_for_matching = list(set([v for v in sanitized_variations_for_matching if v]))
+                    
+                    logging.info(f"[LOGS] Searching for account variations: {sanitized_variations_for_matching}")
+                    logging.info(f"[LOGS] Found {len(azure_logs_all)} total trading log files in Azure")
+                    
                     for log_path in azure_logs_all:
                         fname = os.path.basename(log_path)
-                        if any(acc and acc in fname for acc in account_variations):
+                        # Check if filename contains any sanitized account variation
+                        matches = False
+                        for sanitized_var in sanitized_variations_for_matching:
+                            if sanitized_var and sanitized_var.lower() in fname.lower():
+                                matches = True
+                                logging.info(f"[LOGS] Matched log file '{fname}' with account variation '{sanitized_var}'")
+                                break
+                        
+                        if matches:
                             account_matching_files.append(log_path)
                     
                     if account_matching_files:
@@ -1245,6 +1267,9 @@ def get_live_trader_logs():
                             if log_path not in log_files:
                                 log_files.append(log_path)
                                 logging.info(f"[LOGS] Found Azure log file (account match): {log_path}")
+                    else:
+                        logging.warning(f"[LOGS] No account-specific logs found. Account variations tried: {sanitized_variations_for_matching}")
+                        logging.info(f"[LOGS] Available log files: {[os.path.basename(f) for f in azure_logs_all[:10]]}")  # Show first 10
                     
                     # Fallback: any trading logs if still none
                     if not log_files and azure_logs_all:
@@ -1307,10 +1332,27 @@ def get_live_trader_logs():
                         # Collect recursively
                         alt_logs = collect_logs_from_dir(alt_path)
                         account_matching_files = []
+                        sanitized_variations_for_matching = []
+                        for acc in account_variations:
+                            if acc:
+                                sanitized_variations_for_matching.append(sanitize_account_name_for_filename(acc))
+                                sanitized_variations_for_matching.append(acc.split()[0] if ' ' in acc else acc)
+                                sanitized_variations_for_matching.append(acc.replace(' ', '_'))
+                                sanitized_variations_for_matching.append(acc.replace(' ', ''))
+                        sanitized_variations_for_matching = list(set([v for v in sanitized_variations_for_matching if v]))
+                        
                         for log_path in alt_logs:
                             fname = os.path.basename(log_path)
-                            if any(acc and acc in fname for acc in account_variations):
+                            # Check if filename contains any sanitized account variation
+                            matches = False
+                            for sanitized_var in sanitized_variations_for_matching:
+                                if sanitized_var and sanitized_var.lower() in fname.lower():
+                                    matches = True
+                                    break
+                            
+                            if matches:
                                 account_matching_files.append(log_path)
+                        
                         if account_matching_files:
                             account_matching_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
                             for log_path in account_matching_files:
