@@ -1709,6 +1709,23 @@ def place_order(strike, transaction_type, is_amo, quantity):
     order_variety = kite.VARIETY_AMO if is_amo else kite.VARIETY_REGULAR
     logging.info(f"Placing {'AMO' if is_amo else 'market'} order for {strike['tradingsymbol']} with transaction type {transaction_type}")
     try:
+        # Get lot size from config (imported via 'from config import *')
+        try:
+            lot_size = LOT_SIZE
+        except NameError:
+            # Fallback if LOT_SIZE not defined in config
+            lot_size = 75
+        
+        # Validate quantity is a multiple of lot_size
+        if quantity % lot_size != 0:
+            # Round down to nearest multiple of lot_size
+            rounded_quantity = (quantity // lot_size) * lot_size
+            if rounded_quantity < lot_size:
+                logging.error(f"Quantity {quantity} is too small. Minimum is {lot_size}. Cannot place order.")
+                return None
+            logging.warning(f"Quantity {quantity} is not a multiple of {lot_size}. Rounding down to {rounded_quantity}")
+            quantity = rounded_quantity
+        
         # Use cached LTP to reduce API calls
         symbol = strike['exchange'] + ':' + strike['tradingsymbol']
         ltp = get_cached_ltp(symbol)
@@ -1729,7 +1746,7 @@ def place_order(strike, transaction_type, is_amo, quantity):
             product=kite.PRODUCT_NRML,
             tag="S0001"
         )
-        logging.info(f"Order placed successfully. ID: {order_id}, LTP : {ltp}")
+        logging.info(f"Order placed successfully. ID: {order_id}, LTP : {ltp}, Quantity: {quantity}")
         return order_id
     except Exception as e:
         logging.error(f"Error placing order: {e}")
@@ -1740,6 +1757,23 @@ def place_order(strike, transaction_type, is_amo, quantity):
 def place_stop_loss_order(strike, transaction_type, stop_loss_price, quantity):
     logging.info(f"Placing stop-loss order for {strike['tradingsymbol']} with transaction type {transaction_type} and SL price {stop_loss_price}")
     try:
+        # Get lot size from config (imported via 'from config import *')
+        try:
+            lot_size = LOT_SIZE
+        except NameError:
+            # Fallback if LOT_SIZE not defined in config
+            lot_size = 75
+        
+        # Validate quantity is a multiple of lot_size
+        if quantity % lot_size != 0:
+            # Round down to nearest multiple of lot_size
+            rounded_quantity = (quantity // lot_size) * lot_size
+            if rounded_quantity < lot_size:
+                logging.error(f"Quantity {quantity} is too small. Minimum is {lot_size}. Cannot place stop-loss order.")
+                return None
+            logging.warning(f"Quantity {quantity} is not a multiple of {lot_size}. Rounding down to {rounded_quantity}")
+            quantity = rounded_quantity
+        
         order_id = kite.place_order(
             variety=kite.VARIETY_REGULAR,
             exchange=kite.EXCHANGE_NFO,
@@ -1752,7 +1786,7 @@ def place_stop_loss_order(strike, transaction_type, stop_loss_price, quantity):
             product=kite.PRODUCT_NRML,
             tag="S0001"
         )
-        logging.info(f"Stop-loss order placed successfully. ID: {order_id}")
+        logging.info(f"Stop-loss order placed successfully. ID: {order_id}, Quantity: {quantity}")
         return order_id
     except Exception as e:
         logging.error(f"Error placing stop-loss order: {e}")
@@ -2605,17 +2639,51 @@ def main():
     print("=" * 60)
     
     try:
-        # call_quantity = int(input("Enter Call Quantity: ").strip())
-        # put_quantity = int(input("Enter Put Quantity: ").strip())
+        # Read quantities from stdin (sent by dashboard) or prompt if running locally
+        if is_azure_environment():
+            # On Azure, quantities are passed via stdin from dashboard
+            call_quantity = int(input("Enter Call Quantity: ").strip())
+            put_quantity = int(input("Enter Put Quantity: ").strip())
+        else:
+            # Local: try stdin first (if called from dashboard), otherwise prompt
+            try:
+                call_quantity = int(input("Enter Call Quantity: ").strip())
+                put_quantity = int(input("Enter Put Quantity: ").strip())
+            except (EOFError, ValueError):
+                # If stdin is empty or invalid, use defaults or prompt
+                call_quantity = int(input("Enter Call Quantity (default 150): ").strip() or "150")
+                put_quantity = int(input("Enter Put Quantity (default 150): ").strip() or "150")
+        
+        # Get lot size from config (imported via 'from config import *')
+        try:
+            lot_size = LOT_SIZE
+        except NameError:
+            # Fallback if LOT_SIZE not defined in config
+            lot_size = 75
+        
+        # Validate quantities are multiples of lot_size
+        if call_quantity % lot_size != 0:
+            rounded_call = (call_quantity // lot_size) * lot_size
+            if rounded_call < lot_size:
+                rounded_call = lot_size
+            logging.warning(f"Call Quantity {call_quantity} is not a multiple of {lot_size}. Rounding down to {rounded_call}")
+            call_quantity = rounded_call
+        
+        if put_quantity % lot_size != 0:
+            rounded_put = (put_quantity // lot_size) * lot_size
+            if rounded_put < lot_size:
+                rounded_put = lot_size
+            logging.warning(f"Put Quantity {put_quantity} is not a multiple of {lot_size}. Rounding down to {rounded_put}")
+            put_quantity = rounded_put
         
         print(f"[OK] Call Quantity: {call_quantity}")
         print(f"[OK] Put Quantity: {put_quantity}")
         print("=" * 60)
         
-    except ValueError:
-        print("[ERROR] Invalid quantity entered. Using default values.")
-        call_quantity = 1
-        put_quantity = 1
+    except (ValueError, EOFError) as e:
+        print(f"[ERROR] Invalid quantity entered: {e}. Using default values.")
+        call_quantity = 150  # Default to 150 (2 lots)
+        put_quantity = 150
         print(f"[OK] Using default quantities - Call: {call_quantity}, Put: {put_quantity}")
     
     # Initialize config monitoring system
@@ -2697,24 +2765,31 @@ def main():
 # ------------------------------
 def calculate_hedge_quantity(original_quantity):
     """
-    Calculate hedge quantity as half of the original quantity, rounded DOWN to the nearest multiple of 75.
+    Calculate hedge quantity as half of the original quantity, rounded DOWN to the nearest multiple of LOT_SIZE.
     
     Args:
         original_quantity (int): The original call or put quantity
         
     Returns:
-        int: Hedge quantity rounded down to nearest multiple of 75
+        int: Hedge quantity rounded down to nearest multiple of LOT_SIZE
     """
+    # Get lot size from config (imported via 'from config import *')
+    try:
+        lot_size = LOT_SIZE
+    except NameError:
+        # Fallback if LOT_SIZE not defined in config
+        lot_size = 75
+    
     # Calculate half of the original quantity
     half_quantity = original_quantity / 2
     
-    # Round DOWN to the nearest multiple of 75
-    hedge_quantity = (int(half_quantity) // 75) * 75
+    # Round DOWN to the nearest multiple of lot_size
+    hedge_quantity = (int(half_quantity) // lot_size) * lot_size
     
-    # Ensure minimum quantity is 75 (if original quantity is very small)
-    hedge_quantity = max(75, hedge_quantity)
+    # Ensure minimum quantity is lot_size (if original quantity is very small)
+    hedge_quantity = max(lot_size, hedge_quantity)
     
-    logging.info(f"Hedge quantity calculation: Original={original_quantity}, Half={half_quantity:.1f}, Rounded DOWN to 75s={hedge_quantity}")
+    logging.info(f"Hedge quantity calculation: Original={original_quantity}, Half={half_quantity:.1f}, Rounded DOWN to {lot_size}s={hedge_quantity}")
     
     return int(hedge_quantity)
 

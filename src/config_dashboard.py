@@ -33,6 +33,7 @@ try:
     
     DASHBOARD_HOST = getattr(config, 'DASHBOARD_HOST', '0.0.0.0')
     DASHBOARD_PORT = getattr(config, 'DASHBOARD_PORT', 8080)
+    LOT_SIZE = getattr(config, 'LOT_SIZE', 75)  # Get lot size from config
     
     # Check for Azure environment - Azure provides port via HTTP_PLATFORM_PORT
     if os.getenv('HTTP_PLATFORM_PORT'):
@@ -193,6 +194,21 @@ def get_current_config():
         return jsonify({
             'status': 'error',
             'message': str(e)
+        }), 500
+
+@app.route('/api/config/lot-size', methods=['GET'])
+def get_lot_size():
+    """Get lot size from config"""
+    try:
+        return jsonify({
+            'success': True,
+            'lot_size': LOT_SIZE
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'lot_size': 75  # Fallback default
         }), 500
 
 @app.route('/api/config/history')
@@ -835,6 +851,7 @@ def get_live_trader_logs():
         # Try to read from log file if strategy is running
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         src_dir = os.path.join(script_dir, 'src')  # Log files are in src directory
+        src_logs_dir = os.path.join(src_dir, 'logs')  # Log files are in src/logs directory (local)
         
         # Look for today's log file
         from datetime import date
@@ -854,15 +871,35 @@ def get_live_trader_logs():
             account = 'TRADING_ACCOUNT'
         
         logging.info(f"[LOGS] Looking for log files for account: {account}, date: {today}")
+        logging.info(f"[LOGS] Checking directories: src_dir={src_dir}, src_logs_dir={src_logs_dir}")
         
         # Check multiple locations for log files
-        # 1. src directory with account name (format: "Account YYYY-MM-DD_trading_log.log")
-        account_log = os.path.join(src_dir, f'{account} {today}_trading_log.log')
-        if os.path.exists(account_log):
-            log_files.append(account_log)
-            logging.info(f"[LOGS] Found log file: {account_log}")
+        # 1. PRIORITY: src/logs directory (where logs are actually saved locally)
+        if os.path.exists(src_logs_dir):
+            try:
+                # Check for today's log file first
+                account_log = os.path.join(src_logs_dir, f'{account} {today}_trading_log.log')
+                if os.path.exists(account_log):
+                    log_files.append(account_log)
+                    logging.info(f"[LOGS] Found log file in src/logs: {account_log}")
+                
+                # Check for any log files in src/logs directory matching account name
+                for f in os.listdir(src_logs_dir):
+                    if f.endswith('_trading_log.log') and account in f:
+                        log_path = os.path.join(src_logs_dir, f)
+                        if log_path not in log_files:
+                            log_files.append(log_path)
+                            logging.info(f"[LOGS] Found log file in src/logs: {log_path}")
+            except Exception as e:
+                logging.warning(f"[LOGS] Error reading src/logs directory: {e}")
         
-        # 2. Check for any log files in src directory matching account name
+        # 2. Check src directory with account name (format: "Account YYYY-MM-DD_trading_log.log")
+        account_log = os.path.join(src_dir, f'{account} {today}_trading_log.log')
+        if os.path.exists(account_log) and account_log not in log_files:
+            log_files.append(account_log)
+            logging.info(f"[LOGS] Found log file in src: {account_log}")
+        
+        # 3. Check for any log files in src directory matching account name
         if os.path.exists(src_dir):
             try:
                 for f in os.listdir(src_dir):
@@ -870,17 +907,17 @@ def get_live_trader_logs():
                         log_path = os.path.join(src_dir, f)
                         if log_path not in log_files:
                             log_files.append(log_path)
-                            logging.info(f"[LOGS] Found log file: {log_path}")
+                            logging.info(f"[LOGS] Found log file in src: {log_path}")
             except Exception as e:
                 logging.warning(f"[LOGS] Error reading src directory: {e}")
         
-        # 3. Check root directory (for backward compatibility)
+        # 4. Check root directory (for backward compatibility)
         root_log = os.path.join(script_dir, f'{account} {today}_trading_log.log')
         if os.path.exists(root_log) and root_log not in log_files:
             log_files.append(root_log)
-            logging.info(f"[LOGS] Found log file: {root_log}")
+            logging.info(f"[LOGS] Found log file in root: {root_log}")
         
-        # 4. Check logs directory if it exists
+        # 5. Check logs directory at root level if it exists
         log_dir = os.path.join(script_dir, 'logs')
         if os.path.exists(log_dir):
             try:
@@ -889,38 +926,97 @@ def get_live_trader_logs():
                         log_path = os.path.join(log_dir, f)
                         if log_path not in log_files:
                             log_files.append(log_path)
-                            logging.info(f"[LOGS] Found log file: {log_path}")
+                            logging.info(f"[LOGS] Found log file in root/logs: {log_path}")
             except Exception as e:
-                logging.warning(f"[LOGS] Error reading logs directory: {e}")
+                logging.warning(f"[LOGS] Error reading root logs directory: {e}")
         
-        # 5. Check Azure log directory if in Azure environment
+        # 6. PRIORITY: Check Azure log directory if in Azure environment (similar to src/logs for local)
         from environment import is_azure_environment, get_log_directory
         if is_azure_environment():
             azure_log_dir = get_log_directory()
-            azure_log = os.path.join(azure_log_dir, f'{account} {today}_trading_log.log')
-            if os.path.exists(azure_log) and azure_log not in log_files:
-                log_files.append(azure_log)
-                logging.info(f"[LOGS] Found Azure log file: {azure_log}")
-            # Also check for any log files in Azure log directory
+            logging.info(f"[LOGS] Azure environment detected - checking log directory: {azure_log_dir}")
+            
             if os.path.exists(azure_log_dir):
                 try:
+                    # Check for today's log file first (highest priority)
+                    azure_log = os.path.join(azure_log_dir, f'{account} {today}_trading_log.log')
+                    if os.path.exists(azure_log):
+                        # Insert at beginning for priority (Azure logs should be checked first in Azure)
+                        log_files.insert(0, azure_log)
+                        logging.info(f"[LOGS] Found Azure log file (today): {azure_log}")
+                    
+                    # Check for any log files in Azure log directory matching account name
                     for f in os.listdir(azure_log_dir):
                         if f.endswith('_trading_log.log') and account in f:
                             log_path = os.path.join(azure_log_dir, f)
                             if log_path not in log_files:
                                 log_files.append(log_path)
                                 logging.info(f"[LOGS] Found Azure log file: {log_path}")
+                    
+                    # Also check for any trading log files (fallback if account name doesn't match)
+                    for f in os.listdir(azure_log_dir):
+                        if f.endswith('_trading_log.log'):
+                            log_path = os.path.join(azure_log_dir, f)
+                            if log_path not in log_files:
+                                log_files.append(log_path)
+                                logging.info(f"[LOGS] Found Azure log file (any): {log_path}")
                 except Exception as e:
-                    logging.warning(f"[LOGS] Error reading Azure log directory: {e}")
+                    logging.warning(f"[LOGS] Error reading Azure log directory {azure_log_dir}: {e}")
+                    import traceback
+                    logging.warning(f"[LOGS] Traceback: {traceback.format_exc()}")
+            else:
+                logging.warning(f"[LOGS] Azure log directory does not exist: {azure_log_dir}")
+                # Try alternative Azure log locations
+                alternative_paths = [
+                    '/home/LogFiles',
+                    '/home/LogFiles/Application',
+                    os.path.join(os.getenv('HOME', '/home'), 'LogFiles')
+                ]
+                for alt_path in alternative_paths:
+                    if os.path.exists(alt_path):
+                        logging.info(f"[LOGS] Trying alternative Azure log path: {alt_path}")
+                        try:
+                            for f in os.listdir(alt_path):
+                                if f.endswith('_trading_log.log') and account in f:
+                                    log_path = os.path.join(alt_path, f)
+                                    if log_path not in log_files:
+                                        log_files.append(log_path)
+                                        logging.info(f"[LOGS] Found log file in alternative path: {log_path}")
+                        except Exception as e:
+                            logging.warning(f"[LOGS] Error reading alternative path {alt_path}: {e}")
         
         if not log_files:
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
-            logging.warning(f"[LOGS] Checked directories: {src_dir}, {script_dir}, {log_dir}")
+            # Log checked directories based on environment
+            if is_azure_environment():
+                checked_dirs = f"Azure log directory: {get_log_directory()}"
+            else:
+                checked_dirs = f"src_logs_dir={src_logs_dir}, src_dir={src_dir}, root={script_dir}, root_logs={log_dir}"
+            logging.warning(f"[LOGS] Checked directories: {checked_dirs}")
+            
+            # List existing files for debugging
+            if is_azure_environment():
+                azure_log_dir = get_log_directory()
+                if os.path.exists(azure_log_dir):
+                    try:
+                        existing_files = os.listdir(azure_log_dir)
+                        logging.info(f"[LOGS] Files in Azure log directory ({azure_log_dir}): {existing_files}")
+                    except Exception as e:
+                        logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
+            else:
+                if os.path.exists(src_logs_dir):
+                    try:
+                        existing_files = os.listdir(src_logs_dir)
+                        logging.info(f"[LOGS] Files in src/logs: {existing_files}")
+                    except:
+                        pass
+            
+            env_msg = "Azure log directory" if is_azure_environment() else "src/logs, src, root"
             return jsonify({
                 'success': True,
                 'logs': [],
                 'log_file_path': None,
-                'message': f'No log files found for account: {account}, date: {today}. Logs will appear once the strategy starts.'
+                'message': f'No log files found for account: {account}, date: {today}. Checked: {env_msg}. Logs will appear once the strategy starts.'
             })
         
         # Read last 500 lines from log files (increased to show more logs)
@@ -962,6 +1058,44 @@ def get_live_trader_logs():
             'logs': []
         }), 500
 
+@app.route('/api/live-trader/status', methods=['GET'])
+def live_trader_status():
+    """Get Live Trader engine status"""
+    try:
+        global strategy_process, strategy_running
+        
+        # Check actual process status
+        actual_running = False
+        if strategy_process is not None:
+            poll_result = strategy_process.poll()
+            if poll_result is None:
+                # Process is still running
+                actual_running = True
+            else:
+                # Process has terminated
+                logging.info(f"[LIVE TRADER STATUS] Process terminated with return code: {poll_result}")
+                strategy_running = False
+                strategy_process = None
+        
+        # Update strategy_running flag to match actual state
+        if actual_running:
+            strategy_running = True
+        else:
+            strategy_running = False
+        
+        return jsonify({
+            'running': actual_running,
+            'strategy_running': strategy_running,
+            'process_id': strategy_process.pid if (strategy_process and actual_running) else None
+        })
+    except Exception as e:
+        logging.error(f"[LIVE TRADER STATUS] Error: {e}")
+        return jsonify({
+            'running': False,
+            'strategy_running': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/live-trader/start', methods=['POST'])
 def start_live_trader():
     """Start Live Trader by running Straddle10PointswithSL-Limit.py"""
@@ -998,6 +1132,29 @@ def start_live_trader():
             return jsonify({
                 'success': False,
                 'error': 'Call Quantity and Put Quantity are required'
+            }), 400
+        
+        # Convert to integers
+        try:
+            call_quantity = int(call_quantity)
+            put_quantity = int(put_quantity)
+        except (ValueError, TypeError):
+            return jsonify({
+                'success': False,
+                'error': 'Call Quantity and Put Quantity must be valid numbers'
+            }), 400
+        
+        # Validate quantities are multiples of LOT_SIZE (from config)
+        if call_quantity % LOT_SIZE != 0:
+            return jsonify({
+                'success': False,
+                'error': f'Call Quantity must be a multiple of {LOT_SIZE}. You entered {call_quantity}. Nearest valid: {(call_quantity // LOT_SIZE) * LOT_SIZE}'
+            }), 400
+        
+        if put_quantity % LOT_SIZE != 0:
+            return jsonify({
+                'success': False,
+                'error': f'Put Quantity must be a multiple of {LOT_SIZE}. You entered {put_quantity}. Nearest valid: {(put_quantity // LOT_SIZE) * LOT_SIZE}'
             }), 400
         
         # Check if authenticated

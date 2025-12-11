@@ -1019,14 +1019,14 @@
             <form id="liveTraderForm" onsubmit="startLiveTraderStrategy(event)">
                 <div class="form-group">
                     <label for="callQuantityInput">Call Quantity</label>
-                    <input type="number" id="callQuantityInput" placeholder="Enter call quantity" min="1" required>
-                    <small>Number of call options to trade</small>
+                    <input type="number" id="callQuantityInput" placeholder="Enter call quantity" min="75" value="150" step="75" required>
+                    <small>Number of call options to trade (must be multiple of lot size - will be updated from config)</small>
                 </div>
                 
                 <div class="form-group">
                     <label for="putQuantityInput">Put Quantity</label>
-                    <input type="number" id="putQuantityInput" placeholder="Enter put quantity" min="1" required>
-                    <small>Number of put options to trade</small>
+                    <input type="number" id="putQuantityInput" placeholder="Enter put quantity" min="75" value="150" step="75" required>
+                    <small>Number of put options to trade (must be multiple of lot size - will be updated from config)</small>
                 </div>
                 
                 <div class="auth-error" id="liveTraderError"></div>
@@ -1354,9 +1354,55 @@
         let pnlChart = null;
         let updateInterval = null;
         let isLiveTraderActive = false;
+        let lotSize = 75; // Default lot size, will be fetched from API
+
+        // Fetch lot size from config
+        async function fetchLotSize() {
+            try {
+                const response = await fetch('/api/config/lot-size');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        lotSize = data.lot_size;
+                        // Update input fields with lot size
+                        const callQtyInput = document.getElementById('callQuantityInput');
+                        const putQtyInput = document.getElementById('putQuantityInput');
+                        if (callQtyInput) {
+                            callQtyInput.min = lotSize;
+                            callQtyInput.step = lotSize;
+                            if (!callQtyInput.value || parseInt(callQtyInput.value) < lotSize) {
+                                callQtyInput.value = lotSize * 2; // Default to 2 lots
+                            }
+                            // Update help text
+                            const callQtySmall = callQtyInput.parentElement.querySelector('small');
+                            if (callQtySmall) {
+                                callQtySmall.textContent = `Number of call options to trade (must be multiple of ${lotSize}, e.g., ${lotSize}, ${lotSize * 2}, ${lotSize * 3}, ${lotSize * 4})`;
+                            }
+                        }
+                        if (putQtyInput) {
+                            putQtyInput.min = lotSize;
+                            putQtyInput.step = lotSize;
+                            if (!putQtyInput.value || parseInt(putQtyInput.value) < lotSize) {
+                                putQtyInput.value = lotSize * 2; // Default to 2 lots
+                            }
+                            // Update help text
+                            const putQtySmall = putQtyInput.parentElement.querySelector('small');
+                            if (putQtySmall) {
+                                putQtySmall.textContent = `Number of put options to trade (must be multiple of ${lotSize}, e.g., ${lotSize}, ${lotSize * 2}, ${lotSize * 3}, ${lotSize * 4})`;
+                            }
+                        }
+                        console.log(`[LOT SIZE] Loaded from config: ${lotSize}`);
+                    }
+                }
+            } catch (error) {
+                console.error('[LOT SIZE] Error fetching lot size:', error);
+                // Use default 75 if fetch fails
+            }
+        }
         
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            fetchLotSize(); // Fetch lot size first
             initializeTheme();
             initializeDashboard();
             setupDateFilter();
@@ -1668,6 +1714,23 @@
             if (!putQuantity || putQuantity <= 0) {
                 if (errorEl) {
                     errorEl.textContent = 'Please enter a valid Put Quantity';
+                    errorEl.classList.add('show');
+                }
+                return;
+            }
+
+            // Validate quantities are multiples of lot size (from config)
+            if (callQuantity % lotSize !== 0) {
+                if (errorEl) {
+                    errorEl.textContent = `Call Quantity must be a multiple of ${lotSize}. You entered ${callQuantity}. Nearest valid: ${Math.floor(callQuantity / lotSize) * lotSize}`;
+                    errorEl.classList.add('show');
+                }
+                return;
+            }
+
+            if (putQuantity % lotSize !== 0) {
+                if (errorEl) {
+                    errorEl.textContent = `Put Quantity must be a multiple of ${lotSize}. You entered ${putQuantity}. Nearest valid: ${Math.floor(putQuantity / lotSize) * lotSize}`;
                     errorEl.classList.add('show');
                 }
                 return;

@@ -28,9 +28,21 @@ def get_log_directory():
     """
     if is_azure_environment():
         # Azure App Service log directory
-        log_dir = os.getenv('LOG_DIR', '/home/LogFiles')
-        # Also try the standard Azure location
-        if not os.path.exists(log_dir):
+        # Try multiple Azure log locations
+        possible_dirs = [
+            os.getenv('LOG_DIR'),
+            '/home/LogFiles',
+            '/home/LogFiles/Application',
+            os.path.join(os.getenv('HOME', '/home'), 'LogFiles')
+        ]
+        log_dir = None
+        for dir_path in possible_dirs:
+            if dir_path and os.path.exists(dir_path):
+                log_dir = dir_path
+                break
+        
+        # Default to /home/LogFiles if none found (will be created)
+        if not log_dir:
             log_dir = '/home/LogFiles'
     else:
         # Local: use src/logs directory
