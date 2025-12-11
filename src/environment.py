@@ -164,6 +164,12 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     logger.addHandler(file_handler)
     logger.setLevel(logging.INFO)
     
+    # Log the file path where logs are being written
+    logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
+    logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+    print(f"[LOG SETUP] Log file will be written to: {log_filename}")
+    print(f"[LOG SETUP] Log directory: {log_dir}")
+    
     return logger, log_filename
 
 def setup_logging(account_name=None, logger_name='root'):

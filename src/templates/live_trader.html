@@ -1122,25 +1122,66 @@
                         console.log('[LOGS]', data.message);
                     }
                 } else if (!data.success) {
-                    // Handle error case - don't clear existing logs
+                    // Handle error case - display error logs if provided
                     const logsContainer = document.getElementById('logsContainer');
                     if (logsContainer) {
-                        let errorMsg = data.error || data.message || 'Error loading logs';
-                        // Only add error message if container is empty or as a new entry
-                        const existingLogs = logsContainer.querySelectorAll('.log-entry:not(.log-path-info)');
-                        if (existingLogs.length === 0) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'log-entry error';
-                            errorDiv.innerHTML = `<span>Error: ${errorMsg}</span>`;
-                            logsContainer.appendChild(errorDiv);
+                        // If error logs are provided, display them
+                        if (data.logs && data.logs.length > 0) {
+                            data.logs.forEach(logText => {
+                                const logEntry = parseLogEntry(logText);
+                                logsContainer.appendChild(logEntry);
+                            });
                         } else {
-                            // Add error as a new log entry instead of replacing
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'log-entry error';
-                            errorDiv.innerHTML = `<span>[ERROR] ${errorMsg}</span>`;
-                            logsContainer.appendChild(errorDiv);
+                            // Otherwise show error message
+                            let errorMsg = data.error || data.message || 'Error loading logs';
+                            const existingLogs = logsContainer.querySelectorAll('.log-entry:not(.log-path-info)');
+                            if (existingLogs.length === 0) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'log-entry error';
+                                errorDiv.innerHTML = `<span>Error: ${errorMsg}</span>`;
+                                logsContainer.appendChild(errorDiv);
+                            } else {
+                                // Add error as a new log entry instead of replacing
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'log-entry error';
+                                errorDiv.innerHTML = `<span>[ERROR] ${errorMsg}</span>`;
+                                logsContainer.appendChild(errorDiv);
+                            }
                         }
-                        console.error('[LOGS] Error loading logs:', errorMsg);
+                        console.error('[LOGS] Error loading logs:', data.error);
+                    }
+                }
+                
+                // Display log file path if available
+                if (data.log_file_path && logsContainer) {
+                    // Remove existing path info if any
+                    const existingPathInfo = logsContainer.querySelector('.log-path-info');
+                    if (existingPathInfo) {
+                        existingPathInfo.remove();
+                    }
+                    
+                    // Add log file path info at the top
+                    const pathInfo = document.createElement('div');
+                    pathInfo.className = 'log-entry log-path-info';
+                    pathInfo.style.cssText = 'background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; padding: 8px; margin-bottom: 10px; font-weight: 500;';
+                    pathInfo.innerHTML = `<i class="fas fa-file-alt"></i> <strong>Log File:</strong> <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px; font-family: monospace;">${data.log_file_path}</code>`;
+                    logsContainer.insertBefore(pathInfo, logsContainer.firstChild);
+                }
+                
+                // Display warning if using fallback logs
+                if (data.warning && logsContainer) {
+                    const existingWarning = logsContainer.querySelector('.log-warning-info');
+                    if (!existingWarning) {
+                        const warningDiv = document.createElement('div');
+                        warningDiv.className = 'log-entry log-warning-info warning';
+                        warningDiv.style.cssText = 'background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; padding: 8px; margin-bottom: 10px;';
+                        warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> ${data.warning}`;
+                        const pathInfo = logsContainer.querySelector('.log-path-info');
+                        if (pathInfo) {
+                            pathInfo.insertAdjacentElement('afterend', warningDiv);
+                        } else {
+                            logsContainer.insertBefore(warningDiv, logsContainer.firstChild);
+                        }
                     }
                 }
             } catch (error) {

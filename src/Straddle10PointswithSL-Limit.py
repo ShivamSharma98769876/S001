@@ -2608,24 +2608,43 @@ def main():
     
     # Setup logging for both local and Azure environments
     import os
-    logger, log_filename = setup_logging(account_name=Input_account)
-    
-    # Also add file handler to existing logger for backward compatibility
-    global file_handler
-    if log_filename and os.path.exists(log_filename):
-        # File handler is already added by setup_logging, but we keep reference
-        file_handler = None
-        for handler in logging.getLogger().handlers:
-            if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_filename:
-                file_handler = handler
-                break
-    
-    print(f"[LOG] Log file created at: {log_filename}")
-    if is_azure_environment():
-        print(f"[LOG] Azure Log Stream: View logs in Azure Portal > Log stream")
-        print(f"[LOG] Azure Log Files: Available in /home/LogFiles directory")
-    
-    print("[OK] API credentials set successfully")
+    try:
+        logger, log_filename = setup_logging(account_name=Input_account)
+        
+        # Also add file handler to existing logger for backward compatibility
+        global file_handler
+        if log_filename and os.path.exists(log_filename):
+            # File handler is already added by setup_logging, but we keep reference
+            file_handler = None
+            for handler in logging.getLogger().handlers:
+                if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_filename:
+                    file_handler = handler
+                    break
+        
+        # Log the file path prominently
+        log_msg = f"[LOG] Log file created at: {log_filename}"
+        print(log_msg)
+        logging.info(log_msg)
+        
+        if is_azure_environment():
+            azure_msg = f"[LOG] Azure Log Stream: View logs in Azure Portal > Log stream"
+            print(azure_msg)
+            logging.info(azure_msg)
+            azure_files_msg = f"[LOG] Azure Log Files: Available in /home/LogFiles directory"
+            print(azure_files_msg)
+            logging.info(azure_files_msg)
+        
+        print("[OK] API credentials set successfully")
+        logging.info("[OK] API credentials set successfully")
+    except Exception as e:
+        error_msg = f"[ERROR] Failed to setup logging: {e}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        logging.error(f"{error_msg}\n{traceback.format_exc()}")
+        # Continue execution even if logging setup fails
+        logger = logging.getLogger()
+        log_filename = None
     print("=" * 60)
     
     # Calculate today's stop loss

@@ -1452,16 +1452,42 @@ def get_live_trader_logs():
                 seen.add(log)
                 unique_logs.append(log)
         
-        return jsonify({
+        # Include log file path and any error messages in response
+        response_data = {
             'success': True,
             'logs': unique_logs[-500:],  # Last 500 entries
-            'log_file_path': log_files[0] if log_files else None  # Return log file path for reference
-        })
+            'log_file_path': log_files[0] if log_files else None,  # Return log file path for reference
+            'log_files_found': len(log_files),
+            'log_files_read': len(log_files_read),
+            'log_files': log_files_read if log_files_read else log_files[:5]  # Show up to 5 file paths
+        }
+        
+        # Add log file path to logs for visibility (prepend to show at top)
+        if log_files and log_files[0]:
+            log_path_msg = f"[LOG SETUP] Log file path: {log_files[0]}"
+            # Check if already in logs to avoid duplicates
+            if not any(log_path_msg in log for log in unique_logs):
+                unique_logs.insert(0, log_path_msg)
+                response_data['logs'] = unique_logs[-500:]
+        
+        return jsonify(response_data)
     except Exception as e:
+        import traceback
+        error_traceback = traceback.format_exc()
+        logging.error(f"[LOGS] Error in get_live_trader_logs: {e}\n{error_traceback}")
+        
+        # Return error in logs so it shows up in Live Trading Log section
+        error_logs = [
+            f"[ERROR] Failed to retrieve logs: {str(e)}",
+            f"[ERROR] Traceback: {error_traceback[:500]}"  # Limit traceback length
+        ]
+        
         return jsonify({
             'success': False,
             'error': str(e),
-            'logs': []
+            'logs': error_logs,  # Include error in logs so it shows on screen
+            'log_file_path': None,
+            'log_files_found': 0
         }), 500
 
 @app.route('/api/live-trader/status', methods=['GET'])
