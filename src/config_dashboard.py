@@ -1153,9 +1153,15 @@ def get_live_trader_logs():
                 logging.warning(f"[LOGS] Error reading root logs directory: {e}")
         
         # 6. PRIORITY: Check Azure log directory if in Azure environment (similar to src/logs for local)
-        from environment import is_azure_environment, get_log_directory
+        from environment import is_azure_environment, get_log_directory, sanitize_account_name_for_filename
         if is_azure_environment():
-            azure_log_dir = get_log_directory()
+            # Use account-specific directory: /tmp/{account_name}/logs/
+            if account:
+                sanitized_account = sanitize_account_name_for_filename(account)
+                azure_log_dir = os.path.join('/tmp', sanitized_account, 'logs')
+            else:
+                # Fallback if no account name
+                azure_log_dir = '/tmp/logs'
             logging.info(f"[LOGS] Azure environment detected - checking log directory: {azure_log_dir}")
             logging.info(f"[LOGS] Account name for matching: '{account}'")
             
@@ -1387,14 +1393,25 @@ def get_live_trader_logs():
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
             # Log checked directories based on environment
             if is_azure_environment():
-                checked_dirs = f"Azure log directory: {get_log_directory()}"
+                # For error message, try to get account-specific directory
+                from environment import sanitize_account_name_for_filename
+                if account:
+                    sanitized_account = sanitize_account_name_for_filename(account)
+                    checked_dirs = f"Azure log directory: /tmp/{sanitized_account}/logs/"
+                else:
+                    checked_dirs = f"Azure log directory: /tmp/logs/"
             else:
                 checked_dirs = f"src_logs_dir={src_logs_dir}, src_dir={src_dir}, root={script_dir}, root_logs={log_dir}"
             logging.warning(f"[LOGS] Checked directories: {checked_dirs}")
             
             # List existing files for debugging
             if is_azure_environment():
-                azure_log_dir = get_log_directory()
+                # Use account-specific directory: /tmp/{account_name}/logs/
+                if account:
+                    sanitized_account = sanitize_account_name_for_filename(account)
+                    azure_log_dir = os.path.join('/tmp', sanitized_account, 'logs')
+                else:
+                    azure_log_dir = '/tmp/logs'
                 if os.path.exists(azure_log_dir):
                     try:
                         existing_files = os.listdir(azure_log_dir)

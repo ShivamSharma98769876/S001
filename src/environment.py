@@ -53,30 +53,21 @@ def format_date_for_filename(date_obj):
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return f"{date_obj.year}{month_names[date_obj.month - 1]}{date_obj.day:02d}"
 
-def get_log_directory():
+def get_log_directory(account_name=None):
     """
     Get the appropriate log directory based on environment
     - Local: src/logs directory
-    - Azure: /home/LogFiles (Azure App Service log directory)
+    - Azure: /tmp/{account_name}/logs/ (account-specific directory in /tmp)
     """
     if is_azure_environment():
-        # Azure App Service log directory
-        # Try multiple Azure log locations
-        possible_dirs = [
-            os.getenv('LOG_DIR'),
-            '/home/LogFiles',
-            '/home/LogFiles/Application',
-            os.path.join(os.getenv('HOME', '/home'), 'LogFiles')
-        ]
-        log_dir = None
-        for dir_path in possible_dirs:
-            if dir_path and os.path.exists(dir_path):
-                log_dir = dir_path
-                break
-        
-        # Default to /home/LogFiles if none found (will be created)
-        if not log_dir:
-            log_dir = '/home/LogFiles'
+        # Azure: Use /tmp/{account_name}/logs/ structure
+        if account_name:
+            # Sanitize account name for directory name
+            sanitized_account = sanitize_account_name_for_filename(account_name)
+            log_dir = os.path.join('/tmp', sanitized_account, 'logs')
+        else:
+            # Fallback to /tmp/logs if no account name
+            log_dir = '/tmp/logs'
     else:
         # Local: use src/logs directory
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -90,11 +81,12 @@ def setup_azure_logging(logger_name='root', account_name=None):
     """
     Setup logging for Azure App Service
     Azure automatically captures stdout/stderr, so we configure both file and console logging
+    Logs are stored in /tmp/{account_name}/logs/
     """
     logger = logging.getLogger(logger_name)
     
-    # Get log directory
-    log_dir = get_log_directory()
+    # Get log directory (account-specific for Azure)
+    log_dir = get_log_directory(account_name=account_name)
     
     # Create formatter
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -122,6 +114,12 @@ def setup_azure_logging(logger_name='root', account_name=None):
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
     logger.setLevel(logging.INFO)
+    
+    # Log the file path where logs are being written
+    logger.info(f"[LOG SETUP] Log file created at: {log_file}")
+    logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+    print(f"[LOG SETUP] Log file will be written to: {log_file}")
+    print(f"[LOG SETUP] Log directory: {log_dir}")
     
     return logger, log_file
 

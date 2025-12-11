@@ -50,7 +50,7 @@ def setup_logging():
             )
     else:
         # Local environment - use file and console
-        log_dir = get_log_directory()
+        log_dir = get_log_directory(account_name=None)
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, 'config_monitoring.log')
         logging.basicConfig(
