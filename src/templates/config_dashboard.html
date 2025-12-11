@@ -2482,7 +2482,11 @@
                 const response = await fetch('/api/auth/authenticate', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({request_token: requestToken})
+                    body: JSON.stringify({
+                        request_token: requestToken,
+                        api_key: apiKey,
+                        api_secret: apiSecret
+                    })
                 });
                 
                 const data = await response.json();

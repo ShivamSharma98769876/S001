@@ -1596,13 +1596,25 @@ def authenticate():
     try:
         global strategy_bot, kite_client_global, kite_api_key, kite_api_secret
         
-        data = request.get_json()
+        data = request.get_json() or {}
         request_token = data.get('request_token', '').strip()
+        incoming_api_key = data.get('api_key', '').strip()
+        incoming_api_secret = data.get('api_secret', '').strip()
         
         if not request_token:
             return jsonify({
                 'success': False,
                 'error': 'Request token is required'
+            }), 400
+        
+        # Allow API key/secret to be provided in the same call
+        if incoming_api_key and incoming_api_secret:
+            kite_api_key = incoming_api_key
+            kite_api_secret = incoming_api_secret
+        elif incoming_api_key or incoming_api_secret:
+            return jsonify({
+                'success': False,
+                'error': 'Both API key and API secret are required'
             }), 400
         
         # Need API key and secret for authentication
@@ -1614,7 +1626,10 @@ def authenticate():
         
         # Create or update global kite client
         try:
-            from src.kite_client import KiteClient
+            try:
+                from src.kite_client import KiteClient  # when running from repo root
+            except ImportError:
+                from kite_client import KiteClient       # fallback when src on PYTHONPATH
             kite_client_global = KiteClient(
                 kite_api_key,
                 kite_api_secret,
@@ -1658,17 +1673,19 @@ def set_access_token():
     try:
         global strategy_bot, kite_client_global, kite_api_key, kite_api_secret
         
-        data = request.get_json()
+        data = request.get_json() or {}
         access_token = data.get('access_token', '').strip()
+        api_key = data.get('api_key', '').strip() or kite_api_key  # Allow overriding API key
+        api_secret_override = data.get('api_secret', '').strip()
+        
+        if api_secret_override:
+            kite_api_secret = api_secret_override  # persist secret if provided
         
         if not access_token:
             return jsonify({
                 'success': False,
                 'error': 'Access token is required'
             }), 400
-        
-        # Try to get API key from request or use stored one
-        api_key = data.get('api_key', '').strip() or kite_api_key
         
         if not api_key:
             return jsonify({
@@ -1678,7 +1695,10 @@ def set_access_token():
         
         # Create or update global kite client with access token
         try:
-            from src.kite_client import KiteClient
+            try:
+                from src.kite_client import KiteClient
+            except ImportError:
+                from kite_client import KiteClient
             kite_client_global = KiteClient(
                 api_key,
                 kite_api_secret or '',  # API secret not needed for access token
