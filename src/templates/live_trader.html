@@ -655,17 +655,33 @@
                     engineStatus.innerHTML = '<i class="fas fa-cog fa-spin"></i><span>Engine: Running</span>';
                     engineStatusValue.textContent = 'Running';
                     engineStatusCard.className = 'status-card success';
-                    // Update button states
-                    if (startBtn) startBtn.disabled = true;
-                    if (stopBtn) stopBtn.disabled = false;
+                    // Update button states - CRITICAL: Disable start button when running
+                    if (startBtn) {
+                        startBtn.disabled = true;
+                        startBtn.style.opacity = '0.6';
+                        startBtn.style.cursor = 'not-allowed';
+                    }
+                    if (stopBtn) {
+                        stopBtn.disabled = false;
+                        stopBtn.style.opacity = '1';
+                        stopBtn.style.cursor = 'pointer';
+                    }
                 } else {
                     engineStatus.className = 'status-badge engine-stopped';
                     engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
                     engineStatusValue.textContent = 'Stopped';
                     engineStatusCard.className = 'status-card danger';
-                    // Update button states
-                    if (startBtn) startBtn.disabled = false;
-                    if (stopBtn) stopBtn.disabled = true;
+                    // Update button states - Enable start button when stopped
+                    if (startBtn) {
+                        startBtn.disabled = false;
+                        startBtn.style.opacity = '1';
+                        startBtn.style.cursor = 'pointer';
+                    }
+                    if (stopBtn) {
+                        stopBtn.disabled = true;
+                        stopBtn.style.opacity = '0.6';
+                        stopBtn.style.cursor = 'not-allowed';
+                    }
                 }
                 
                 // Update account name if available
@@ -719,7 +735,10 @@
 
             try {
                 errorEl.classList.remove('show');
+                // Disable button immediately to prevent double-clicks
                 startBtn.disabled = true;
+                startBtn.style.opacity = '0.6';
+                startBtn.style.cursor = 'not-allowed';
                 startBtn.innerHTML = '<span class="loading-spinner"></span> Starting...';
 
                 const response = await fetch('/api/live-trader/start', {
@@ -735,15 +754,25 @@
 
                 if (data.success) {
                     isRunning = true;
+                    // Keep button disabled when running
                     startBtn.disabled = true;
-                    stopBtn.disabled = false;
+                    startBtn.style.opacity = '0.6';
+                    startBtn.style.cursor = 'not-allowed';
                     startBtn.innerHTML = '<i class="fas fa-play"></i> Start Live Trader';
+                    stopBtn.disabled = false;
+                    stopBtn.style.opacity = '1';
+                    stopBtn.style.cursor = 'pointer';
                     checkStatus();
                     addLog('success', 'Live Trader started successfully!');
                 } else {
                     errorEl.textContent = data.error || 'Failed to start Live Trader';
                     errorEl.classList.add('show');
-                    startBtn.disabled = false;
+                    // Only re-enable if not actually running
+                    if (!isRunning) {
+                        startBtn.disabled = false;
+                        startBtn.style.opacity = '1';
+                        startBtn.style.cursor = 'pointer';
+                    }
                     startBtn.innerHTML = '<i class="fas fa-play"></i> Start Live Trader';
                 }
             } catch (error) {
@@ -813,17 +842,24 @@
                     
                     // On first load, show all logs
                     if (isInitialLoad) {
-                        logsContainer.innerHTML = '';
-                        // Re-add path info
-                        if (data.log_file_path) {
+                        // Only clear if container has placeholder messages, otherwise preserve existing logs
+                        const hasOnlyPlaceholder = logsContainer.children.length === 0 || 
+                            (logsContainer.children.length === 1 && logsContainer.querySelector('.log-entry.info, .log-entry.error'));
+                        
+                        if (hasOnlyPlaceholder) {
+                            logsContainer.innerHTML = '';
+                        }
+                        
+                        // Re-add path info if not already present
+                        if (data.log_file_path && !logsContainer.querySelector('.log-path-info')) {
                             const pathInfo = document.createElement('div');
                             pathInfo.className = 'log-path-info';
                             pathInfo.style.cssText = 'padding: 8px; background: rgba(59, 130, 246, 0.1); border-radius: 4px; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary);';
                             pathInfo.innerHTML = `<i class="fas fa-file-alt"></i> Log File: <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">${data.log_file_path}</code>`;
-                            logsContainer.appendChild(pathInfo);
+                            logsContainer.insertBefore(pathInfo, logsContainer.firstChild);
                         }
                         
-                        // Add all logs on first load
+                        // Add all logs on first load (append, don't replace)
                         data.logs.forEach(log => {
                             const entry = parseLogEntry(log);
                             logsContainer.appendChild(entry);
@@ -886,27 +922,45 @@
                         }
                     }
                 } else if (data.success && data.logs && data.logs.length === 0) {
+                    // Don't clear existing logs - just show message if container is empty
                     const logsContainer = document.getElementById('logsContainer');
-                    if (isInitialLoad || logsContainer.children.length === 0 || (logsContainer.children.length === 1 && logsContainer.querySelector('.log-path-info'))) {
-                        let message = 'No logs available yet. ';
-                        if (data.message) {
-                            message += data.message + ' ';
+                    if (logsContainer) {
+                        const existingLogs = logsContainer.querySelectorAll('.log-entry:not(.log-path-info)');
+                        if (existingLogs.length === 0) {
+                            // Only show message if there are no logs at all
+                            let message = 'No logs available yet. ';
+                            if (data.message) {
+                                message += data.message + ' ';
+                            }
+                            message += 'Logs will appear here once the strategy starts running.';
+                            const infoDiv = document.createElement('div');
+                            infoDiv.className = 'log-entry info';
+                            infoDiv.innerHTML = `<span>${message}</span>`;
+                            logsContainer.appendChild(infoDiv);
                         }
-                        message += 'Logs will appear here once the strategy starts running.';
-                        logsContainer.innerHTML = `<div class="log-entry info"><span>${message}</span></div>`;
-                        isInitialLoad = true;
-                        lastLogText = null;
+                        // Don't reset isInitialLoad or lastLogText - preserve state
                     }
                     if (data.message) {
                         console.log('[LOGS]', data.message);
                     }
                 } else if (!data.success) {
-                    // Handle error case
+                    // Handle error case - don't clear existing logs
                     const logsContainer = document.getElementById('logsContainer');
                     if (logsContainer) {
                         let errorMsg = data.error || data.message || 'Error loading logs';
-                        if (isInitialLoad || logsContainer.children.length === 0) {
-                            logsContainer.innerHTML = `<div class="log-entry error"><span>Error: ${errorMsg}</span></div>`;
+                        // Only add error message if container is empty or as a new entry
+                        const existingLogs = logsContainer.querySelectorAll('.log-entry:not(.log-path-info)');
+                        if (existingLogs.length === 0) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'log-entry error';
+                            errorDiv.innerHTML = `<span>Error: ${errorMsg}</span>`;
+                            logsContainer.appendChild(errorDiv);
+                        } else {
+                            // Add error as a new log entry instead of replacing
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'log-entry error';
+                            errorDiv.innerHTML = `<span>[ERROR] ${errorMsg}</span>`;
+                            logsContainer.appendChild(errorDiv);
                         }
                         console.error('[LOGS] Error loading logs:', errorMsg);
                     }

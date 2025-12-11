@@ -1364,8 +1364,8 @@
             startAutoRefresh();
             checkAuthStatus();
             checkConnectivity();
-            // Check auth and connectivity every 10 seconds
-            setInterval(checkAuthStatus, 10000);
+            // Check auth status every 5 seconds to keep button and label in sync
+            setInterval(checkAuthStatus, 5000);
             setInterval(checkConnectivity, 5000);
             
             // Auto-show auth modal if not authenticated after 2 seconds
@@ -2006,18 +2006,22 @@
                 }
                 
                 // CRITICAL: Ensure authentication button matches connection status
-                // If authenticated, button should show "Authenticated", not "Not Authenticated"
-                if (authStatusEl) {
+                // This is a duplicate check to ensure button state is always correct
+                // The button state should match the authenticated status
+                const authButton = document.getElementById('authStatus');
+                if (authButton) {
                     if (data.authenticated) {
-                        authStatusEl.className = 'status-badge authenticated';
-                        authStatusEl.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
-                        authStatusEl.onclick = null;
-                        authStatusEl.style.cursor = 'default';
+                        authButton.className = 'status-badge authenticated';
+                        authButton.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
+                        authButton.onclick = null;
+                        authButton.style.cursor = 'default';
+                        authButton.style.pointerEvents = 'none';
                     } else {
-                        authStatusEl.className = 'status-badge not-authenticated';
-                        authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
-                        authStatusEl.onclick = showAuthModal;
-                        authStatusEl.style.cursor = 'pointer';
+                        authButton.className = 'status-badge not-authenticated';
+                        authButton.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
+                        authButton.onclick = showAuthModal;
+                        authButton.style.cursor = 'pointer';
+                        authButton.style.pointerEvents = 'auto';
                     }
                 }
             } catch (error) {
