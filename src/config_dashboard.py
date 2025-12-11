@@ -843,37 +843,85 @@ def get_live_trader_logs():
         # Try to find log files
         log_files = []
         
-        # Check for account-specific log files in src directory (format: "Account YYYY-MM-DD_trading_log.log")
-        if kite_client_global and hasattr(kite_client_global, 'account'):
+        # Get account name from global account_holder_name or kite_client_global
+        global account_holder_name
+        account = None
+        if account_holder_name:
+            account = account_holder_name
+        elif kite_client_global and hasattr(kite_client_global, 'account'):
             account = kite_client_global.account or 'TRADING_ACCOUNT'
-            # Primary location: src directory
-            account_log = os.path.join(src_dir, f'{account} {today}_trading_log.log')
-            if os.path.exists(account_log):
-                log_files.append(account_log)
-            
-            # Also check for any log files in src directory (in case date format differs)
-            if os.path.exists(src_dir):
+        else:
+            account = 'TRADING_ACCOUNT'
+        
+        logging.info(f"[LOGS] Looking for log files for account: {account}, date: {today}")
+        
+        # Check multiple locations for log files
+        # 1. src directory with account name (format: "Account YYYY-MM-DD_trading_log.log")
+        account_log = os.path.join(src_dir, f'{account} {today}_trading_log.log')
+        if os.path.exists(account_log):
+            log_files.append(account_log)
+            logging.info(f"[LOGS] Found log file: {account_log}")
+        
+        # 2. Check for any log files in src directory matching account name
+        if os.path.exists(src_dir):
+            try:
                 for f in os.listdir(src_dir):
                     if f.endswith('_trading_log.log') and account in f:
                         log_path = os.path.join(src_dir, f)
                         if log_path not in log_files:
                             log_files.append(log_path)
+                            logging.info(f"[LOGS] Found log file: {log_path}")
+            except Exception as e:
+                logging.warning(f"[LOGS] Error reading src directory: {e}")
         
-        # Fallback: Check root directory (for backward compatibility)
-        if kite_client_global and hasattr(kite_client_global, 'account'):
-            account = kite_client_global.account or 'TRADING_ACCOUNT'
-            root_log = os.path.join(script_dir, f'{account} {today}_trading_log.log')
-            if os.path.exists(root_log) and root_log not in log_files:
-                log_files.append(root_log)
+        # 3. Check root directory (for backward compatibility)
+        root_log = os.path.join(script_dir, f'{account} {today}_trading_log.log')
+        if os.path.exists(root_log) and root_log not in log_files:
+            log_files.append(root_log)
+            logging.info(f"[LOGS] Found log file: {root_log}")
         
-        # Also check logs directory if it exists
+        # 4. Check logs directory if it exists
         log_dir = os.path.join(script_dir, 'logs')
         if os.path.exists(log_dir):
-            for f in os.listdir(log_dir):
-                if f.endswith('.log'):
-                    log_path = os.path.join(log_dir, f)
-                    if log_path not in log_files:
-                        log_files.append(log_path)
+            try:
+                for f in os.listdir(log_dir):
+                    if f.endswith('.log') and (account in f or 'trading' in f.lower()):
+                        log_path = os.path.join(log_dir, f)
+                        if log_path not in log_files:
+                            log_files.append(log_path)
+                            logging.info(f"[LOGS] Found log file: {log_path}")
+            except Exception as e:
+                logging.warning(f"[LOGS] Error reading logs directory: {e}")
+        
+        # 5. Check Azure log directory if in Azure environment
+        from environment import is_azure_environment, get_log_directory
+        if is_azure_environment():
+            azure_log_dir = get_log_directory()
+            azure_log = os.path.join(azure_log_dir, f'{account} {today}_trading_log.log')
+            if os.path.exists(azure_log) and azure_log not in log_files:
+                log_files.append(azure_log)
+                logging.info(f"[LOGS] Found Azure log file: {azure_log}")
+            # Also check for any log files in Azure log directory
+            if os.path.exists(azure_log_dir):
+                try:
+                    for f in os.listdir(azure_log_dir):
+                        if f.endswith('_trading_log.log') and account in f:
+                            log_path = os.path.join(azure_log_dir, f)
+                            if log_path not in log_files:
+                                log_files.append(log_path)
+                                logging.info(f"[LOGS] Found Azure log file: {log_path}")
+                except Exception as e:
+                    logging.warning(f"[LOGS] Error reading Azure log directory: {e}")
+        
+        if not log_files:
+            logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
+            logging.warning(f"[LOGS] Checked directories: {src_dir}, {script_dir}, {log_dir}")
+            return jsonify({
+                'success': True,
+                'logs': [],
+                'log_file_path': None,
+                'message': f'No log files found for account: {account}, date: {today}. Logs will appear once the strategy starts.'
+            })
         
         # Read last 500 lines from log files (increased to show more logs)
         all_lines = []

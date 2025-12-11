@@ -627,29 +627,45 @@
                     connectionStatusValue.textContent = 'Disconnected';
                 }
 
-                // Check engine status from server
+                // Check engine status from server - MUST check before updating UI
+                let actualRunning = false;
                 try {
                     const statusResponse = await fetch('/api/live-trader/status');
-                    const statusData = await statusResponse.json();
-                    isRunning = statusData.running || false;
+                    if (statusResponse.ok) {
+                        const statusData = await statusResponse.json();
+                        actualRunning = statusData.running || false;
+                        // Update isRunning to match server state
+                        isRunning = actualRunning;
+                        console.log('[STATUS] Engine status from server:', actualRunning ? 'Running' : 'Stopped');
+                    } else {
+                        console.error('[STATUS] Failed to get engine status:', statusResponse.status);
+                    }
                 } catch (error) {
-                    console.error('Error checking engine status:', error);
+                    console.error('[STATUS] Error checking engine status:', error);
                 }
                 
                 const engineStatus = document.getElementById('engineStatus');
                 const engineStatusValue = document.getElementById('engineStatusValue');
                 const engineStatusCard = document.getElementById('engineStatusCard');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
                 
-                if (isRunning) {
+                if (actualRunning) {
                     engineStatus.className = 'status-badge engine-running';
                     engineStatus.innerHTML = '<i class="fas fa-cog fa-spin"></i><span>Engine: Running</span>';
                     engineStatusValue.textContent = 'Running';
                     engineStatusCard.className = 'status-card success';
+                    // Update button states
+                    if (startBtn) startBtn.disabled = true;
+                    if (stopBtn) stopBtn.disabled = false;
                 } else {
                     engineStatus.className = 'status-badge engine-stopped';
                     engineStatus.innerHTML = '<i class="fas fa-cog"></i><span>Engine: Stopped</span>';
                     engineStatusValue.textContent = 'Stopped';
                     engineStatusCard.className = 'status-card danger';
+                    // Update button states
+                    if (startBtn) startBtn.disabled = false;
+                    if (stopBtn) stopBtn.disabled = true;
                 }
                 
                 // Update account name if available
@@ -662,6 +678,27 @@
         }
 
         async function startLiveTrader() {
+            // First check actual status from server before starting
+            try {
+                const statusResponse = await fetch('/api/live-trader/status');
+                if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    if (statusData.running) {
+                        const errorEl = document.getElementById('errorMessage');
+                        if (errorEl) {
+                            errorEl.textContent = 'Strategy is already running. Please stop it first.';
+                            errorEl.classList.add('show');
+                        }
+                        // Update UI to reflect running state
+                        isRunning = true;
+                        checkStatus();
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('[START] Error checking status before start:', error);
+            }
+            
             const callQuantity = parseInt(document.getElementById('callQuantity').value);
             const putQuantity = parseInt(document.getElementById('putQuantity').value);
             const errorEl = document.getElementById('errorMessage');
@@ -758,9 +795,10 @@
                 const response = await fetch('/api/live-trader/logs');
                 const data = await response.json();
                 
+                const logsContainer = document.getElementById('logsContainer');
+                if (!logsContainer) return;
+                
                 if (data.success && data.logs && data.logs.length > 0) {
-                    const logsContainer = document.getElementById('logsContainer');
-                    
                     // Check if user is at bottom before updating
                     const wasAtBottom = logsContainer.scrollHeight - logsContainer.scrollTop <= logsContainer.clientHeight + 50;
                     
@@ -850,9 +888,27 @@
                 } else if (data.success && data.logs && data.logs.length === 0) {
                     const logsContainer = document.getElementById('logsContainer');
                     if (isInitialLoad || logsContainer.children.length === 0 || (logsContainer.children.length === 1 && logsContainer.querySelector('.log-path-info'))) {
-                        logsContainer.innerHTML = '<div class="log-entry info"><span>No logs available yet. Logs will appear here once the strategy starts running.</span></div>';
+                        let message = 'No logs available yet. ';
+                        if (data.message) {
+                            message += data.message + ' ';
+                        }
+                        message += 'Logs will appear here once the strategy starts running.';
+                        logsContainer.innerHTML = `<div class="log-entry info"><span>${message}</span></div>`;
                         isInitialLoad = true;
                         lastLogText = null;
+                    }
+                    if (data.message) {
+                        console.log('[LOGS]', data.message);
+                    }
+                } else if (!data.success) {
+                    // Handle error case
+                    const logsContainer = document.getElementById('logsContainer');
+                    if (logsContainer) {
+                        let errorMsg = data.error || data.message || 'Error loading logs';
+                        if (isInitialLoad || logsContainer.children.length === 0) {
+                            logsContainer.innerHTML = `<div class="log-entry error"><span>Error: ${errorMsg}</span></div>`;
+                        }
+                        console.error('[LOGS] Error loading logs:', errorMsg);
                     }
                 }
             } catch (error) {

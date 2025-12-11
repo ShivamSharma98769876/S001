@@ -2004,6 +2004,22 @@
                         connectionText.textContent = 'Disconnected';
                     }
                 }
+                
+                // CRITICAL: Ensure authentication button matches connection status
+                // If authenticated, button should show "Authenticated", not "Not Authenticated"
+                if (authStatusEl) {
+                    if (data.authenticated) {
+                        authStatusEl.className = 'status-badge authenticated';
+                        authStatusEl.innerHTML = '<i class="fas fa-check-circle"></i><span id="authStatusText">Authenticated</span>';
+                        authStatusEl.onclick = null;
+                        authStatusEl.style.cursor = 'default';
+                    } else {
+                        authStatusEl.className = 'status-badge not-authenticated';
+                        authStatusEl.innerHTML = '<i class="fas fa-lock"></i><span id="authStatusText">Not Authenticated</span>';
+                        authStatusEl.onclick = showAuthModal;
+                        authStatusEl.style.cursor = 'pointer';
+                    }
+                }
             } catch (error) {
                 console.error('Error checking auth status:', error);
                 const authStatusEl = document.getElementById('authStatus');
