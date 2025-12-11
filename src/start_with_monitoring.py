@@ -71,33 +71,59 @@ def start_config_dashboard():
         start_dashboard(host=None, port=None, debug=False)
     except Exception as e:
         logging.error(f"[DASHBOARD] Failed to start dashboard: {e}")
+        import traceback
+        logging.error(f"[DASHBOARD] Traceback: {traceback.format_exc()}")
+        # Re-raise to see error in Azure logs
+        raise
 
 def main():
     """Main startup function"""
-    setup_logging()
-    
-    print("=" * 60)
-    print("TRADING BOT WITH REAL-TIME CONFIG MONITORING")
-    print("=" * 60)
-    print("Features:")
-    print("[OK] Real-time config file monitoring")
-    print("[OK] Auto-reload parameters without restart")
-    print("[OK] Web dashboard for parameter management")
-    print("[OK] Configuration change history tracking")
-    print("[OK] Parameter validation and rollback")
-    print("=" * 60)
-    
-    # Start web dashboard in background thread
-    dashboard_thread = threading.Thread(target=start_config_dashboard, daemon=True)
-    dashboard_thread.start()
-    
-    # Give dashboard time to start
-    time.sleep(2)
-    
-    print(f"\nWeb Dashboard: http://{DASHBOARD_HOST}:{DASHBOARD_PORT}")
-    print("Config Monitor: Active")
-    print("Auto-reload: Enabled")
-    print("\n" + "=" * 60)
+    try:
+        setup_logging()
+        
+        # Check if running in Azure - if so, just start dashboard (not the trading strategy)
+        if is_azure_environment():
+            print("=" * 60)
+            print("TRADING BOT DASHBOARD (Azure Mode)")
+            print("=" * 60)
+            print("[AZURE] Azure environment detected")
+            print(f"[AZURE] Starting dashboard on port: {DASHBOARD_PORT}")
+            print("=" * 60)
+            # Start dashboard directly (blocking call for Azure)
+            start_config_dashboard()
+            return  # Exit after dashboard starts (it runs forever)
+        
+        # Local environment: Start dashboard in thread, then run strategy
+        print("=" * 60)
+        print("TRADING BOT WITH REAL-TIME CONFIG MONITORING")
+        print("=" * 60)
+        print("Features:")
+        print("[OK] Real-time config file monitoring")
+        print("[OK] Auto-reload parameters without restart")
+        print("[OK] Web dashboard for parameter management")
+        print("[OK] Configuration change history tracking")
+        print("[OK] Parameter validation and rollback")
+        print("=" * 60)
+        
+        # Start web dashboard in background thread
+        dashboard_thread = threading.Thread(target=start_config_dashboard, daemon=True)
+        dashboard_thread.start()
+        
+        # Give dashboard time to start
+        time.sleep(2)
+        
+        print(f"\nWeb Dashboard: http://{DASHBOARD_HOST}:{DASHBOARD_PORT}")
+        print("Config Monitor: Active")
+        print("Auto-reload: Enabled")
+        print("\n" + "=" * 60)
+        
+    except Exception as e:
+        logging.error(f"[STARTUP] Fatal error during startup: {e}")
+        import traceback
+        logging.error(f"[STARTUP] Traceback: {traceback.format_exc()}")
+        print(f"[ERROR] Failed to start application: {e}")
+        traceback.print_exc()
+        sys.exit(1)
     
     try:
         # Import and run the main strategy

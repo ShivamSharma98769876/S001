@@ -2303,23 +2303,39 @@ def initialize_dashboard():
 
 def start_dashboard(host=None, port=None, debug=False):
     """Start the config dashboard web server"""
-    # Initialize dashboard (try to reconnect)
-    initialize_dashboard()
-    
-    # Use config values if not provided
-    if host is None:
-        host = DASHBOARD_HOST
-    if port is None:
-        port = DASHBOARD_PORT
-    
-    print("=" * 60)
-    print(f"[CONFIG DASHBOARD] Starting web server")
-    print(f"[CONFIG DASHBOARD] Host: {host}")
-    print(f"[CONFIG DASHBOARD] Port: {port}")
-    print(f"[CONFIG DASHBOARD] Dashboard URL: http://{host}:{port}")
-    print(f"[CONFIG DASHBOARD] Configuration loaded from: src/config.py")
-    print("=" * 60)
-    app.run(host=host, port=port, debug=debug, use_reloader=False)
+    try:
+        # Initialize dashboard (try to reconnect)
+        initialize_dashboard()
+        
+        # Use config values if not provided
+        if host is None:
+            host = DASHBOARD_HOST
+        if port is None:
+            port = DASHBOARD_PORT
+        
+        print("=" * 60)
+        print(f"[CONFIG DASHBOARD] Starting web server")
+        print(f"[CONFIG DASHBOARD] Host: {host}")
+        print(f"[CONFIG DASHBOARD] Port: {port}")
+        print(f"[CONFIG DASHBOARD] Dashboard URL: http://{host}:{port}")
+        print(f"[CONFIG DASHBOARD] Configuration loaded from: src/config.py")
+        print("=" * 60)
+        
+        # Log startup info
+        logging.info(f"[DASHBOARD] Starting Flask app on {host}:{port}")
+        logging.info(f"[DASHBOARD] Dashboard will be available at http://{host}:{port}")
+        
+        # Run Flask app (blocking call)
+        app.run(host=host, port=port, debug=debug, use_reloader=False)
+    except Exception as e:
+        error_msg = f"[DASHBOARD] Failed to start dashboard: {e}"
+        print(error_msg)
+        logging.error(error_msg)
+        import traceback
+        traceback_str = traceback.format_exc()
+        logging.error(f"[DASHBOARD] Traceback: {traceback_str}")
+        print(traceback_str)
+        raise  # Re-raise to see error in Azure logs
 
 if __name__ == '__main__':
     start_dashboard()
