@@ -1669,9 +1669,11 @@ def authenticate():
             profile = kite_client_global.kite.profile()
             
             # Extract and store account holder name
-            global account_holder_name
+            global account_holder_name, strategy_account_name
             account_holder_name = profile.get('user_name') or profile.get('user_id') or 'Trading Account'
             kite_client_global.account = account_holder_name  # Update account name in client
+            # Keep strategy account name in sync for log matching
+            strategy_account_name = account_holder_name
             
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
@@ -1738,9 +1740,11 @@ def set_access_token():
             profile = kite_client_global.kite.profile()
             
             # Extract and store account holder name
-            global account_holder_name
+            global account_holder_name, strategy_account_name
             account_holder_name = profile.get('user_name') or profile.get('user_id') or 'Trading Account'
             kite_client_global.account = account_holder_name  # Update account name in client
+            # Keep strategy account name in sync for log matching
+            strategy_account_name = account_holder_name
             
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
