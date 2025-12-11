@@ -20,6 +20,39 @@ def is_azure_environment():
     ]
     return any(os.getenv(var) for var in azure_indicators)
 
+def sanitize_account_name_for_filename(account_name):
+    """
+    Sanitize account name for use in filenames
+    - Extract first name only (first word before space)
+    - Replace spaces with underscores
+    - Remove or replace special characters that might cause filesystem issues
+    - Limit length to avoid filesystem path length issues
+    """
+    if not account_name:
+        return 'TRADING_ACCOUNT'
+    
+    # Extract first name only (first word before space)
+    first_name = account_name.split()[0] if account_name.split() else account_name
+    
+    # Remove or replace other problematic characters
+    # Keep only alphanumeric, underscores, and hyphens
+    import re
+    sanitized = re.sub(r'[^a-zA-Z0-9_-]', '', first_name)
+    
+    # Limit length to 30 characters to avoid filesystem issues
+    if len(sanitized) > 30:
+        sanitized = sanitized[:30]
+    
+    return sanitized if sanitized else 'TRADING_ACCOUNT'
+
+def format_date_for_filename(date_obj):
+    """
+    Format date as YYYYMONDD (e.g., 2025Dec11)
+    """
+    month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return f"{date_obj.year}{month_names[date_obj.month - 1]}{date_obj.day:02d}"
+
 def get_log_directory():
     """
     Get the appropriate log directory based on environment
@@ -74,7 +107,11 @@ def setup_azure_logging(logger_name='root', account_name=None):
     # File handler for persistent logs - use account name if provided
     from datetime import date
     if account_name:
-        log_file = os.path.join(log_dir, f'{account_name} {date.today()}_trading_log.log')
+        # Sanitize account name for filename (first name only)
+        sanitized_account = sanitize_account_name_for_filename(account_name)
+        # Format date as YYYYMONDD (e.g., 2025Dec11)
+        date_str = format_date_for_filename(date.today())
+        log_file = os.path.join(log_dir, f'{sanitized_account}_{date_str}.log')
     else:
         log_file = os.path.join(log_dir, 'trading_bot.log')
     file_handler = logging.FileHandler(log_file, encoding='utf-8')
@@ -108,9 +145,15 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     # File handler with account name
     from datetime import date
     if account_name:
-        log_filename = os.path.join(log_dir, f'{account_name} {date.today()}_trading_log.log')
+        # Sanitize account name for filename (first name only)
+        sanitized_account = sanitize_account_name_for_filename(account_name)
+        # Format date as YYYYMONDD (e.g., 2025Dec11)
+        date_str = format_date_for_filename(date.today())
+        log_filename = os.path.join(log_dir, f'{sanitized_account}_{date_str}.log')
     else:
-        log_filename = os.path.join(log_dir, f'trading_{date.today()}_trading_log.log')
+        # Format date as YYYYMONDD
+        date_str = format_date_for_filename(date.today())
+        log_filename = os.path.join(log_dir, f'trading_{date_str}.log')
     
     file_handler = logging.FileHandler(log_filename, encoding='utf-8')
     file_handler.setFormatter(formatter)

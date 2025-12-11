@@ -86,6 +86,9 @@ kite_api_secret = None
 account_holder_name = None  # Store account holder name from profile
 strategy_account_name = None  # Store account name used when starting strategy (for log retrieval)
 
+# Token persistence file path
+TOKEN_STORAGE_FILE = os.path.join(current_dir, 'kite_tokens.json')
+
 # Global trading credentials (for main trading script)
 trading_credentials = {
     'account': None,
@@ -99,6 +102,114 @@ def set_config_monitor(monitor):
     """Set the global config monitor reference"""
     global config_monitor
     config_monitor = monitor
+
+# Token Persistence Functions
+def save_access_token(api_key, access_token, account_name=None):
+    """Save access token to file for persistence"""
+    try:
+        tokens = {}
+        if os.path.exists(TOKEN_STORAGE_FILE):
+            try:
+                with open(TOKEN_STORAGE_FILE, 'r') as f:
+                    tokens = json.load(f)
+            except (json.JSONDecodeError, IOError):
+                tokens = {}
+        
+        tokens[api_key] = {
+            'access_token': access_token,
+            'account_name': account_name,
+            'saved_at': datetime.now().isoformat()
+        }
+        
+        with open(TOKEN_STORAGE_FILE, 'w') as f:
+            json.dump(tokens, f, indent=2)
+        
+        logging.info(f"[TOKEN] Saved access token for API key: {api_key[:8]}...")
+        return True
+    except Exception as e:
+        logging.error(f"[TOKEN] Error saving token: {e}")
+        return False
+
+def load_access_token(api_key):
+    """Load access token from file"""
+    try:
+        if os.path.exists(TOKEN_STORAGE_FILE):
+            with open(TOKEN_STORAGE_FILE, 'r') as f:
+                tokens = json.load(f)
+                if api_key in tokens:
+                    token_data = tokens[api_key]
+                    logging.info(f"[TOKEN] Loaded access token for API key: {api_key[:8]}...")
+                    return token_data.get('access_token'), token_data.get('account_name')
+    except Exception as e:
+        logging.error(f"[TOKEN] Error loading token: {e}")
+    return None, None
+
+def validate_kite_connection(kite_client, retry_count=2):
+    """Validate Kite connection with retry logic"""
+    if not kite_client or not hasattr(kite_client, 'kite'):
+        return False, "Kite client not initialized"
+    
+    for attempt in range(retry_count + 1):
+        try:
+            profile = kite_client.kite.profile()
+            return True, profile
+        except Exception as e:
+            error_msg = str(e).lower()
+            if attempt < retry_count:
+                logging.warning(f"[CONNECTION] Validation attempt {attempt + 1} failed: {e}, retrying...")
+                time.sleep(0.5)  # Brief delay before retry
+            else:
+                if "invalid" in error_msg or "expired" in error_msg or "token" in error_msg:
+                    return False, "Token expired or invalid"
+                elif "network" in error_msg or "timeout" in error_msg or "connection" in error_msg:
+                    return False, "Network error"
+                else:
+                    return False, f"Connection error: {str(e)[:100]}"
+    
+    return False, "Connection validation failed"
+
+def reconnect_kite_client():
+    """Attempt to reconnect using saved token"""
+    global kite_client_global, kite_api_key, kite_api_secret, account_holder_name
+    
+    if not kite_api_key:
+        logging.warning("[RECONNECT] No API key available for reconnection")
+        return False
+    
+    access_token, saved_account_name = load_access_token(kite_api_key)
+    if not access_token:
+        logging.warning("[RECONNECT] No saved token found")
+        return False
+    
+    try:
+        try:
+            from src.kite_client import KiteClient
+        except ImportError:
+            from kite_client import KiteClient
+        
+        kite_client_global = KiteClient(
+            kite_api_key,
+            kite_api_secret or '',
+            access_token=access_token,
+            account='DASHBOARD'
+        )
+        
+        # Validate connection
+        is_valid, result = validate_kite_connection(kite_client_global)
+        if is_valid:
+            profile = result
+            account_holder_name = profile.get('user_name') or profile.get('user_id') or saved_account_name or 'Trading Account'
+            kite_client_global.account = account_holder_name
+            logging.info(f"[RECONNECT] Successfully reconnected. Account: {account_holder_name}")
+            return True
+        else:
+            logging.warning(f"[RECONNECT] Reconnection failed: {result}")
+            kite_client_global = None
+            return False
+    except Exception as e:
+        logging.error(f"[RECONNECT] Error during reconnection: {e}")
+        kite_client_global = None
+        return False
 
 @app.route('/')
 def dashboard():
@@ -856,7 +967,9 @@ def get_live_trader_logs():
         
         # Look for today's log file
         from datetime import date
-        today = date.today().strftime('%Y-%m-%d')
+        from environment import format_date_for_filename
+        today = date.today().strftime('%Y-%m-%d')  # For backward compatibility searches
+        today_formatted = format_date_for_filename(date.today())  # New format: YYYYMONDD
         
         # Try to find log files
         log_files = []
@@ -886,60 +999,145 @@ def get_live_trader_logs():
         logging.info(f"[LOGS] Checking directories: src_dir={src_dir}, src_logs_dir={src_logs_dir}")
         
         # Also try variations of account name (in case of spaces or formatting differences)
-        account_variations = [account]
+        # CRITICAL: Log files now use sanitized names (spaces replaced with underscores)
+        from environment import sanitize_account_name_for_filename
+        account_variations = []
+        
+        # Add sanitized version (spaces -> underscores) - this is what log files use now
+        if account:
+            sanitized_account = sanitize_account_name_for_filename(account)
+            account_variations.append(sanitized_account)
+            logging.info(f"[LOGS] Sanitized account name: '{account}' -> '{sanitized_account}'")
+        
+        # Also try original account name (for backward compatibility with old logs)
+        if account and account not in account_variations:
+            account_variations.append(account)
+        
+        # Try variations: without spaces, with underscores, with hyphens
         if account and ' ' in account:
-            # Try without spaces
             account_variations.append(account.replace(' ', ''))
-            # Try with underscores
             account_variations.append(account.replace(' ', '_'))
+            account_variations.append(account.replace(' ', '-'))
+        
         # Try account holder name if different
         if account_holder_name and account_holder_name != account:
             account_variations.append(account_holder_name)
+            sanitized_holder = sanitize_account_name_for_filename(account_holder_name)
+            if sanitized_holder not in account_variations:
+                account_variations.append(sanitized_holder)
+        
         logging.info(f"[LOGS] Will try matching with account name variations: {account_variations}")
         
         # Check multiple locations for log files
         # 1. PRIORITY: src/logs directory (where logs are actually saved locally)
         if os.path.exists(src_logs_dir):
             try:
-                # Check for today's log file first
-                account_log = os.path.join(src_logs_dir, f'{account} {today}_trading_log.log')
-                if os.path.exists(account_log):
-                    log_files.append(account_log)
-                    logging.info(f"[LOGS] Found log file in src/logs: {account_log}")
+                # Check for today's log file first - try all account name variations
+                for account_var in account_variations:
+                    if account_var:
+                        # NEW FORMAT: FirstName_YYYYMONDD.log (e.g., Priti_2025Dec11.log)
+                        sanitized_var = sanitize_account_name_for_filename(account_var)
+                        account_log_new = os.path.join(src_logs_dir, f'{sanitized_var}_{today_formatted}.log')
+                        if os.path.exists(account_log_new) and account_log_new not in log_files:
+                            log_files.append(account_log_new)
+                            logging.info(f"[LOGS] Found log file (new format) in src/logs: {account_log_new}")
+                        
+                        # OLD FORMATS (backward compatibility):
+                        account_log_old1 = os.path.join(src_logs_dir, f'{account_var}_{today}_trading_log.log')
+                        if os.path.exists(account_log_old1) and account_log_old1 not in log_files:
+                            log_files.append(account_log_old1)
+                            logging.info(f"[LOGS] Found log file (old format 1) in src/logs: {account_log_old1}")
+                        
+                        if ' ' in account_var:
+                            account_log_old2 = os.path.join(src_logs_dir, f'{account_var} {today}_trading_log.log')
+                            if os.path.exists(account_log_old2) and account_log_old2 not in log_files:
+                                log_files.append(account_log_old2)
+                                logging.info(f"[LOGS] Found log file (old format 2) in src/logs: {account_log_old2}")
                 
-                # Check for any log files in src/logs directory matching account name
+                # Check for any log files in src/logs directory matching account name variations
                 for f in os.listdir(src_logs_dir):
-                    if f.endswith('_trading_log.log') and account in f:
-                        log_path = os.path.join(src_logs_dir, f)
-                        if log_path not in log_files:
-                            log_files.append(log_path)
-                            logging.info(f"[LOGS] Found log file in src/logs: {log_path}")
+                    # Match both new format (.log) and old format (_trading_log.log)
+                    if f.endswith('.log'):
+                        # Check if file matches any account name variation
+                        matches_account = False
+                        for account_var in account_variations:
+                            if account_var:
+                                sanitized_var = sanitize_account_name_for_filename(account_var)
+                                # Check if sanitized first name is in filename
+                                if sanitized_var in f or account_var.split()[0] in f:
+                                    matches_account = True
+                                    break
+                        
+                        if matches_account:
+                            log_path = os.path.join(src_logs_dir, f)
+                            if log_path not in log_files:
+                                log_files.append(log_path)
+                                logging.info(f"[LOGS] Found log file in src/logs: {log_path}")
             except Exception as e:
                 logging.warning(f"[LOGS] Error reading src/logs directory: {e}")
         
-        # 2. Check src directory with account name (format: "Account YYYY-MM-DD_trading_log.log")
-        account_log = os.path.join(src_dir, f'{account} {today}_trading_log.log')
-        if os.path.exists(account_log) and account_log not in log_files:
-            log_files.append(account_log)
-            logging.info(f"[LOGS] Found log file in src: {account_log}")
+        # 2. Check src directory with account name variations
+        for account_var in account_variations:
+            if account_var:
+                # NEW FORMAT: FirstName_YYYYMONDD.log
+                sanitized_var = sanitize_account_name_for_filename(account_var)
+                account_log_new = os.path.join(src_dir, f'{sanitized_var}_{today_formatted}.log')
+                if os.path.exists(account_log_new) and account_log_new not in log_files:
+                    log_files.append(account_log_new)
+                    logging.info(f"[LOGS] Found log file (new format) in src: {account_log_new}")
+                
+                # OLD FORMATS (backward compatibility):
+                account_log_old1 = os.path.join(src_dir, f'{account_var}_{today}_trading_log.log')
+                if os.path.exists(account_log_old1) and account_log_old1 not in log_files:
+                    log_files.append(account_log_old1)
+                    logging.info(f"[LOGS] Found log file (old format 1) in src: {account_log_old1}")
+                
+                if ' ' in account_var:
+                    account_log_old2 = os.path.join(src_dir, f'{account_var} {today}_trading_log.log')
+                    if os.path.exists(account_log_old2) and account_log_old2 not in log_files:
+                        log_files.append(account_log_old2)
+                        logging.info(f"[LOGS] Found log file (old format 2) in src: {account_log_old2}")
         
-        # 3. Check for any log files in src directory matching account name
+        # 3. Check for any log files in src directory matching account name variations
         if os.path.exists(src_dir):
             try:
                 for f in os.listdir(src_dir):
-                    if f.endswith('_trading_log.log') and account in f:
-                        log_path = os.path.join(src_dir, f)
-                        if log_path not in log_files:
-                            log_files.append(log_path)
-                            logging.info(f"[LOGS] Found log file in src: {log_path}")
+                    if f.endswith('.log'):
+                        # Check if file matches any account name variation
+                        matches_account = False
+                        for account_var in account_variations:
+                            if account_var:
+                                sanitized_var = sanitize_account_name_for_filename(account_var)
+                                if sanitized_var in f or account_var.split()[0] in f:
+                                    matches_account = True
+                                    break
+                        
+                        if matches_account:
+                            log_path = os.path.join(src_dir, f)
+                            if log_path not in log_files:
+                                log_files.append(log_path)
+                                logging.info(f"[LOGS] Found log file in src: {log_path}")
             except Exception as e:
                 logging.warning(f"[LOGS] Error reading src directory: {e}")
         
         # 4. Check root directory (for backward compatibility)
-        root_log = os.path.join(script_dir, f'{account} {today}_trading_log.log')
-        if os.path.exists(root_log) and root_log not in log_files:
-            log_files.append(root_log)
-            logging.info(f"[LOGS] Found log file in root: {root_log}")
+        # Try new format first
+        sanitized_account = sanitize_account_name_for_filename(account)
+        root_log_new = os.path.join(script_dir, f'{sanitized_account}_{today_formatted}.log')
+        if os.path.exists(root_log_new) and root_log_new not in log_files:
+            log_files.append(root_log_new)
+            logging.info(f"[LOGS] Found log file (new format) in root: {root_log_new}")
+        
+        # Try old formats
+        root_log_old1 = os.path.join(script_dir, f'{account}_{today}_trading_log.log')
+        if os.path.exists(root_log_old1) and root_log_old1 not in log_files:
+            log_files.append(root_log_old1)
+            logging.info(f"[LOGS] Found log file (old format 1) in root: {root_log_old1}")
+        
+        root_log_old2 = os.path.join(script_dir, f'{account} {today}_trading_log.log')
+        if os.path.exists(root_log_old2) and root_log_old2 not in log_files:
+            log_files.append(root_log_old2)
+            logging.info(f"[LOGS] Found log file (old format 2) in root: {root_log_old2}")
         
         # 5. Check logs directory at root level if it exists
         log_dir = os.path.join(script_dir, 'logs')
@@ -977,10 +1175,14 @@ def get_live_trader_logs():
                     return collected
                 for root, _, files in os.walk(base_dir):
                     for f in files:
-                        if (f.endswith('_trading_log.log') and 
+                        # Match both new format (.log) and old format (_trading_log.log)
+                        # Exclude dashboard/config/monitoring logs
+                        if (f.endswith('.log') and 
                             'dashboard' not in f.lower() and 
                             'config' not in f.lower() and
-                            'monitoring' not in f.lower()):
+                            'monitoring' not in f.lower() and
+                            not f.endswith('_dashboard.log') and
+                            not f.endswith('_config.log')):
                             path = os.path.join(root, f)
                             collected.append(path)
                 return collected
@@ -996,12 +1198,30 @@ def get_live_trader_logs():
                 # PRIORITY 1: today's log exact match using variations
                 for account_var in account_variations:
                     if account_var:
-                        azure_log_today = os.path.join(base_dir, f'{account_var} {today}_trading_log.log')
-                        if os.path.exists(azure_log_today):
-                            if azure_log_today not in log_files:
-                                log_files.insert(0, azure_log_today)
-                                logging.info(f"[LOGS] Found Azure log file (today, match): {azure_log_today}")
+                        # NEW FORMAT: FirstName_YYYYMONDD.log (e.g., Priti_2025Dec11.log)
+                        sanitized_var = sanitize_account_name_for_filename(account_var)
+                        azure_log_today_new = os.path.join(base_dir, f'{sanitized_var}_{today_formatted}.log')
+                        if os.path.exists(azure_log_today_new):
+                            if azure_log_today_new not in log_files:
+                                log_files.insert(0, azure_log_today_new)
+                                logging.info(f"[LOGS] Found Azure log file (today, new format): {azure_log_today_new}")
                             return True
+                        
+                        # OLD FORMATS (backward compatibility):
+                        azure_log_today_old1 = os.path.join(base_dir, f'{account_var}_{today}_trading_log.log')
+                        if os.path.exists(azure_log_today_old1):
+                            if azure_log_today_old1 not in log_files:
+                                log_files.insert(0, azure_log_today_old1)
+                                logging.info(f"[LOGS] Found Azure log file (today, old format 1): {azure_log_today_old1}")
+                            return True
+                        
+                        if ' ' in account_var:
+                            azure_log_today_old2 = os.path.join(base_dir, f'{account_var} {today}_trading_log.log')
+                            if os.path.exists(azure_log_today_old2):
+                                if azure_log_today_old2 not in log_files:
+                                    log_files.insert(0, azure_log_today_old2)
+                                    logging.info(f"[LOGS] Found Azure log file (today, old format 2): {azure_log_today_old2}")
+                                return True
                 return False
             
             # Check primary Azure dir and subdirs
@@ -1057,13 +1277,33 @@ def get_live_trader_logs():
                         found_today = False
                         for account_var in account_variations:
                             if account_var:
-                                alt_today = os.path.join(alt_path, f'{account_var} {today}_trading_log.log')
-                                if os.path.exists(alt_today):
-                                    if alt_today not in log_files:
-                                        log_files.insert(0, alt_today)
-                                        logging.info(f"[LOGS] Found Azure log file (alt, today): {alt_today}")
+                                # NEW FORMAT: FirstName_YYYYMONDD.log
+                                sanitized_var = sanitize_account_name_for_filename(account_var)
+                                alt_today_new = os.path.join(alt_path, f'{sanitized_var}_{today_formatted}.log')
+                                if os.path.exists(alt_today_new):
+                                    if alt_today_new not in log_files:
+                                        log_files.insert(0, alt_today_new)
+                                        logging.info(f"[LOGS] Found Azure log file (alt, today, new format): {alt_today_new}")
                                     found_today = True
                                     break
+                                
+                                # OLD FORMATS (backward compatibility):
+                                alt_today_old1 = os.path.join(alt_path, f'{account_var}_{today}_trading_log.log')
+                                if os.path.exists(alt_today_old1):
+                                    if alt_today_old1 not in log_files:
+                                        log_files.insert(0, alt_today_old1)
+                                        logging.info(f"[LOGS] Found Azure log file (alt, today, old format 1): {alt_today_old1}")
+                                    found_today = True
+                                    break
+                                
+                                if ' ' in account_var:
+                                    alt_today_old2 = os.path.join(alt_path, f'{account_var} {today}_trading_log.log')
+                                    if os.path.exists(alt_today_old2):
+                                        if alt_today_old2 not in log_files:
+                                            log_files.insert(0, alt_today_old2)
+                                            logging.info(f"[LOGS] Found Azure log file (alt, today, old format 2): {alt_today_old2}")
+                                        found_today = True
+                                        break
                         # Collect recursively
                         alt_logs = collect_logs_from_dir(alt_path)
                         account_matching_files = []
@@ -1542,9 +1782,9 @@ def stop_strategy():
 # Authentication API Endpoints
 @app.route('/api/auth/status', methods=['GET'])
 def auth_status():
-    """Check authentication status"""
+    """Check authentication status with auto-reconnection"""
     try:
-        global strategy_bot, kite_client_global
+        global strategy_bot, kite_client_global, kite_api_key
         
         authenticated = False
         has_access_token = False
@@ -1552,9 +1792,11 @@ def auth_status():
         # Check global kite client first
         global account_holder_name
         if kite_client_global and hasattr(kite_client_global, 'kite'):
-            try:
-                # Try to get profile to verify authentication
-                profile = kite_client_global.kite.profile()
+            # Validate connection with retry
+            is_valid, result = validate_kite_connection(kite_client_global)
+            
+            if is_valid:
+                profile = result
                 authenticated = True
                 has_access_token = kite_client_global.access_token is not None
                 
@@ -1566,18 +1808,34 @@ def auth_status():
                     account_holder_name = new_account_name
                     kite_client_global.account = account_holder_name
                 logging.debug("[AUTH] Authentication verified successfully for account: {}".format(account_holder_name))
-            except Exception as e:
+            else:
+                # Connection failed - try to reconnect if we have API key
                 authenticated = False
                 has_access_token = kite_client_global.access_token is not None
-                logging.warning("[AUTH] Authentication check failed: {}. Token may have expired.".format(str(e)))
+                logging.warning("[AUTH] Authentication check failed: {}. Attempting reconnection...".format(result))
+                
+                # Attempt auto-reconnection
+                if kite_api_key and reconnect_kite_client():
+                    authenticated = True
+                    has_access_token = kite_client_global.access_token is not None
+                    logging.info("[AUTH] Auto-reconnection successful")
+        else:
+            # No client - try to reconnect if we have API key
+            if kite_api_key:
+                logging.info("[AUTH] No kite client found, attempting reconnection...")
+                if reconnect_kite_client():
+                    authenticated = True
+                    has_access_token = kite_client_global.access_token is not None
+                    logging.info("[AUTH] Reconnection successful")
         
         # Also check bot's kite client
         if not authenticated and strategy_bot and hasattr(strategy_bot, 'kite_client'):
             try:
                 if hasattr(strategy_bot.kite_client, 'kite'):
-                    strategy_bot.kite_client.kite.profile()
-                    authenticated = True
-                    has_access_token = strategy_bot.kite_client.access_token is not None
+                    is_valid, _ = validate_kite_connection(strategy_bot.kite_client)
+                    if is_valid:
+                        authenticated = True
+                        has_access_token = strategy_bot.kite_client.access_token is not None if hasattr(strategy_bot.kite_client, 'access_token') else False
             except:
                 pass
         
@@ -1587,6 +1845,7 @@ def auth_status():
             'account_name': account_holder_name if authenticated else None
         })
     except Exception as e:
+        logging.error(f"[AUTH] Error checking auth status: {e}")
         return jsonify({
             'authenticated': False,
             'error': str(e)
@@ -1666,7 +1925,11 @@ def authenticate():
             )
             
             # Verify authentication by getting profile
-            profile = kite_client_global.kite.profile()
+            is_valid, result = validate_kite_connection(kite_client_global)
+            if not is_valid:
+                raise Exception(result)
+            
+            profile = result
             
             # Extract and store account holder name
             global account_holder_name, strategy_account_name
@@ -1674,6 +1937,10 @@ def authenticate():
             kite_client_global.account = account_holder_name  # Update account name in client
             # Keep strategy account name in sync for log matching
             strategy_account_name = account_holder_name
+            
+            # Save token for persistence
+            if kite_client_global.access_token:
+                save_access_token(kite_api_key, kite_client_global.access_token, account_holder_name)
             
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
@@ -1737,7 +2004,11 @@ def set_access_token():
             )
             
             # Verify the token works by getting profile
-            profile = kite_client_global.kite.profile()
+            is_valid, result = validate_kite_connection(kite_client_global)
+            if not is_valid:
+                raise Exception(result)
+            
+            profile = result
             
             # Extract and store account holder name
             global account_holder_name, strategy_account_name
@@ -1745,6 +2016,10 @@ def set_access_token():
             kite_client_global.account = account_holder_name  # Update account name in client
             # Keep strategy account name in sync for log matching
             strategy_account_name = account_holder_name
+            
+            # Save token for persistence
+            if kite_client_global.access_token:
+                save_access_token(api_key, kite_client_global.access_token, account_holder_name)
             
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
@@ -1787,15 +2062,22 @@ def check_connectivity():
         
         # Check global kite client first
         if kite_client_global and hasattr(kite_client_global, 'kite'):
-            try:
-                kite_client_global.kite.profile()
+            is_valid, result = validate_kite_connection(kite_client_global)
+            if is_valid:
                 connectivity['api_authenticated'] = True
                 connectivity['api_connected'] = True
                 connectivity['status_message'] = 'API Connected'
-            except Exception as api_error:
+            else:
                 connectivity['api_authenticated'] = kite_client_global.access_token is not None
                 connectivity['api_connected'] = False
-                connectivity['status_message'] = f'API Error: {str(api_error)[:50]}'
+                connectivity['status_message'] = f'API Error: {result[:50]}'
+                
+                # Try auto-reconnection
+                if kite_api_key:
+                    if reconnect_kite_client():
+                        connectivity['api_authenticated'] = True
+                        connectivity['api_connected'] = True
+                        connectivity['status_message'] = 'API Connected (reconnected)'
         
         # Also check bot's kite client
         if not connectivity['api_connected'] and strategy_bot and hasattr(strategy_bot, 'kite_client'):
@@ -1937,8 +2219,25 @@ def update_config_file(param_name, new_value):
         traceback.print_exc()
         return False
 
+def initialize_dashboard():
+    """Initialize dashboard and attempt to reconnect if token exists"""
+    global kite_api_key
+    try:
+        # Try to load saved token if API key is available
+        if kite_api_key:
+            logging.info("[INIT] Attempting to reconnect with saved token...")
+            if reconnect_kite_client():
+                logging.info("[INIT] Successfully reconnected on startup")
+            else:
+                logging.info("[INIT] No valid saved token found or reconnection failed")
+    except Exception as e:
+        logging.warning(f"[INIT] Error during initialization: {e}")
+
 def start_dashboard(host=None, port=None, debug=False):
     """Start the config dashboard web server"""
+    # Initialize dashboard (try to reconnect)
+    initialize_dashboard()
+    
     # Use config values if not provided
     if host is None:
         host = DASHBOARD_HOST
