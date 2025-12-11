@@ -2336,7 +2336,10 @@
             const apiSecretInput = document.getElementById('apiSecretInput');
             const accessTokenApiKey = document.getElementById('accessTokenApiKey');
             
-            if (modal) modal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
             if (errorEl) {
                 errorEl.classList.remove('show');
                 errorEl.textContent = '';

@@ -961,47 +961,64 @@ def get_live_trader_logs():
             logging.info(f"[LOGS] Azure environment detected - checking log directory: {azure_log_dir}")
             logging.info(f"[LOGS] Account name for matching: '{account}'")
             
-            if os.path.exists(azure_log_dir):
-                try:
-                    # List all files for debugging
-                    all_files = os.listdir(azure_log_dir)
-                    logging.info(f"[LOGS] Files in Azure log directory: {all_files}")
-                    
-                    # PRIORITY 1: Check for today's log file with account name variations (highest priority)
-                    for account_var in account_variations:
-                        if account_var:
-                            azure_log_today = os.path.join(azure_log_dir, f'{account_var} {today}_trading_log.log')
-                            if os.path.exists(azure_log_today):
-                                # Insert at beginning for priority (Azure logs should be checked first in Azure)
-                                if azure_log_today not in log_files:
-                                    log_files.insert(0, azure_log_today)
-                                    logging.info(f"[LOGS] Found Azure log file (today, exact match): {azure_log_today}")
-                                break  # Found today's log, no need to check other variations
-                    
-                    # PRIORITY 2: Check for any log files matching account name (most recent first)
-                    # Try all account name variations
-                    account_matching_files = []
-                    for f in os.listdir(azure_log_dir):
-                        # Only match files that end with _trading_log.log
-                        # Exclude dashboard.log, config_monitoring.log, etc.
+            # Include additional sanitized variations for matching
+            sanitized_variations = []
+            for acc in list(account_variations):
+                if acc:
+                    sanitized_variations.append(acc.replace(' ', '_'))
+                    sanitized_variations.append(acc.replace(' ', '-'))
+                    sanitized_variations.append(acc.replace(' ', ''))
+            account_variations.extend([v for v in sanitized_variations if v not in account_variations])
+            
+            def collect_logs_from_dir(base_dir):
+                """Collect log files from a base directory and all subdirectories."""
+                collected = []
+                if not os.path.exists(base_dir):
+                    return collected
+                for root, _, files in os.walk(base_dir):
+                    for f in files:
                         if (f.endswith('_trading_log.log') and 
                             'dashboard' not in f.lower() and 
                             'config' not in f.lower() and
                             'monitoring' not in f.lower()):
-                            # Check if file matches any account name variation
-                            matches_account = False
-                            for account_var in account_variations:
-                                if account_var and account_var in f:
-                                    matches_account = True
-                                    break
-                            
-                            if matches_account:
-                                log_path = os.path.join(azure_log_dir, f)
-                                if log_path not in log_files:
-                                    account_matching_files.append(log_path)
-                                    logging.info(f"[LOGS] Found matching log file: {f} (matched account variation)")
+                            path = os.path.join(root, f)
+                            collected.append(path)
+                return collected
+            
+            def add_matching_logs(base_dir):
+                # List all files for debugging (shallow)
+                try:
+                    all_files = os.listdir(base_dir)
+                    logging.info(f"[LOGS] Files in Azure log directory: {all_files}")
+                except Exception as e:
+                    logging.warning(f"[LOGS] Could not list {base_dir}: {e}")
+                
+                # PRIORITY 1: today's log exact match using variations
+                for account_var in account_variations:
+                    if account_var:
+                        azure_log_today = os.path.join(base_dir, f'{account_var} {today}_trading_log.log')
+                        if os.path.exists(azure_log_today):
+                            if azure_log_today not in log_files:
+                                log_files.insert(0, azure_log_today)
+                                logging.info(f"[LOGS] Found Azure log file (today, match): {azure_log_today}")
+                            return True
+                return False
+            
+            # Check primary Azure dir and subdirs
+            if os.path.exists(azure_log_dir):
+                try:
+                    found_today = add_matching_logs(azure_log_dir)
                     
-                    # Sort by modification time (most recent first) and add to log_files
+                    # Collect all trading logs (recursive)
+                    azure_logs_all = collect_logs_from_dir(azure_log_dir)
+                    
+                    # Filter account-specific
+                    account_matching_files = []
+                    for log_path in azure_logs_all:
+                        fname = os.path.basename(log_path)
+                        if any(acc and acc in fname for acc in account_variations):
+                            account_matching_files.append(log_path)
+                    
                     if account_matching_files:
                         account_matching_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
                         for log_path in account_matching_files:
@@ -1009,54 +1026,65 @@ def get_live_trader_logs():
                                 log_files.append(log_path)
                                 logging.info(f"[LOGS] Found Azure log file (account match): {log_path}")
                     
-                    # PRIORITY 3: Fallback - check for any trading log files (but exclude dashboard/config logs)
-                    # Only if no account-specific logs found - this ensures we show logs even if account name doesn't match exactly
-                    if not log_files:
-                        logging.warning(f"[LOGS] No account-specific logs found, trying fallback: any trading log files")
-                        fallback_files = []
-                        for f in os.listdir(azure_log_dir):
-                            # Only include actual trading logs, exclude dashboard/config logs
-                            if (f.endswith('_trading_log.log') and 
-                                'dashboard' not in f.lower() and 
-                                'config' not in f.lower() and
-                                'monitoring' not in f.lower()):
-                                log_path = os.path.join(azure_log_dir, f)
-                                fallback_files.append((log_path, os.path.getmtime(log_path)))
-                        
-                        # Sort by modification time (most recent first) and add
-                        if fallback_files:
-                            fallback_files.sort(key=lambda x: x[1], reverse=True)
-                            for log_path, _ in fallback_files:
+                    # Fallback: any trading logs if still none
+                    if not log_files and azure_logs_all:
+                        logging.warning("[LOGS] No account-specific logs found, using fallback trading logs (Azure)")
+                        azure_logs_all.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                        for log_path in azure_logs_all:
+                            if log_path not in log_files:
                                 log_files.append(log_path)
-                                logging.info(f"[LOGS] Found Azure log file (fallback, any trading log): {log_path}")
+                                logging.info(f"[LOGS] Added fallback Azure log: {log_path}")
                 except Exception as e:
                     logging.warning(f"[LOGS] Error reading Azure log directory {azure_log_dir}: {e}")
                     import traceback
                     logging.warning(f"[LOGS] Traceback: {traceback.format_exc()}")
             else:
                 logging.warning(f"[LOGS] Azure log directory does not exist: {azure_log_dir}")
-                # Try alternative Azure log locations
-                alternative_paths = [
-                    '/home/LogFiles',
-                    '/home/LogFiles/Application',
-                    os.path.join(os.getenv('HOME', '/home'), 'LogFiles')
-                ]
-                for alt_path in alternative_paths:
-                    if os.path.exists(alt_path):
-                        logging.info(f"[LOGS] Trying alternative Azure log path: {alt_path}")
-                        try:
-                            for f in os.listdir(alt_path):
-                                # Only match actual trading logs with account name
-                                if (f.endswith('_trading_log.log') and 
-                                    account in f and 
-                                    'dashboard' not in f.lower() and 
-                                    'config' not in f.lower()):
-                                    log_path = os.path.join(alt_path, f)
-                                    if log_path not in log_files:
-                                        log_files.append(log_path)
-                                        logging.info(f"[LOGS] Found log file in alternative path: {log_path}")
-                        except Exception as e:
-                            logging.warning(f"[LOGS] Error reading alternative path {alt_path}: {e}")
+            
+            # Also check alternative Azure paths recursively
+            alternative_paths = [
+                '/home/LogFiles',
+                '/home/LogFiles/Application',
+                os.path.join(os.getenv('HOME', '/home'), 'LogFiles')
+            ]
+            for alt_path in alternative_paths:
+                if alt_path == azure_log_dir:
+                    continue
+                if os.path.exists(alt_path):
+                    logging.info(f"[LOGS] Trying alternative Azure log path: {alt_path}")
+                    try:
+                        # Try today's file first
+                        found_today = False
+                        for account_var in account_variations:
+                            if account_var:
+                                alt_today = os.path.join(alt_path, f'{account_var} {today}_trading_log.log')
+                                if os.path.exists(alt_today):
+                                    if alt_today not in log_files:
+                                        log_files.insert(0, alt_today)
+                                        logging.info(f"[LOGS] Found Azure log file (alt, today): {alt_today}")
+                                    found_today = True
+                                    break
+                        # Collect recursively
+                        alt_logs = collect_logs_from_dir(alt_path)
+                        account_matching_files = []
+                        for log_path in alt_logs:
+                            fname = os.path.basename(log_path)
+                            if any(acc and acc in fname for acc in account_variations):
+                                account_matching_files.append(log_path)
+                        if account_matching_files:
+                            account_matching_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                            for log_path in account_matching_files:
+                                if log_path not in log_files:
+                                    log_files.append(log_path)
+                                    logging.info(f"[LOGS] Found Azure log file (alt account match): {log_path}")
+                        if not log_files and alt_logs:
+                            alt_logs.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                            for log_path in alt_logs:
+                                if log_path not in log_files:
+                                    log_files.append(log_path)
+                                    logging.info(f"[LOGS] Added fallback Azure alt log: {log_path}")
+                    except Exception as e:
+                        logging.warning(f"[LOGS] Error reading alternative path {alt_path}: {e}")
         
         if not log_files:
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
