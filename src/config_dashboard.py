@@ -1162,6 +1162,8 @@ def get_live_trader_logs():
             else:
                 # Fallback if no account name
                 azure_log_dir = '/tmp/logs'
+            # Ensure directory exists (create if it doesn't)
+            os.makedirs(azure_log_dir, exist_ok=True)
             logging.info(f"[LOGS] Azure environment detected - checking log directory: {azure_log_dir}")
             logging.info(f"[LOGS] Account name for matching: '{account}'")
             
@@ -1231,6 +1233,8 @@ def get_live_trader_logs():
                 return False
             
             # Check primary Azure dir and subdirs
+            # Ensure directory exists (create if it doesn't)
+            os.makedirs(azure_log_dir, exist_ok=True)
             if os.path.exists(azure_log_dir):
                 try:
                     found_today = add_matching_logs(azure_log_dir)
@@ -1412,12 +1416,13 @@ def get_live_trader_logs():
                     azure_log_dir = os.path.join('/tmp', sanitized_account, 'logs')
                 else:
                     azure_log_dir = '/tmp/logs'
-                if os.path.exists(azure_log_dir):
-                    try:
-                        existing_files = os.listdir(azure_log_dir)
-                        logging.info(f"[LOGS] Files in Azure log directory ({azure_log_dir}): {existing_files}")
-                    except Exception as e:
-                        logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
+                # Ensure directory exists (create if it doesn't)
+                os.makedirs(azure_log_dir, exist_ok=True)
+                try:
+                    existing_files = os.listdir(azure_log_dir)
+                    logging.info(f"[LOGS] Files in Azure log directory ({azure_log_dir}): {existing_files}")
+                except Exception as e:
+                    logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
             else:
                 if os.path.exists(src_logs_dir):
                     try:

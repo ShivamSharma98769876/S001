@@ -106,6 +106,8 @@ def setup_azure_logging(logger_name='root', account_name=None):
         log_file = os.path.join(log_dir, f'{sanitized_account}_{date_str}.log')
     else:
         log_file = os.path.join(log_dir, 'trading_bot.log')
+    # Ensure directory exists before creating file handler
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
     file_handler = logging.FileHandler(log_file, encoding='utf-8')
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
@@ -153,6 +155,8 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         date_str = format_date_for_filename(date.today())
         log_filename = os.path.join(log_dir, f'trading_{date_str}.log')
     
+    # Ensure directory exists before creating file handler
+    os.makedirs(os.path.dirname(log_filename), exist_ok=True)
     file_handler = logging.FileHandler(log_filename, encoding='utf-8')
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
