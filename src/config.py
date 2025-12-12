@@ -44,10 +44,13 @@ LOG_LEVEL = 'INFO'
 
 # Azure Blob Storage Configuration for Logs
 # Load from environment variables (stored in .env file)
-AZURE_BLOB_CONNECTION_STRING = os.getenv(
-    'AZURE_BLOB_CONNECTION_STRING',
-    'DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=[REMOVED_SECRET];EndpointSuffix=core.windows.net'
-)  # Fallback to hardcoded value if not in .env (for backward compatibility)
+# Note: AZURE_BLOB_CONNECTION_STRING must be set in .env file
+AZURE_BLOB_CONNECTION_STRING = os.getenv('AZURE_BLOB_CONNECTION_STRING')
+if not AZURE_BLOB_CONNECTION_STRING:
+    raise ValueError(
+        "AZURE_BLOB_CONNECTION_STRING not found in environment variables. "
+        "Please set it in your .env file. See env_example.txt for reference."
+    )
 AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', 's0001strangle')  # Container name for logs
 AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'True').lower() == 'true'  # Enable/disable Azure Blob logging
 
