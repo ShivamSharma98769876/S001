@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-jdljfljfldjfl
-=======
 """
 StockSage Configuration file for the AI-Powered Options Trading Bot
 """
@@ -111,4 +108,4 @@ DASHBOARD_HOST = '0.0.0.0'  # Dashboard host address
 # Port will be auto-detected from Azure environment or use default
 import os
 DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))  # Dashboard port number 
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
+
