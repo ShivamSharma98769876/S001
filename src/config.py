@@ -38,6 +38,11 @@ KITE_API_BASE_URL = "https://api.kite.trade"
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 LOG_LEVEL = 'INFO'
 
+# Azure Blob Storage Configuration for Logs
+AZURE_BLOB_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=[REMOVED_SECRET];EndpointSuffix=core.windows.net'
+AZURE_BLOB_CONTAINER_NAME = 's0001strangle'  # Container name for logs
+AZURE_BLOB_LOGGING_ENABLED = True  # Enable/disable Azure Blob logging
+
 # VIX Configuration
 VIX_INSTRUMENT_TOKEN = '264969'
 VIX_FETCH_INTERVAL = 240  # seconds
