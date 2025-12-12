@@ -43,35 +43,33 @@ LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 LOG_LEVEL = 'INFO'
 
 # Azure Blob Storage Configuration for Logs
-# In Azure: Uses AzureBlobStorageKey environment variable to construct connection string
-# Locally: Can use AZURE_BLOB_CONNECTION_STRING from .env file as fallback
-AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME', 's0001strangle')  # Storage account name
-AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', 's0001strangle')  # Container name for logs
+# In Azure: Uses AzureBlobStorageKey environment variable to construct connection string at runtime
+# All configuration must be provided via environment variables - no hardcoded values
+AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME')  # Storage account name (required)
+AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME')  # Container name for logs (required)
 AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'True').lower() == 'true'  # Enable/disable Azure Blob logging
 
-# Construct connection string from Azure environment variable or .env file
+# Construct connection string from Azure environment variable
 def get_azure_blob_connection_string():
     """
-    Get Azure Blob Storage connection string.
-    Priority:
-    1. AzureBlobStorageKey environment variable (Azure App Service)
-    2. AZURE_BLOB_CONNECTION_STRING from .env file (local development)
+    Get Azure Blob Storage connection string from AzureBlobStorageKey environment variable.
+    Requires AzureBlobStorageKey environment variable to be set in Azure App Service.
     """
-    # Try Azure environment variable first (Azure App Service)
+    # Get Azure Blob Storage key from environment variable (Azure App Service)
     azure_blob_storage_key = os.getenv('AzureBlobStorageKey')
-    if azure_blob_storage_key:
-        # Construct connection string from Azure environment variable
-        account_name = AZURE_BLOB_ACCOUNT_NAME
-        endpoint_suffix = os.getenv('AZURE_BLOB_ENDPOINT_SUFFIX', 'core.windows.net')
-        return f'DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={azure_blob_storage_key};EndpointSuffix={endpoint_suffix}'
+    if not azure_blob_storage_key:
+        return None
     
-    # Fallback to .env file for local development
-    connection_string = os.getenv('AZURE_BLOB_CONNECTION_STRING')
-    if connection_string:
-        return connection_string
+    # Get account name from environment variable
+    account_name = AZURE_BLOB_ACCOUNT_NAME
+    if not account_name:
+        return None
     
-    # Return None if neither is available
-    return None
+    # Construct connection string from environment variables
+    endpoint_suffix = os.getenv('AZURE_BLOB_ENDPOINT_SUFFIX')
+    if not endpoint_suffix:
+        endpoint_suffix = 'core.windows.net'  # Default Azure endpoint suffix
+    return f'DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={azure_blob_storage_key};EndpointSuffix={endpoint_suffix}'
 
 AZURE_BLOB_CONNECTION_STRING = get_azure_blob_connection_string()
 
