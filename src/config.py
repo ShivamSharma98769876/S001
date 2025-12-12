@@ -3,6 +3,10 @@ StockSage Configuration file for the AI-Powered Options Trading Bot
 """
 from datetime import time
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Trading Parameters
 TARGET_DELTA_LOW = 0.29  # Lower bound for target delta
@@ -39,9 +43,13 @@ LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 LOG_LEVEL = 'INFO'
 
 # Azure Blob Storage Configuration for Logs
-AZURE_BLOB_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=[REMOVED_SECRET];EndpointSuffix=core.windows.net'
-AZURE_BLOB_CONTAINER_NAME = 's0001strangle'  # Container name for logs
-AZURE_BLOB_LOGGING_ENABLED = True  # Enable/disable Azure Blob logging
+# Load from environment variables (stored in .env file)
+AZURE_BLOB_CONNECTION_STRING = os.getenv(
+    'AZURE_BLOB_CONNECTION_STRING',
+    'DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=[REMOVED_SECRET];EndpointSuffix=core.windows.net'
+)  # Fallback to hardcoded value if not in .env (for backward compatibility)
+AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', 's0001strangle')  # Container name for logs
+AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'True').lower() == 'true'  # Enable/disable Azure Blob logging
 
 # VIX Configuration
 VIX_INSTRUMENT_TOKEN = '264969'
