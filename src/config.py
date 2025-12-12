@@ -43,13 +43,37 @@ LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 LOG_LEVEL = 'INFO'
 
 # Azure Blob Storage Configuration for Logs
-# Load from environment variables (stored in .env file)
-AZURE_BLOB_CONNECTION_STRING = os.getenv(
-    'AZURE_BLOB_CONNECTION_STRING',
-    'DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=[REMOVED_SECRET];EndpointSuffix=core.windows.net'
-)  # Fallback to hardcoded value if not in .env (for backward compatibility)
+# In Azure: Uses AzureBlobStorageKey environment variable to construct connection string
+# Locally: Can use AZURE_BLOB_CONNECTION_STRING from .env file as fallback
+AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME', 's0001strangle')  # Storage account name
 AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', 's0001strangle')  # Container name for logs
 AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'True').lower() == 'true'  # Enable/disable Azure Blob logging
+
+# Construct connection string from Azure environment variable or .env file
+def get_azure_blob_connection_string():
+    """
+    Get Azure Blob Storage connection string.
+    Priority:
+    1. AzureBlobStorageKey environment variable (Azure App Service)
+    2. AZURE_BLOB_CONNECTION_STRING from .env file (local development)
+    """
+    # Try Azure environment variable first (Azure App Service)
+    azure_blob_storage_key = os.getenv('AzureBlobStorageKey')
+    if azure_blob_storage_key:
+        # Construct connection string from Azure environment variable
+        account_name = AZURE_BLOB_ACCOUNT_NAME
+        endpoint_suffix = os.getenv('AZURE_BLOB_ENDPOINT_SUFFIX', 'core.windows.net')
+        return f'DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={azure_blob_storage_key};EndpointSuffix={endpoint_suffix}'
+    
+    # Fallback to .env file for local development
+    connection_string = os.getenv('AZURE_BLOB_CONNECTION_STRING')
+    if connection_string:
+        return connection_string
+    
+    # Return None if neither is available
+    return None
+
+AZURE_BLOB_CONNECTION_STRING = get_azure_blob_connection_string()
 
 # VIX Configuration
 VIX_INSTRUMENT_TOKEN = '264969'

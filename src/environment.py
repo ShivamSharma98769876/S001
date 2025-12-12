@@ -168,6 +168,13 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         if not AZURE_BLOB_LOGGING_ENABLED:
             return None, None
         
+        # Check if connection string is available
+        if not AZURE_BLOB_CONNECTION_STRING:
+            print("[AZURE BLOB] Warning: Azure Blob Storage connection string not available.")
+            print("[AZURE BLOB] In Azure: Set AzureBlobStorageKey environment variable")
+            print("[AZURE BLOB] Locally: Set AZURE_BLOB_CONNECTION_STRING in .env file")
+            return None, None
+        
         logger = logging.getLogger(logger_name)
         
         # Determine blob path

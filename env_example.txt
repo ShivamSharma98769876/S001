@@ -7,6 +7,9 @@ KITE_REQUEST_TOKEN=your_request_token_here
 KITE_ACCOUNT=your_account_here
 
 # Azure Blob Storage Configuration for Logs
-AZURE_BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=your_account_key_here;EndpointSuffix=core.windows.net
+# In Azure App Service: Set AzureBlobStorageKey environment variable (connection string is constructed automatically)
+# For local development: Optionally set AZURE_BLOB_CONNECTION_STRING if you want to test Azure Blob logging locally
+# AZURE_BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=s0001strangle;AccountKey=your_account_key_here;EndpointSuffix=core.windows.net
+AZURE_BLOB_ACCOUNT_NAME=s0001strangle
 AZURE_BLOB_CONTAINER_NAME=s0001strangle
 AZURE_BLOB_LOGGING_ENABLED=True
