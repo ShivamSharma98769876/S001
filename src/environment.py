@@ -305,9 +305,14 @@ def setup_azure_logging(logger_name='root', account_name=None):
         logger.setLevel(logging.INFO)
         
         # Setup Azure Blob Storage logging
+        print(f"[LOG SETUP] Setting up Azure Blob Storage logging for account: {account_name}")
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
+            print(f"[LOG SETUP] ✓ Azure Blob Storage logging configured: {blob_path}")
+        else:
+            print(f"[LOG SETUP] ✗ Azure Blob Storage logging NOT configured (check environment variables)")
+            logger.warning(f"[LOG SETUP] Azure Blob Storage logging not available - check environment variables")
         
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
@@ -408,12 +413,15 @@ def setup_logging(account_name=None, logger_name='root'):
     """
     Universal logging setup that works in both local and Azure environments
     """
+    print(f"[SETUP LOGGING] Starting logging setup - account_name={account_name}, logger_name={logger_name}")
     if is_azure_environment():
+        print(f"[SETUP LOGGING] Azure environment detected")
         logger, log_file = setup_azure_logging(logger_name, account_name=account_name)
         logging.info(f"[ENV] Running in Azure App Service - Logs: {log_file}")
         logging.info(f"[ENV] Azure Log Stream: Available via Azure Portal > Log stream")
         if account_name:
             logging.info(f"[ENV] Account name: {account_name}")
+        print(f"[SETUP LOGGING] Azure logging setup complete - log_file={log_file}")
         return logger, log_file
     else:
         logger, log_file = setup_local_logging(account_name=account_name, logger_name=logger_name)
