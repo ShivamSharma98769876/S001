@@ -171,16 +171,25 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
     try:
         from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
         
+        # Always print diagnostic info (even if disabled)
+        print(f"[AZURE BLOB] Checking configuration...")
+        print(f"[AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = {AZURE_BLOB_LOGGING_ENABLED}")
+        print(f"[AZURE BLOB] Connection string available: {AZURE_BLOB_CONNECTION_STRING is not None}")
+        print(f"[AZURE BLOB] Container name: {AZURE_BLOB_CONTAINER_NAME}")
+        
         if not AZURE_BLOB_LOGGING_ENABLED:
+            print("[AZURE BLOB] Logging is DISABLED. Set AZURE_BLOB_LOGGING_ENABLED=True in Azure Portal.")
             return None, None
         
         # Check if connection string is available
         if not AZURE_BLOB_CONNECTION_STRING:
-            print("[AZURE BLOB] Warning: Azure Blob Storage connection string not available.")
-            print("[AZURE BLOB] Required environment variables:")
-            print("[AZURE BLOB]   - AzureBlobStorageKey (Azure Blob Storage account key)")
-            print("[AZURE BLOB]   - AZURE_BLOB_ACCOUNT_NAME (Storage account name)")
-            print("[AZURE BLOB]   - AZURE_BLOB_CONTAINER_NAME (Container name)")
+            print("[AZURE BLOB] ERROR: Azure Blob Storage connection string not available.")
+            print("[AZURE BLOB] Required environment variables in Azure Portal:")
+            print("[AZURE BLOB]   1. AzureBlobStorageKey = <your-storage-account-key>")
+            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001strangle")
+            print("[AZURE BLOB]   3. AZURE_BLOB_CONTAINER_NAME = s0001strangle")
+            print("[AZURE BLOB]   4. AZURE_BLOB_LOGGING_ENABLED = True")
+            print("[AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
             return None, None
         
         logger = logging.getLogger(logger_name)

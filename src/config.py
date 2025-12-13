@@ -3,6 +3,30 @@ StockSage Configuration file for the AI-Powered Options Trading Bot
 """
 from datetime import time
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Import environment detection (needed for diagnostic output)
+try:
+    from src.environment import is_azure_environment
+except ImportError:
+    # Fallback if import fails
+    def is_azure_environment():
+        return any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME'])
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Import environment detection (needed for diagnostic output)
+try:
+    from src.environment import is_azure_environment
+except ImportError:
+    # Fallback if import fails
+    def is_azure_environment():
+        return any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME'])
 
 # Trading Parameters
 TARGET_DELTA_LOW = 0.29  # Lower bound for target delta
@@ -115,7 +139,16 @@ DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))  
 AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME', '')
 AZURE_BLOB_STORAGE_KEY = os.getenv('AzureBlobStorageKey', '')  # Note: Azure App Service uses this name
 AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', '')
-AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False').lower() == 'true'
+AZURE_BLOB_LOGGING_ENABLED_RAW = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False')
+AZURE_BLOB_LOGGING_ENABLED = AZURE_BLOB_LOGGING_ENABLED_RAW.lower() == 'true'
+
+# Print diagnostic info at startup (helps with troubleshooting)
+if is_azure_environment():
+    print(f"[CONFIG] Azure Blob Storage Configuration:")
+    print(f"[CONFIG]   AZURE_BLOB_ACCOUNT_NAME = '{AZURE_BLOB_ACCOUNT_NAME}' ({'SET' if AZURE_BLOB_ACCOUNT_NAME else 'NOT SET'})")
+    print(f"[CONFIG]   AzureBlobStorageKey = {'SET' if AZURE_BLOB_STORAGE_KEY else 'NOT SET'}")
+    print(f"[CONFIG]   AZURE_BLOB_CONTAINER_NAME = '{AZURE_BLOB_CONTAINER_NAME}' ({'SET' if AZURE_BLOB_CONTAINER_NAME else 'NOT SET'})")
+    print(f"[CONFIG]   AZURE_BLOB_LOGGING_ENABLED = '{AZURE_BLOB_LOGGING_ENABLED_RAW}' -> {AZURE_BLOB_LOGGING_ENABLED}")
 
 # Construct connection string from account name and key
 if AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_STORAGE_KEY:

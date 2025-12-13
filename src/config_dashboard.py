@@ -29,6 +29,20 @@ sys.path.append(current_dir)
 # Import config monitor
 from config_monitor import get_config_monitor
 
+# Print Azure Blob Storage diagnostic info BEFORE importing config
+print("=" * 60)
+print("[STARTUP] Checking Azure Blob Storage Configuration...")
+print("=" * 60)
+azure_blob_key = os.getenv('AzureBlobStorageKey')
+azure_blob_account = os.getenv('AZURE_BLOB_ACCOUNT_NAME')
+azure_blob_container = os.getenv('AZURE_BLOB_CONTAINER_NAME')
+azure_blob_enabled = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False')
+print(f"[STARTUP] AzureBlobStorageKey: {'SET' if azure_blob_key else 'NOT SET'}")
+print(f"[STARTUP] AZURE_BLOB_ACCOUNT_NAME: '{azure_blob_account}' ({'SET' if azure_blob_account else 'NOT SET'})")
+print(f"[STARTUP] AZURE_BLOB_CONTAINER_NAME: '{azure_blob_container}' ({'SET' if azure_blob_container else 'NOT SET'})")
+print(f"[STARTUP] AZURE_BLOB_LOGGING_ENABLED: '{azure_blob_enabled}' -> {azure_blob_enabled.lower() == 'true'}")
+print("=" * 60)
+
 # Import dashboard configuration
 try:
     # Try importing from src.config first (since config.py is in src/)
@@ -65,7 +79,7 @@ except (ImportError, AttributeError) as e:
 
 app = Flask(__name__)
 
-# Setup logging
+# Setup logging with Azure Blob Storage support
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -75,6 +89,23 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Setup Azure Blob Storage logging if enabled
+try:
+    from src.environment import setup_azure_blob_logging, is_azure_environment
+    if is_azure_environment():
+        print("[STARTUP] Azure environment detected - setting up Azure Blob Storage logging...")
+        blob_handler, blob_path = setup_azure_blob_logging(account_name=None, logger_name=__name__)
+        if blob_handler:
+            logger.info(f"[STARTUP] Azure Blob Storage logging enabled: {blob_path}")
+            print(f"[STARTUP] ✓ Azure Blob Storage logging configured: {blob_path}")
+        else:
+            print("[STARTUP] ✗ Azure Blob Storage logging NOT configured (check environment variables)")
+except Exception as e:
+    print(f"[STARTUP] Warning: Could not setup Azure Blob Storage logging: {e}")
+    import traceback
+    print(traceback.format_exc())
+
 logger.info("[DASHBOARD] Dashboard application initialized")
 
 # Global config monitor reference
