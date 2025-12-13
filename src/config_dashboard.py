@@ -997,6 +997,61 @@ def get_live_trader_logs():
             account = 'TRADING_ACCOUNT'
             logging.info(f"[LOGS] Using default account name for log matching: {account}")
         
+        # Simplify: Only look for today's log file in format: {account}_{YYYYMONDD}.log
+        # Get sanitized account name (first name only)
+        if not account:
+            logging.warning(f"[LOGS] No account name available, cannot find log file")
+        else:
+            sanitized_account = sanitize_account_name_for_filename(account)
+            log_filename = f'{sanitized_account}_{today_formatted}.log'
+            logging.info(f"[LOGS] Looking for today's log file: '{log_filename}' for account: '{account}' (sanitized: '{sanitized_account}')")
+            
+            # LOCAL ENVIRONMENT: Check src/logs directory
+            if not is_azure_environment():
+                # Ensure directory exists
+                if not os.path.exists(src_logs_dir):
+                    try:
+                        os.makedirs(src_logs_dir, exist_ok=True)
+                        logging.info(f"[LOGS] Created src/logs directory: {src_logs_dir}")
+                    except Exception as e:
+                        logging.warning(f"[LOGS] Could not create src/logs directory: {e}")
+                
+                # Look for today's log file in src/logs
+                today_log_path = os.path.join(src_logs_dir, log_filename)
+                if os.path.exists(today_log_path):
+                    log_files.append(today_log_path)
+                    logging.info(f"[LOGS] ✓ Found today's log file: {today_log_path}")
+                else:
+                    logging.info(f"[LOGS] Today's log file does not exist: {today_log_path}")
+            
+            # AZURE ENVIRONMENT: Check /tmp/{account}/logs/ directory
+            else:
+                from environment import get_log_directory
+                if account:
+                    sanitized_account = sanitize_account_name_for_filename(account)
+                    azure_log_dir = os.path.join('/tmp', sanitized_account, 'logs')
+                else:
+                    azure_log_dir = '/tmp/logs'
+                
+                # Ensure directory exists
+                os.makedirs(azure_log_dir, exist_ok=True)
+                logging.info(f"[LOGS] Azure environment - checking log directory: {azure_log_dir}")
+                
+                # Look for today's log file
+                today_log_path = os.path.join(azure_log_dir, log_filename)
+                if os.path.exists(today_log_path):
+                    log_files.append(today_log_path)
+                    logging.info(f"[LOGS] ✓ Found today's log file: {today_log_path}")
+                else:
+                    logging.info(f"[LOGS] Today's log file does not exist: {today_log_path}")
+                    # List files in directory for debugging
+                    try:
+                        if os.path.exists(azure_log_dir):
+                            all_files = os.listdir(azure_log_dir)
+                            logging.info(f"[LOGS] Files in Azure log directory: {all_files}")
+                    except Exception as e:
+                        logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
+        
         if not log_files:
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
             # Log checked directories based on environment
@@ -1425,9 +1480,36 @@ def start_live_trader():
         strategy_thread = threading.Thread(target=run_strategy, daemon=True)
         strategy_thread.start()
         
+        # Wait for process to be created (with timeout)
+        if process_ready.wait(timeout=3.0):
+            # Check if there was an error
+            if process_error[0]:
+                strategy_running = False
+                logging.error(f"[LIVE TRADER] Strategy process creation failed: {process_error[0]}")
+                return jsonify({
+                    'success': False,
+                    'error': f'Failed to start strategy process: {process_error[0]}'
+                }), 500
+            
+            # Check if process started successfully
+            if strategy_process is None:
+                strategy_running = False
+                logging.error("[LIVE TRADER] Strategy process is None after creation")
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to start strategy process - process is None'
+                }), 500
+        else:
+            # Timeout waiting for process
+            strategy_running = False
+            logging.error("[LIVE TRADER] Timeout waiting for strategy process to start")
+            return jsonify({
+                'success': False,
+                'error': 'Timeout waiting for strategy process to start. Please check logs for details.'
+            }), 500
         
         # Check if process has already terminated with error
-        if strategy_process.poll() is not None:
+        if strategy_process is not None and strategy_process.poll() is not None:
             returncode = strategy_process.returncode
             strategy_running = False
             error_msg = f'Strategy process exited immediately with code {returncode}'

@@ -11,7 +11,7 @@ print(sys.argv)
 api_key = "14vxzgvarfrfxs5k"
 api_secret = "6wiefl80trb7t8psih5badkwlpijo1gd"
 
-request_token = "UFOyn9cS0qctZPvW2RSJo0Egq7NjmeoU"  # Obtain this after login
+request_token = "bFcqToRvaMTsyQDfW0Wl0VuTTqSNrI78"  # Obtain this after login
 
 
 
@@ -21,9 +21,7 @@ request_token = "UFOyn9cS0qctZPvW2RSJo0Egq7NjmeoU"  # Obtain this after login
 
 
 
-#   4TNv7ByTFu2wlgDE2BZDXiXJRqo3jmwU
-
-#   jHGSsQAf7fE83HeWtmQt5eT4XPBWXh7W
+#   5xd1qlaK10FPXQr20MWa2yGXJ0aR00Qd
 
 kite = KiteConnect(api_key=api_key)
 
