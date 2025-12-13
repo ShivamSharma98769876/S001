@@ -13,6 +13,13 @@ import threading
 import time
 import logging
 
+# Disable Azure Monitor OpenTelemetry if not properly configured
+# This prevents "Bad Request" errors when Application Insights is misconfigured
+if not os.getenv('APPLICATIONINSIGHTS_CONNECTION_STRING'):
+    os.environ.setdefault('APPLICATIONINSIGHTS_ENABLE_AGENT', 'false')
+    # Suppress OpenTelemetry errors
+    logging.getLogger('azure.monitor.opentelemetry').setLevel(logging.CRITICAL)
+
 # Add parent directory to path for config imports
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 current_dir = os.path.dirname(os.path.abspath(__file__))

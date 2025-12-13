@@ -139,8 +139,14 @@ class AzureBlobStorageHandler(logging.Handler):
                 import time
                 self.last_flush = time.time()
                 
+                # Log success (to console only, to avoid recursion)
+                print(f"[AZURE BLOB] Successfully uploaded {len(content)} bytes to {self.container_name}/{self.blob_path}")
+                
         except Exception as e:
-            print(f"[AZURE BLOB] Error flushing to blob: {e}")
+            error_msg = f"[AZURE BLOB] Error flushing to blob {self.container_name}/{self.blob_path}: {e}"
+            print(error_msg)
+            import traceback
+            print(f"[AZURE BLOB] Traceback: {traceback.format_exc()}")
             # Put content back in buffer for retry if we have content
             if 'content' in locals() and content:
                 with self.buffer_lock:
@@ -206,7 +212,12 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         # Add handler to logger
         logger.addHandler(blob_handler)
         
+        # Write initial test message to verify it works
+        logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+        blob_handler.flush()  # Force immediate flush of initial message
+        
         print(f"[AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+        print(f"[AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
         return blob_handler, blob_path
         
     except ImportError as e:

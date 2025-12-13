@@ -10,6 +10,13 @@ import time
 import logging
 from datetime import datetime
 
+# Disable Azure Monitor OpenTelemetry if not properly configured
+# This prevents "Bad Request" errors when Application Insights is misconfigured
+if not os.getenv('APPLICATIONINSIGHTS_CONNECTION_STRING'):
+    os.environ.setdefault('APPLICATIONINSIGHTS_ENABLE_AGENT', 'false')
+    # Suppress OpenTelemetry errors
+    logging.getLogger('azure.monitor.opentelemetry').setLevel(logging.CRITICAL)
+
 # Add current directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
