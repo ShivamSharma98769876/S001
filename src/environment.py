@@ -5,12 +5,9 @@ Supports both local and Azure cloud deployments
 import os
 import logging
 from pathlib import Path
-<<<<<<< HEAD
 import io
 import threading
 from datetime import date
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
 
 def is_azure_environment():
     """
@@ -59,7 +56,6 @@ def format_date_for_filename(date_obj):
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     return f"{date_obj.year}{month_names[date_obj.month - 1]}{date_obj.day:02d}"
 
-<<<<<<< HEAD
 class AzureBlobStorageHandler(logging.Handler):
     """
     Custom logging handler that writes logs to Azure Blob Storage
@@ -222,8 +218,6 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         print(traceback.format_exc())
         return None, None
 
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
 def get_log_directory(account_name=None):
     """
     Get the appropriate log directory based on environment
@@ -252,11 +246,7 @@ def setup_azure_logging(logger_name='root', account_name=None):
     """
     Setup logging for Azure App Service
     Azure automatically captures stdout/stderr, so we configure both file and console logging
-<<<<<<< HEAD
     Logs are stored in /tmp/{account_name}/logs/ and also uploaded to Azure Blob Storage
-=======
-    Logs are stored in /tmp/{account_name}/logs/
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
     """
     logger = logging.getLogger(logger_name)
     
@@ -272,10 +262,6 @@ def setup_azure_logging(logger_name='root', account_name=None):
     console_handler.setLevel(logging.INFO)
     
     # File handler for persistent logs - use account name if provided
-<<<<<<< HEAD
-=======
-    from datetime import date
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
     if account_name:
         # Sanitize account name for filename (first name only)
         sanitized_account = sanitize_account_name_for_filename(account_name)
@@ -298,14 +284,11 @@ def setup_azure_logging(logger_name='root', account_name=None):
         logger.addHandler(file_handler)
         logger.setLevel(logging.INFO)
         
-<<<<<<< HEAD
         # Setup Azure Blob Storage logging
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
         
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
         logger.info(f"[LOG SETUP] Log file created at: {log_file}")
@@ -332,10 +315,7 @@ def setup_azure_logging(logger_name='root', account_name=None):
 def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     """
     Setup logging for local environment
-<<<<<<< HEAD
     Logs are stored locally and also uploaded to Azure Blob Storage if enabled
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
     """
     logger = logging.getLogger(logger_name)
     
@@ -351,10 +331,6 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     console_handler.setLevel(logging.INFO)
     
     # File handler with account name
-<<<<<<< HEAD
-=======
-    from datetime import date
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
     if account_name:
         # Sanitize account name for filename (first name only)
         sanitized_account = sanitize_account_name_for_filename(account_name)
@@ -380,14 +356,11 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         logger.addHandler(file_handler)
         logger.setLevel(logging.INFO)
         
-<<<<<<< HEAD
         # Setup Azure Blob Storage logging
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
         
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
         logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
