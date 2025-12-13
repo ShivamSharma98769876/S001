@@ -109,19 +109,4 @@ DASHBOARD_HOST = '0.0.0.0'  # Dashboard host address
 import os
 DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))  # Dashboard port number 
 
-# Azure Blob Storage Configuration for Logs
-AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME', '')
-AZURE_BLOB_STORAGE_KEY = os.getenv('AzureBlobStorageKey', '')
-AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', '')
-AZURE_BLOB_LOGGING_ENABLED = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False').lower() == 'true'
-# Construct connection string
-if AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_STORAGE_KEY:
-    AZURE_BLOB_CONNECTION_STRING = (
-        f"DefaultEndpointsProtocol=https;"
-        f"AccountName={AZURE_BLOB_ACCOUNT_NAME};"
-        f"AccountKey={AZURE_BLOB_STORAGE_KEY};"
-        f"EndpointSuffix=core.windows.net"
-    )
-else:
-    AZURE_BLOB_CONNECTION_STRING = None
     
