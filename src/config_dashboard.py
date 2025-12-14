@@ -1094,6 +1094,20 @@ def get_live_trader_logs():
                     except Exception as e:
                         logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
         
+        # FIRST: Check subprocess output buffer (real-time logs) - this should always be checked
+        subprocess_logs = []
+        with strategy_output_lock:
+            subprocess_logs = list(strategy_output_buffer)  # Copy buffer
+        
+        if subprocess_logs:
+            logging.info(f"[LOGS] Found {len(subprocess_logs)} lines in subprocess output buffer")
+            # Add subprocess logs to all_lines (these are the most recent/real-time)
+            all_lines = list(subprocess_logs)
+        else:
+            all_lines = []
+            logging.info(f"[LOGS] No subprocess output in buffer yet (strategy may be starting or not running)")
+        
+        # THEN: Check log files (as fallback/persistent storage)
         if not log_files:
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
             # Log checked directories based on environment
@@ -1132,6 +1146,25 @@ def get_live_trader_logs():
                     except:
                         pass
             
+            # If we have subprocess logs, return them even if no log files exist
+            if subprocess_logs:
+                logging.info(f"[LOGS] Returning {len(subprocess_logs)} lines from subprocess buffer (no log files found yet)")
+                # Remove duplicates while preserving order
+                seen = set()
+                unique_logs = []
+                for log in subprocess_logs:
+                    if log not in seen:
+                        seen.add(log)
+                        unique_logs.append(log)
+                
+                return jsonify({
+                    'success': True,
+                    'logs': unique_logs[-1000:],  # Last 1000 entries
+                    'log_file_path': None,
+                    'message': f'Showing real-time logs from strategy ({len(unique_logs)} lines). Log files will appear once strategy writes to disk.'
+                })
+            
+            # Only return empty if we have neither subprocess logs nor log files
             env_msg = "Azure log directory" if is_azure_environment() else "src/logs, src, root"
             return jsonify({
                 'success': True,
@@ -1139,18 +1172,6 @@ def get_live_trader_logs():
                 'log_file_path': None,
                 'message': f'No log files found for account: {account}, date: {today}. Checked: {env_msg}. Logs will appear once the strategy starts.'
             })
-        
-        # Also get subprocess output from in-memory buffer (real-time logs)
-        subprocess_logs = []
-        with strategy_output_lock:
-            subprocess_logs = list(strategy_output_buffer)  # Copy buffer
-        
-        if subprocess_logs:
-            logging.info(f"[LOGS] Found {len(subprocess_logs)} lines in subprocess output buffer")
-            # Add subprocess logs to all_lines (these are the most recent/real-time)
-            all_lines = list(subprocess_logs)
-        else:
-            all_lines = []
         
         # Read last 500 lines from log files (increased to show more logs)
         # Prioritize: read from first file (most relevant) first, then others
@@ -1508,9 +1529,12 @@ def start_live_trader():
                         
                         try:
                             # Read output in background and store in buffer for real-time display
+                            logging.info(f"[STRATEGY] Monitor thread started, reading subprocess output...")
+                            line_count = 0
                             for line in proc.stdout:
                                 line_text = line.strip()
                                 if line_text:  # Only store non-empty lines
+                                    line_count += 1
                                     # Log to dashboard logger
                                     logging.info(f"[STRATEGY] {line_text}")
                                     
@@ -1520,8 +1544,16 @@ def start_live_trader():
                                         # Keep buffer size manageable
                                         if len(strategy_output_buffer) > MAX_BUFFER_SIZE:
                                             strategy_output_buffer = strategy_output_buffer[-MAX_BUFFER_SIZE:]
+                                    
+                                    # Log every 10 lines to confirm we're capturing output
+                                    if line_count % 10 == 0:
+                                        logging.info(f"[STRATEGY] Captured {line_count} lines so far, buffer size: {len(strategy_output_buffer)}")
+                            
+                            logging.info(f"[STRATEGY] Monitor thread finished, captured {line_count} total lines")
                         except Exception as e:
-                            logging.warning(f"[STRATEGY] Monitor error: {e}")
+                            logging.error(f"[STRATEGY] Monitor error: {e}")
+                            import traceback
+                            logging.error(f"[STRATEGY] Monitor traceback: {traceback.format_exc()}")
                         finally:
                             # Check if process has terminated
                             try:
