@@ -1436,6 +1436,9 @@ def start_live_trader():
                 logging.info(f"[LIVE TRADER] Python executable: {sys.executable}")
                 
                 try:
+                    # Ensure environment variables are passed to subprocess
+                    # By default, subprocess inherits parent's environment, but we make it explicit
+                    env = os.environ.copy()
                     strategy_process = subprocess.Popen(
                         [sys.executable, strategy_file],
                         stdin=subprocess.PIPE,
@@ -1443,6 +1446,7 @@ def start_live_trader():
                         stderr=subprocess.STDOUT,
                         text=True,
                         cwd=strategy_cwd,
+                        env=env,  # Explicitly pass environment variables
                         bufsize=1
                     )
                     
