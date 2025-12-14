@@ -549,7 +549,7 @@
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
             </div>
-            <div class="logs-container" id="logsContainer">
+            <div class="logs-container" id="logsContainer" onscroll="handleLogScroll()">
                 <div class="log-entry info">
                     <span class="log-timestamp">[--:--:--]</span>
                     <span>Waiting for logs...</span>
@@ -564,6 +564,8 @@
         let lastLogText = null; // Track the last log line we've displayed (for tail-like behavior)
         let isInitialLoad = true; // Track if this is the first load
         let lotSize = 75; // Default lot size, will be fetched from API
+        let autoScrollEnabled = true; // Tail mode: always auto-scroll to bottom when new logs arrive
+        let userScrolledUp = false; // Track if user manually scrolled up
 
         // Fetch lot size from config
         async function fetchLotSize() {
@@ -1026,8 +1028,16 @@
                 if (!logsContainer) return;
                 
                 if (data.success && data.logs && data.logs.length > 0) {
-                    // Check if user is at bottom before updating
-                    const wasAtBottom = logsContainer.scrollHeight - logsContainer.scrollTop <= logsContainer.clientHeight + 50;
+                    // Check if user is at bottom before updating (more accurate calculation)
+                    const scrollThreshold = 100; // Pixels from bottom to consider "at bottom"
+                    const wasAtBottom = (logsContainer.scrollHeight - logsContainer.scrollTop - logsContainer.clientHeight) <= scrollThreshold;
+                    
+                    // Update user scroll state
+                    if (!wasAtBottom) {
+                        userScrolledUp = true;
+                    } else {
+                        userScrolledUp = false; // User is back at bottom
+                    }
                     
                     // Show log file path if available (only once)
                     if (data.log_file_path && !logsContainer.querySelector('.log-path-info')) {
@@ -1067,9 +1077,14 @@
                         isInitialLoad = false;
                         
                         // Scroll to bottom on first load (tail -f behavior)
-                        setTimeout(() => {
+                        // Use requestAnimationFrame for smoother scrolling
+                        requestAnimationFrame(() => {
                             logsContainer.scrollTop = logsContainer.scrollHeight;
-                        }, 100);
+                            // Force scroll again after DOM update
+                            setTimeout(() => {
+                                logsContainer.scrollTop = logsContainer.scrollHeight;
+                            }, 50);
+                        });
                         
                         // Ensure logs continue to auto-refresh every 3 seconds
                         if (!logsInterval) {
@@ -1116,19 +1131,24 @@
                                 }
                             }
                             
-                            // Auto-scroll to bottom when new logs arrive (tail -f behavior)
-                            // Always scroll to bottom if user was at bottom (like tail -f)
-                            // If user scrolled up, only auto-scroll if many new logs arrived
-                            if (wasAtBottom) {
-                                // User was at bottom - always scroll to show new logs (tail -f)
-                                setTimeout(() => {
+                            // Auto-scroll to bottom when new logs arrive (tail -f behavior like Notepad++)
+                            // Always scroll to bottom if auto-scroll is enabled and user was at bottom
+                            // If user scrolled up, still auto-scroll (true tail -f behavior)
+                            if (autoScrollEnabled) {
+                                // Tail mode: Always scroll to bottom when new logs arrive
+                                // Use requestAnimationFrame for smoother scrolling
+                                requestAnimationFrame(() => {
                                     logsContainer.scrollTop = logsContainer.scrollHeight;
-                                }, 50);
-                            } else if (newLogs.length > 5) {
-                                // User scrolled up but many new logs arrived - auto-scroll anyway
-                                setTimeout(() => {
+                                    // Force scroll again after DOM update to ensure we're at bottom
+                                    setTimeout(() => {
+                                        logsContainer.scrollTop = logsContainer.scrollHeight;
+                                    }, 10);
+                                });
+                            } else if (wasAtBottom) {
+                                // Auto-scroll disabled but user was at bottom - scroll anyway
+                                requestAnimationFrame(() => {
                                     logsContainer.scrollTop = logsContainer.scrollHeight;
-                                }, 50);
+                                });
                             }
                         }
                     }
@@ -1301,7 +1321,27 @@
             const logsContainer = document.getElementById('logsContainer');
             const entry = parseLogEntry(message);
             logsContainer.appendChild(entry);
-            logsContainer.scrollTop = logsContainer.scrollHeight;
+            // Always scroll to bottom when adding log (tail -f behavior)
+            if (autoScrollEnabled) {
+                requestAnimationFrame(() => {
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                });
+            }
+        }
+        
+        function handleLogScroll() {
+            // Track if user manually scrolled up
+            const logsContainer = document.getElementById('logsContainer');
+            if (!logsContainer) return;
+            
+            const scrollThreshold = 100;
+            const isAtBottom = (logsContainer.scrollHeight - logsContainer.scrollTop - logsContainer.clientHeight) <= scrollThreshold;
+            
+            if (!isAtBottom) {
+                userScrolledUp = true;
+            } else {
+                userScrolledUp = false;
+            }
         }
 
         function refreshLogs() {

@@ -8,6 +8,25 @@ from pathlib import Path
 import io
 import threading
 from datetime import date
+import sys
+
+# Safe formatter that handles Unicode encoding errors gracefully
+class SafeFormatter(logging.Formatter):
+    """Formatter that safely handles Unicode characters"""
+    def format(self, record):
+        try:
+            return super().format(record)
+        except (UnicodeEncodeError, UnicodeDecodeError) as e:
+            # Fallback: replace problematic characters
+            try:
+                msg = record.getMessage()
+                # Replace Unicode characters that can't be encoded
+                safe_msg = msg.encode('ascii', 'replace').decode('ascii')
+                record.msg = safe_msg
+                return super().format(record)
+            except Exception:
+                # Last resort: return basic message
+                return f"{record.levelname} - {record.name} - {record.getMessage()}"
 
 def is_azure_environment():
     """
@@ -288,17 +307,32 @@ def setup_azure_logging(logger_name='root', account_name=None):
     Setup logging for Azure App Service
     Azure automatically captures stdout/stderr, so we configure both file and console logging
     Logs are stored in /tmp/{account_name}/logs/ and also uploaded to Azure Blob Storage
+    
+    CRITICAL FIX: Always add handlers to root logger to ensure logging.info() calls work
     """
+    # Get both named logger and root logger
     logger = logging.getLogger(logger_name)
+    root_logger = logging.getLogger()  # Root logger - this is what logging.info() uses
     
     # Get log directory (account-specific for Azure)
     log_dir = get_log_directory(account_name=account_name)
     
-    # Create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # Create safe formatter that handles Unicode characters
+    formatter = SafeFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
     # Console handler (Azure captures stdout/stderr automatically)
+    # Set stream encoding to UTF-8 for Windows compatibility
     console_handler = logging.StreamHandler()
+    # On Windows, ensure stdout/stderr use UTF-8
+    if sys.platform == 'win32':
+        try:
+            import codecs
+            if hasattr(sys.stdout, 'reconfigure'):
+                sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+            if hasattr(sys.stderr, 'reconfigure'):
+                sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass  # Fallback to default if reconfigure fails
     console_handler.setFormatter(formatter)
     console_handler.setLevel(logging.INFO)
     
@@ -314,16 +348,32 @@ def setup_azure_logging(logger_name='root', account_name=None):
     # Ensure directory exists before creating file handler
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
     
-    # Create file handler
+    # Create file handler with immediate flush (unbuffered) and UTF-8 encoding
     try:
-        file_handler = logging.FileHandler(log_file, encoding='utf-8', mode='a')  # 'a' for append mode
-        file_handler.setFormatter(formatter)
+        # Use mode='a' for append, UTF-8 encoding, and errors='replace' to handle any Unicode issues
+        # Note: FileHandler doesn't support errors parameter directly, but we use SafeFormatter
+        file_handler = logging.FileHandler(log_file, encoding='utf-8', mode='a', delay=False)
+        file_handler.setFormatter(formatter)  # SafeFormatter handles Unicode encoding errors
         file_handler.setLevel(logging.INFO)
         
-        # Add handlers
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        logger.setLevel(logging.INFO)
+        # CRITICAL FIX: Add handlers to ROOT logger (what logging.info() uses)
+        # This ensures all logging.info() calls throughout the codebase write to file
+        if not any(isinstance(h, logging.FileHandler) and h.baseFilename == log_file for h in root_logger.handlers):
+            root_logger.addHandler(file_handler)
+            root_logger.setLevel(logging.INFO)
+        
+        # Also add to named logger if it's different from root
+        if logger_name != 'root' and logger != root_logger:
+            if not any(isinstance(h, logging.FileHandler) and h.baseFilename == log_file for h in logger.handlers):
+                logger.addHandler(file_handler)
+                logger.setLevel(logging.INFO)
+        
+        # Add console handler to root logger as well
+        if not any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers):
+            root_logger.addHandler(console_handler)
+        
+        # Ensure named logger propagates to root (default behavior, but make explicit)
+        logger.propagate = True
         
         # Setup Azure Blob Storage logging
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
@@ -331,32 +381,55 @@ def setup_azure_logging(logger_name='root', account_name=None):
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
-            print(f"{prefix} [LOG SETUP] ✓ Azure Blob Storage logging configured: {blob_path}")
+            print(f"{prefix} [LOG SETUP] SUCCESS: Azure Blob Storage logging configured: {blob_path}")
             if account_name:
                 print(f"{prefix} [LOG SETUP] Strategy logs will be written to: s0001strangle/{blob_path}")
         else:
-            print(f"{prefix} [LOG SETUP] ✗ Azure Blob Storage logging NOT configured (check environment variables)")
+            print(f"{prefix} [LOG SETUP] ERROR: Azure Blob Storage logging NOT configured (check environment variables)")
             logger.warning(f"[LOG SETUP] Azure Blob Storage logging not available - check environment variables")
         
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
-        logger.info(f"[LOG SETUP] Log file created at: {log_file}")
-        logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+        # Use root logger to ensure it works
+        root_logger.info(f"[LOG SETUP] Log file created at: {log_file}")
+        root_logger.info(f"[LOG SETUP] Log directory: {log_dir}")
         file_handler.flush()  # Force write to disk
+        os.fsync(file_handler.stream.fileno()) if hasattr(file_handler.stream, 'fileno') else None  # Force OS-level flush
         
-        print(f"[LOG SETUP] Log file created at: {log_file}")
+        # Verify file was created and is writable
+        if os.path.exists(log_file):
+            try:
+                # Test write access with UTF-8 encoding
+                with open(log_file, 'a', encoding='utf-8', errors='replace') as test_file:
+                    test_file.write("")
+                # Use ASCII-safe characters for print statements to avoid encoding issues
+                print(f"[LOG SETUP] SUCCESS: Log file created and writable: {log_file}")
+            except Exception as write_test:
+                print(f"[LOG SETUP] WARNING: Log file exists but may not be writable: {write_test}")
+        else:
+            print(f"[LOG SETUP] ERROR: Log file was NOT created: {log_file}")
+        
+        print(f"[LOG SETUP] Log file path: {log_file}")
         print(f"[LOG SETUP] Log directory: {log_dir}")
-        print(f"[LOG SETUP] File exists: {os.path.exists(log_file)}")
+        print(f"[LOG SETUP] Root logger handlers: {len(root_logger.handlers)}")
+        print(f"[LOG SETUP] Named logger handlers: {len(logger.handlers)}")
         
     except Exception as e:
         error_msg = f"[LOG SETUP] Failed to create log file {log_file}: {e}"
         print(error_msg)
-        logging.error(error_msg)
         import traceback
-        logging.error(traceback.format_exc())
-        # Fallback: try to create at least console logging
-        logger.addHandler(console_handler)
-        logger.setLevel(logging.INFO)
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        # Try to log to root logger (might not have handlers yet)
+        try:
+            root_logger.error(error_msg)
+            root_logger.error(error_trace)
+        except:
+            pass
+        # Fallback: try to create at least console logging on root logger
+        if not any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers):
+            root_logger.addHandler(console_handler)
+            root_logger.setLevel(logging.INFO)
         return logger, None
     
     return logger, log_file
@@ -365,17 +438,31 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     """
     Setup logging for local environment
     Logs are stored locally and also uploaded to Azure Blob Storage if enabled
+    
+    CRITICAL FIX: Always add handlers to root logger to ensure logging.info() calls work
     """
+    # Get both named logger and root logger
     logger = logging.getLogger(logger_name)
+    root_logger = logging.getLogger()  # Root logger - this is what logging.info() uses
     
     if log_dir is None:
         log_dir = get_log_directory()
     
-    # Create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # Create safe formatter that handles Unicode characters
+    formatter = SafeFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
-    # Console handler
+    # Console handler with UTF-8 encoding for Windows
     console_handler = logging.StreamHandler()
+    # On Windows, ensure stdout/stderr use UTF-8
+    if sys.platform == 'win32':
+        try:
+            import codecs
+            if hasattr(sys.stdout, 'reconfigure'):
+                sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+            if hasattr(sys.stderr, 'reconfigure'):
+                sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass  # Fallback to default if reconfigure fails
     console_handler.setFormatter(formatter)
     console_handler.setLevel(logging.INFO)
     
@@ -394,16 +481,31 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
     # Ensure directory exists before creating file handler
     os.makedirs(os.path.dirname(log_filename), exist_ok=True)
     
-    # Create file handler
+    # Create file handler with UTF-8 encoding and safe formatter
     try:
-        file_handler = logging.FileHandler(log_filename, encoding='utf-8', mode='a')  # 'a' for append mode
-        file_handler.setFormatter(formatter)
+        # Use UTF-8 encoding with SafeFormatter to handle Unicode characters
+        file_handler = logging.FileHandler(log_filename, encoding='utf-8', mode='a', delay=False)
+        file_handler.setFormatter(formatter)  # SafeFormatter handles Unicode encoding errors
         file_handler.setLevel(logging.INFO)
         
-        # Add handlers
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        logger.setLevel(logging.INFO)
+        # CRITICAL FIX: Add handlers to ROOT logger (what logging.info() uses)
+        # This ensures all logging.info() calls throughout the codebase write to file
+        if not any(isinstance(h, logging.FileHandler) and h.baseFilename == log_filename for h in root_logger.handlers):
+            root_logger.addHandler(file_handler)
+            root_logger.setLevel(logging.INFO)
+        
+        # Also add to named logger if it's different from root
+        if logger_name != 'root' and logger != root_logger:
+            if not any(isinstance(h, logging.FileHandler) and h.baseFilename == log_filename for h in logger.handlers):
+                logger.addHandler(file_handler)
+                logger.setLevel(logging.INFO)
+        
+        # Add console handler to root logger as well
+        if not any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers):
+            root_logger.addHandler(console_handler)
+        
+        # Ensure named logger propagates to root (default behavior, but make explicit)
+        logger.propagate = True
         
         # Setup Azure Blob Storage logging
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
@@ -412,13 +514,28 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
-        logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
-        logger.info(f"[LOG SETUP] Log directory: {log_dir}")
+        # Use root logger to ensure it works
+        root_logger.info(f"[LOG SETUP] Log file created at: {log_filename}")
+        root_logger.info(f"[LOG SETUP] Log directory: {log_dir}")
         file_handler.flush()  # Force write to disk
+        os.fsync(file_handler.stream.fileno()) if hasattr(file_handler.stream, 'fileno') else None  # Force OS-level flush
         
-        print(f"[LOG SETUP] Log file created at: {log_filename}")
+        # Verify file was created and is writable
+        if os.path.exists(log_filename):
+            try:
+                # Test write access with UTF-8 encoding
+                with open(log_filename, 'a', encoding='utf-8', errors='replace') as test_file:
+                    test_file.write("")
+                print(f"[LOG SETUP] SUCCESS: Log file created and writable: {log_filename}")
+            except Exception as write_test:
+                print(f"[LOG SETUP] WARNING: Log file exists but may not be writable: {write_test}")
+        else:
+            print(f"[LOG SETUP] ERROR: Log file was NOT created: {log_filename}")
+        
+        print(f"[LOG SETUP] Log file path: {log_filename}")
         print(f"[LOG SETUP] Log directory: {log_dir}")
-        print(f"[LOG SETUP] File exists: {os.path.exists(log_filename)}")
+        print(f"[LOG SETUP] Root logger handlers: {len(root_logger.handlers)}")
+        print(f"[LOG SETUP] Named logger handlers: {len(logger.handlers)}")
         
     except Exception as e:
         error_msg = f"[LOG SETUP] Failed to create log file {log_filename}: {e}"
