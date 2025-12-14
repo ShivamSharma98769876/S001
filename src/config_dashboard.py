@@ -970,11 +970,10 @@ def get_live_trader_logs():
         src_logs_dir = os.path.join(src_dir, 'logs')  # Log files are in src/logs directory (local)
         
         # Look for today's log file
-<<<<<<< HEAD
-=======
+
         from datetime import date
         from environment import format_date_for_filename
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
+
         today = date.today().strftime('%Y-%m-%d')  # For backward compatibility searches
         today_formatted = format_date_for_filename(date.today())  # New format: YYYYMONDD
         
@@ -1002,7 +1001,7 @@ def get_live_trader_logs():
             account = 'TRADING_ACCOUNT'
             logging.info(f"[LOGS] Using default account name for log matching: {account}")
         
-<<<<<<< HEAD
+
         # Simplify: Only look for today's log file in format: {account}_{YYYYMONDD}.log
         # Get sanitized account name (first name only)
         if not account:
@@ -1058,7 +1057,7 @@ def get_live_trader_logs():
                     except Exception as e:
                         logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
         
-=======
+
         logging.info(f"[LOGS] Looking for log files for account: '{account}', date: {today}")
         logging.info(f"[LOGS] Checking directories: src_dir={src_dir}, src_logs_dir={src_logs_dir}")
         
@@ -1457,7 +1456,7 @@ def get_live_trader_logs():
                     except Exception as e:
                         logging.warning(f"[LOGS] Error reading alternative path {alt_path}: {e}")
         
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
+
         if not log_files:
             logging.warning(f"[LOGS] No log files found for account: {account}, date: {today}")
             # Log checked directories based on environment
@@ -1886,7 +1885,7 @@ def start_live_trader():
         strategy_thread = threading.Thread(target=run_strategy, daemon=True)
         strategy_thread.start()
         
-<<<<<<< HEAD
+
         # Wait for process to be created (with timeout)
         if process_ready.wait(timeout=3.0):
             # Check if there was an error
@@ -1913,7 +1912,7 @@ def start_live_trader():
             return jsonify({
                 'success': False,
                 'error': 'Timeout waiting for strategy process to start. Please check logs for details.'
-=======
+
         # Give it a moment to start
         time.sleep(1.0)
         
@@ -1924,7 +1923,7 @@ def start_live_trader():
             return jsonify({
                 'success': False,
                 'error': 'Failed to start strategy process - process is None'
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
+
             }), 500
         
         # Check if process has already terminated with error
