@@ -223,7 +223,7 @@ class PnLRecorder:
                         writer.writerows(existing_records)
                         writer.writerow(row)
                 else:
-                    writer.writerow(row)
+                    writer.writerow(row) 
             
             logging.info(f"[P&L RECORD] Saved to CSV: {self.csv_file}")
             
