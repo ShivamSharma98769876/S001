@@ -225,7 +225,7 @@ class PnLRecorder:
                 else:
                     writer.writerow(row) 
             
-            logging.info(f"[P&L RECORD] Saved to CSV: {self.csv_file}")
+            logging.info(f"[P&L  RECORD] Saved to CSV: {self.csv_file}")
             
         except Exception as e:
             logging.error(f"Error saving to CSV: {e}")
