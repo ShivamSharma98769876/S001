@@ -866,6 +866,14 @@
                     stopBtn.style.cursor = 'pointer';
                     checkStatus(); // This will also ensure button stays disabled
                     addLog('success', 'Live Trader started successfully!');
+                    
+                    // Ensure logs are being fetched every 3 seconds (tail -f behavior)
+                    if (logsInterval) {
+                        clearInterval(logsInterval);
+                    }
+                    logsInterval = setInterval(loadLogs, 3000);
+                    // Load logs immediately to show current state
+                    loadLogs();
                 } else {
                     const errorMessage = data.error || 'Failed to start Live Trader';
                     errorEl.textContent = errorMessage;
@@ -1058,10 +1066,15 @@
                         lastLogText = data.logs[data.logs.length - 1]; // Store last log
                         isInitialLoad = false;
                         
-                        // Scroll to bottom on first load
+                        // Scroll to bottom on first load (tail -f behavior)
                         setTimeout(() => {
                             logsContainer.scrollTop = logsContainer.scrollHeight;
                         }, 100);
+                        
+                        // Ensure logs continue to auto-refresh every 3 seconds
+                        if (!logsInterval) {
+                            logsInterval = setInterval(loadLogs, 3000);
+                        }
                     } else {
                         // On subsequent loads, only append new logs (tail behavior)
                         let startIndex = 0;
@@ -1103,8 +1116,16 @@
                                 }
                             }
                             
-                            // Auto-scroll to bottom only if user was already at bottom
+                            // Auto-scroll to bottom when new logs arrive (tail -f behavior)
+                            // Always scroll to bottom if user was at bottom (like tail -f)
+                            // If user scrolled up, only auto-scroll if many new logs arrived
                             if (wasAtBottom) {
+                                // User was at bottom - always scroll to show new logs (tail -f)
+                                setTimeout(() => {
+                                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                                }, 50);
+                            } else if (newLogs.length > 5) {
+                                // User scrolled up but many new logs arrived - auto-scroll anyway
                                 setTimeout(() => {
                                     logsContainer.scrollTop = logsContainer.scrollHeight;
                                 }, 50);
@@ -1288,6 +1309,10 @@
             isInitialLoad = true;
             lastLogText = null;
             loadLogs();
+            // Ensure auto-refresh interval is running
+            if (!logsInterval) {
+                logsInterval = setInterval(loadLogs, 3000);
+            }
         }
         
         function showAuthModal() {
