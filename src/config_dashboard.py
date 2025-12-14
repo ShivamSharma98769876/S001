@@ -116,6 +116,10 @@ strategy_thread = None
 strategy_bot = None
 strategy_process = None
 strategy_running = False
+# In-memory buffer to store subprocess output for real-time log display
+strategy_output_buffer = []  # List of log lines from subprocess
+strategy_output_lock = threading.Lock()  # Thread-safe access to buffer
+MAX_BUFFER_SIZE = 1000  # Maximum number of lines to keep in buffer
 
 # Global Kite client for authentication (can be used independently)
 kite_client_global = None
@@ -1136,9 +1140,20 @@ def get_live_trader_logs():
                 'message': f'No log files found for account: {account}, date: {today}. Checked: {env_msg}. Logs will appear once the strategy starts.'
             })
         
+        # Also get subprocess output from in-memory buffer (real-time logs)
+        subprocess_logs = []
+        with strategy_output_lock:
+            subprocess_logs = list(strategy_output_buffer)  # Copy buffer
+        
+        if subprocess_logs:
+            logging.info(f"[LOGS] Found {len(subprocess_logs)} lines in subprocess output buffer")
+            # Add subprocess logs to all_lines (these are the most recent/real-time)
+            all_lines = list(subprocess_logs)
+        else:
+            all_lines = []
+        
         # Read last 500 lines from log files (increased to show more logs)
         # Prioritize: read from first file (most relevant) first, then others
-        all_lines = []
         log_files_read = []
         for log_path in log_files:
             try:
@@ -1155,7 +1170,16 @@ def get_live_trader_logs():
                     lines = f.readlines()
                     # Get last 500 lines from each file to show more detailed logs
                     file_lines = lines[-500:] if len(lines) > 500 else lines
-                    all_lines.extend(file_lines)
+                    # Merge file lines with subprocess buffer (avoid duplicates)
+                    # File logs are older, subprocess buffer has latest
+                    # Combine: file logs + new subprocess logs not in file
+                    existing_texts = set(all_lines)  # What we already have
+                    for file_line in file_lines:
+                        file_line_stripped = file_line.strip()
+                        if file_line_stripped and file_line_stripped not in existing_texts:
+                            all_lines.append(file_line_stripped)
+                            existing_texts.add(file_line_stripped)
+                    
                     log_files_read.append(log_path)
                     logging.info(f"[LOGS] Successfully read {len(file_lines)} lines from {log_path} (total lines in file: {len(lines)})")
             except PermissionError as e:
@@ -1168,13 +1192,19 @@ def get_live_trader_logs():
         
         if log_files_read:
             logging.info(f"[LOGS] Successfully read from {len(log_files_read)} log file(s): {log_files_read}")
+        elif subprocess_logs:
+            logging.info(f"[LOGS] Using subprocess output buffer ({len(subprocess_logs)} lines) - log file not found yet")
         else:
-            logging.warning(f"[LOGS] No log files were successfully read from {len(log_files)} attempted file(s)")
+            logging.warning(f"[LOGS] No log files were successfully read from {len(log_files)} attempted file(s) and no subprocess output available")
         
         # Show ALL logs (remove filtering to display complete log details)
         # Sort by timestamp if available, otherwise keep order
-        for line in all_lines[-500:]:  # Show last 500 lines
-            line = line.strip()
+        # Use all_lines which already contains subprocess buffer + file logs
+        for line in all_lines[-1000:]:  # Show last 1000 lines (increased for better visibility)
+            if isinstance(line, str):
+                line = line.strip()
+            else:
+                line = str(line).strip()
             if line:  # Only add non-empty lines
                 logs.append(line)
         
@@ -1189,7 +1219,7 @@ def get_live_trader_logs():
         # Include log file path and any error messages in response
         response_data = {
             'success': True,
-            'logs': unique_logs[-500:],  # Last 500 entries
+            'logs': unique_logs[-1000:],  # Last 1000 entries (increased for better visibility)
             'log_file_path': log_files[0] if log_files else None,  # Return log file path for reference
             'log_files_found': len(log_files),
             'log_files_read': len(log_files_read),
@@ -1412,9 +1442,14 @@ def start_live_trader():
         process_error = [None]  # Use list to allow modification from inner function
         
         def run_strategy():
-            global strategy_process, strategy_running
+            global strategy_process, strategy_running, strategy_output_buffer
             try:
                 strategy_running = True
+                
+                # Clear output buffer when starting new strategy
+                with strategy_output_lock:
+                    strategy_output_buffer = []
+                    logging.info(f"[LIVE TRADER] Cleared output buffer for new strategy run")
                 
                 # Store the account name used for this strategy run (for log retrieval)
                 global strategy_account_name
@@ -1439,15 +1474,17 @@ def start_live_trader():
                     # Ensure environment variables are passed to subprocess
                     # By default, subprocess inherits parent's environment, but we make it explicit
                     env = os.environ.copy()
+                    # Add PYTHONUNBUFFERED to ensure real-time output
+                    env['PYTHONUNBUFFERED'] = '1'
                     strategy_process = subprocess.Popen(
-                        [sys.executable, strategy_file],
+                        [sys.executable, '-u', strategy_file],  # -u flag for unbuffered output
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT,
                         text=True,
                         cwd=strategy_cwd,
                         env=env,  # Explicitly pass environment variables
-                        bufsize=1
+                        bufsize=0  # Unbuffered for real-time output
                     )
                     
                     logging.info(f"[LIVE TRADER] Process created successfully (PID: {strategy_process.pid})")
@@ -1463,16 +1500,26 @@ def start_live_trader():
                     # Don't wait for completion - let it run in background
                     # Monitor the process in background
                     def monitor_process():
-                        global strategy_process, strategy_running
+                        global strategy_process, strategy_running, strategy_output_buffer
                         # Store local reference to avoid race conditions
                         proc = strategy_process
                         if proc is None:
                             return
                         
                         try:
-                            # Read output in background
+                            # Read output in background and store in buffer for real-time display
                             for line in proc.stdout:
-                                logging.info(f"[STRATEGY] {line.strip()}")
+                                line_text = line.strip()
+                                if line_text:  # Only store non-empty lines
+                                    # Log to dashboard logger
+                                    logging.info(f"[STRATEGY] {line_text}")
+                                    
+                                    # Store in buffer for real-time log display
+                                    with strategy_output_lock:
+                                        strategy_output_buffer.append(line_text)
+                                        # Keep buffer size manageable
+                                        if len(strategy_output_buffer) > MAX_BUFFER_SIZE:
+                                            strategy_output_buffer = strategy_output_buffer[-MAX_BUFFER_SIZE:]
                         except Exception as e:
                             logging.warning(f"[STRATEGY] Monitor error: {e}")
                         finally:
