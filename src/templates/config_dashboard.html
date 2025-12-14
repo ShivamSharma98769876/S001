@@ -1101,6 +1101,11 @@
                         <small>Only needed if API key is not configured in the system</small>
                     </div>
                     <div class="form-group">
+                        <label for="accessTokenApiSecret">API Secret (Recommended)</label>
+                        <input type="password" id="accessTokenApiSecret" placeholder="Enter API secret (recommended for strategy)" title="API secret is recommended for starting trading strategy" aria-label="API secret recommended">
+                        <small style="color: var(--warning-color);">Required for starting trading strategy. If not provided, strategy may fail to start.</small>
+                    </div>
+                    <div class="form-group">
                         <label for="accessTokenInput">Access Token</label>
                         <input type="text" id="accessTokenInput" placeholder="Enter your access token" title="Access token" aria-label="Access token" required>
                         <small>
@@ -2335,6 +2340,7 @@
             const apiKeyInput = document.getElementById('apiKeyInput');
             const apiSecretInput = document.getElementById('apiSecretInput');
             const accessTokenApiKey = document.getElementById('accessTokenApiKey');
+            const accessTokenApiSecret = document.getElementById('accessTokenApiSecret');
             
             if (modal) {
                 modal.classList.remove('active');
@@ -2353,6 +2359,7 @@
             if (apiKeyInput) apiKeyInput.value = '';
             if (apiSecretInput) apiSecretInput.value = '';
             if (accessTokenApiKey) accessTokenApiKey.value = '';
+            if (accessTokenApiSecret) accessTokenApiSecret.value = '';
         }
         
         function switchAuthTab(tab) {
@@ -2377,6 +2384,7 @@
         async function authenticateWithAccessToken(event) {
             event.preventDefault();
             const apiKey = document.getElementById('accessTokenApiKey').value.trim();
+            const apiSecret = document.getElementById('accessTokenApiSecret').value.trim();
             const accessToken = document.getElementById('accessTokenInput').value.trim();
             const errorEl = document.getElementById('authError');
             const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -2399,6 +2407,9 @@
                 const requestBody = {access_token: accessToken};
                 if (apiKey) {
                     requestBody.api_key = apiKey;
+                }
+                if (apiSecret) {
+                    requestBody.api_secret = apiSecret;
                 }
                 
                 const response = await fetch('/api/auth/set-access-token', {

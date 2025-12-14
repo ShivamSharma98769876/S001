@@ -1435,11 +1435,14 @@ def start_live_trader():
                 'error': 'API key not available. Please authenticate first.'
             }), 401
         
+        # API secret is required for the strategy to work properly
         if not api_secret:
+            logging.warning("[LIVE TRADER] API secret not available - cannot start strategy")
             return jsonify({
                 'success': False,
-                'error': 'API secret not available. Please authenticate with API key and secret first.'
-            }), 401
+                'error': 'API secret is required to start the trading strategy. Please re-authenticate and provide your API secret. Click on "Authenticated" status badge to update your credentials.',
+                'requires_api_secret': True
+            }), 400
         
         if not access_token:
             return jsonify({

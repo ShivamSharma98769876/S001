@@ -867,8 +867,20 @@
                     checkStatus(); // This will also ensure button stays disabled
                     addLog('success', 'Live Trader started successfully!');
                 } else {
-                    errorEl.textContent = data.error || 'Failed to start Live Trader';
+                    const errorMessage = data.error || 'Failed to start Live Trader';
+                    errorEl.textContent = errorMessage;
                     errorEl.classList.add('show');
+                    
+                    // If error indicates missing API secret, show helpful message
+                    if (data.requires_api_secret || errorMessage.includes('API secret')) {
+                        // Show a more helpful message with link to authenticate
+                        errorEl.innerHTML = `
+                            <div style="margin-bottom: 8px;">${errorMessage}</div>
+                            <div style="font-size: 13px; margin-top: 8px;">
+                                <strong>Solution:</strong> Click on the <strong>"Authenticated"</strong> status badge at the top and provide your API secret when authenticating.
+                            </div>
+                        `;
+                    }
                     // Verify engine status before re-enabling button
                     try {
                         const statusResponse = await fetch('/api/live-trader/status');
