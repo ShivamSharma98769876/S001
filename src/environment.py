@@ -169,7 +169,20 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
     Creates logs in Azure Blob Storage with folder structure: {account_name}/logs/{filename}.log
     """
     try:
-        from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
+        # Try different import paths to work in both local and Azure environments
+        try:
+            from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
+        except ImportError:
+            # Fallback for Azure environment where 'src' might not be in path
+            import sys
+            import os
+            # Add parent directory to path if not already there
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            parent_dir = os.path.dirname(current_dir)
+            if parent_dir not in sys.path:
+                sys.path.insert(0, parent_dir)
+            # Try importing again
+            from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
         
         # Always print diagnostic info (even if disabled)
         print(f"[AZURE BLOB] Checking configuration...")
