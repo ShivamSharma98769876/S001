@@ -8,7 +8,4 @@ python-dotenv>=1.0.0
 requests>=2.31.0
 flask>=2.3.0
 gunicorn>=21.2.0
-<<<<<<< HEAD
 azure-storage-blob>=12.19.0
-=======
->>>>>>> d6ada5fbc40b38044e346746af8c22b95eb5c9d5
