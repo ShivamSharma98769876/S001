@@ -1,79 +1,83 @@
-# Fix: Trading Strategy Logs Not Appearing in Azure Blob
+# Fix: Trading Strategy Logs Not in Azure Blob
 
 ## Current Situation
 
-✅ **Dashboard logs ARE appearing in blob:**
-- Path: `s0001strangle-log/logs/trading_2025Dec14.log`
-- These are from `config_dashboard` logger (no account_name)
+✅ **Dashboard logs ARE in blob:**
+- Path: `s0001strangle/logs/trading_2025Dec14.log`
+- These are initialization messages from `config_dashboard` (no account_name)
 
-❌ **Trading strategy logs are NOT appearing in blob:**
-- Strategy runs with account_name="Priti Sharma"
-- Logs should go to: `Priti/logs/Priti_2025Dec14.log`
-- But they're only in `/tmp/Priti/logs/` (local filesystem)
+❌ **Trading strategy logs are NOT in blob:**
+- Strategy should run with account_name="Priti Sharma"
+- Logs should go to: `s0001strangle/Priti/logs/Priti_2025Dec14.log`
+- But they're not appearing
 
 ## Root Cause
 
-The trading strategy runs as a subprocess and:
-1. ✅ Environment variables are now explicitly passed (fixed)
-2. ❌ Azure Blob logging setup may be failing silently
-3. ❌ Diagnostic messages may not be appearing in log stream
+The trading strategy logs you showed are from **local execution** (Windows machine), not Azure. The strategy needs to be **started from the dashboard in Azure** to write logs to the blob.
 
 ## What Should Happen
 
-When the trading strategy starts:
+When you start the trading strategy from the dashboard in Azure:
 
-1. It calls `setup_logging(account_name="Priti Sharma")`
-2. This should print in log stream:
-   ```
-   [STRATEGY] [SETUP LOGGING] Starting logging setup - account_name=Priti Sharma
-   [STRATEGY] [SETUP LOGGING] Azure environment detected
-   [STRATEGY] [LOG SETUP] Setting up Azure Blob Storage logging for account: Priti Sharma
-   [STRATEGY] [AZURE BLOB] Checking configuration...
-   [STRATEGY] [AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = True
-   [STRATEGY] [AZURE BLOB] Connection string available: True
-   [STRATEGY] [AZURE BLOB] Container name: s0001strangle
-   [STRATEGY] [AZURE BLOB] Logging to Azure Blob: s0001strangle/Priti/logs/Priti_2025Dec14.log
-   ```
+1. **Strategy starts** → Calls `setup_logging(account_name="Priti Sharma")`
+2. **Azure environment detected** → Calls `setup_azure_logging()` with account name
+3. **Azure Blob handler created** → Path: `Priti/logs/Priti_2025Dec14.log`
+4. **All logs written** → `[FLOW]`, `[EXPIRY]`, `[LOG SETUP]`, etc. go to blob
 
-3. Logs should appear in blob at: `Priti/logs/Priti_2025Dec14.log`
+## How to Verify
 
-## Container Name Issue
+### Step 1: Check Log Stream for Strategy Messages
 
-The blob path shows `s0001strangle-log` instead of `s0001strangle`. This suggests:
-- `AZURE_BLOB_CONTAINER_NAME` might be set to `s0001strangle-log` in Azure Portal
-- Or there's a typo in the environment variable
+When you start the trading strategy from the dashboard, you should see in the **Azure Log Stream**:
 
-**Check in Azure Portal:**
-- Configuration > Application settings
-- `AZURE_BLOB_CONTAINER_NAME` should be exactly `s0001strangle` (not `s0001strangle-log`)
+```
+[STRATEGY] [SETUP LOGGING] Starting logging setup - account_name=Priti Sharma
+[STRATEGY] [SETUP LOGGING] Azure environment detected
+[STRATEGY] [LOG SETUP] Setting up Azure Blob Storage logging for account: Priti Sharma
+[STRATEGY] [AZURE BLOB] Checking configuration...
+[STRATEGY] [AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = True
+[STRATEGY] [AZURE BLOB] Connection string available: True
+[STRATEGY] [AZURE BLOB] Container name: s0001strangle
+[STRATEGY] [AZURE BLOB] Logging to Azure Blob: s0001strangle/Priti/logs/Priti_2025Dec14.log
+[STRATEGY] [AZURE BLOB] Initial test message sent. Check container: s0001strangle
+```
+
+### Step 2: Check Azure Blob Container
+
+After starting the strategy, check:
+- **Container:** `s0001strangle`
+- **Path:** `Priti/logs/Priti_2025Dec14.log`
+- **Should contain:** All `[FLOW]`, `[EXPIRY]`, trading activity logs
+
+## If Strategy Logs Still Don't Appear
+
+### Check 1: Is the Strategy Running?
+
+Look for `[STRATEGY]` messages in the log stream. If you don't see them, the strategy isn't starting.
+
+### Check 2: Environment Variables in Subprocess
+
+The dashboard passes environment variables to the subprocess. Verify they're being passed correctly.
+
+### Check 3: Account Name Format
+
+The account name "Priti Sharma" gets sanitized to "Priti" for the folder name. This is correct.
+
+## Expected Log Locations
+
+### Dashboard Logs (Currently Working)
+- **Blob Path:** `s0001strangle/logs/trading_2025Dec14.log`
+- **Contains:** Dashboard initialization messages
+- **Logger:** `config_dashboard` (no account_name)
+
+### Trading Strategy Logs (Should Appear After Starting Strategy)
+- **Blob Path:** `s0001strangle/Priti/logs/Priti_2025Dec14.log`
+- **Contains:** All trading activity (`[FLOW]`, `[EXPIRY]`, etc.)
+- **Logger:** `root` (with account_name="Priti Sharma")
 
 ## Next Steps
 
-1. **Check Log Stream** for `[STRATEGY]` messages when starting a new trading strategy
-2. **Look for** `[SETUP LOGGING]`, `[LOG SETUP]`, and `[AZURE BLOB]` messages
-3. **Verify** container name in Azure Portal is `s0001strangle`
-4. **Wait 30+ seconds** after strategy starts for first blob flush
-5. **Check blob** at path: `Priti/logs/Priti_2025Dec14.log`
-
-## Expected Blob Structure
-
-After fix, you should see:
-
-```
-s0001strangle/
-├── logs/
-│   └── trading_2025Dec14.log          (Dashboard logs - no account)
-└── Priti/
-    └── logs/
-        └── Priti_2025Dec14.log        (Trading strategy logs - with account)
-```
-
-## If Still Not Working
-
-1. Check Log Stream for `[STRATEGY] [AZURE BLOB]` messages
-2. Look for error messages like:
-   - `[AZURE BLOB] ERROR: Azure Blob Storage connection string not available`
-   - `[AZURE BLOB] Warning: Failed to setup Azure Blob logging`
-3. Verify all environment variables are set correctly
-4. Check if subprocess has access to environment variables (now fixed with explicit `env=env`)
-
+1. **Start the trading strategy** from the dashboard in Azure
+2. **Watch the log stream** for `[STRATEGY]` messages
+3. **Check the blob container** at `Priti/logs/Priti_2025Dec14.log`
+4. **If logs still don't appear**, check for errors in the log stream

@@ -184,11 +184,16 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
             # Try importing again
             from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
         
+        # Add prefix to identify if this is from trading strategy (has account_name) vs dashboard (no account_name)
+        prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
+        
         # Always print diagnostic info (even if disabled)
-        print(f"[AZURE BLOB] Checking configuration...")
-        print(f"[AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = {AZURE_BLOB_LOGGING_ENABLED}")
-        print(f"[AZURE BLOB] Connection string available: {AZURE_BLOB_CONNECTION_STRING is not None}")
-        print(f"[AZURE BLOB] Container name: {AZURE_BLOB_CONTAINER_NAME}")
+        print(f"{prefix} [AZURE BLOB] Checking configuration...")
+        print(f"{prefix} [AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = {AZURE_BLOB_LOGGING_ENABLED}")
+        print(f"{prefix} [AZURE BLOB] Connection string available: {AZURE_BLOB_CONNECTION_STRING is not None}")
+        print(f"{prefix} [AZURE BLOB] Container name: {AZURE_BLOB_CONTAINER_NAME}")
+        if account_name:
+            print(f"{prefix} [AZURE BLOB] Account name: {account_name} (will create folder: {sanitize_account_name_for_filename(account_name)})")
         
         if not AZURE_BLOB_LOGGING_ENABLED:
             print("[AZURE BLOB] Logging is DISABLED. Set AZURE_BLOB_LOGGING_ENABLED=True in Azure Portal.")
@@ -235,11 +240,14 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         logger.addHandler(blob_handler)
         
         # Write initial test message to verify it works
+        prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
         blob_handler.flush()  # Force immediate flush of initial message
         
-        print(f"[AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
-        print(f"[AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
+        print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+        print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
+        if account_name:
+            print(f"{prefix} [AZURE BLOB] Full blob path: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
         return blob_handler, blob_path
         
     except ImportError as e:
@@ -318,13 +326,16 @@ def setup_azure_logging(logger_name='root', account_name=None):
         logger.setLevel(logging.INFO)
         
         # Setup Azure Blob Storage logging
-        print(f"[LOG SETUP] Setting up Azure Blob Storage logging for account: {account_name}")
+        prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
+        print(f"{prefix} [LOG SETUP] Setting up Azure Blob Storage logging for account: {account_name}")
         blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
-            print(f"[LOG SETUP] ✓ Azure Blob Storage logging configured: {blob_path}")
+            print(f"{prefix} [LOG SETUP] ✓ Azure Blob Storage logging configured: {blob_path}")
+            if account_name:
+                print(f"{prefix} [LOG SETUP] Strategy logs will be written to: s0001strangle/{blob_path}")
         else:
-            print(f"[LOG SETUP] ✗ Azure Blob Storage logging NOT configured (check environment variables)")
+            print(f"{prefix} [LOG SETUP] ✗ Azure Blob Storage logging NOT configured (check environment variables)")
             logger.warning(f"[LOG SETUP] Azure Blob Storage logging not available - check environment variables")
         
         # Force file creation by writing an initial log message
@@ -426,15 +437,19 @@ def setup_logging(account_name=None, logger_name='root'):
     """
     Universal logging setup that works in both local and Azure environments
     """
-    print(f"[SETUP LOGGING] Starting logging setup - account_name={account_name}, logger_name={logger_name}")
+    # Add prefix to identify if this is from trading strategy (has account_name) vs dashboard (no account_name)
+    prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
+    print(f"{prefix} [SETUP LOGGING] Starting logging setup - account_name={account_name}, logger_name={logger_name}")
+    
     if is_azure_environment():
-        print(f"[SETUP LOGGING] Azure environment detected")
+        print(f"{prefix} [SETUP LOGGING] Azure environment detected")
         logger, log_file = setup_azure_logging(logger_name, account_name=account_name)
         logging.info(f"[ENV] Running in Azure App Service - Logs: {log_file}")
         logging.info(f"[ENV] Azure Log Stream: Available via Azure Portal > Log stream")
         if account_name:
             logging.info(f"[ENV] Account name: {account_name}")
-        print(f"[SETUP LOGGING] Azure logging setup complete - log_file={log_file}")
+            print(f"{prefix} [SETUP LOGGING] Strategy logs will be written to blob: {account_name}/logs/")
+        print(f"{prefix} [SETUP LOGGING] Azure logging setup complete - log_file={log_file}")
         return logger, log_file
     else:
         logger, log_file = setup_local_logging(account_name=account_name, logger_name=logger_name)

@@ -2609,7 +2609,15 @@ def main():
     # Setup logging for both local and Azure environments
     import os
     try:
+        # Print diagnostic message before setting up logging (helps identify strategy start in log stream)
+        print(f"[STRATEGY] Starting logging setup for account: {Input_account}")
+        print(f"[STRATEGY] Azure environment: {is_azure_environment()}")
+        
         logger, log_filename = setup_logging(account_name=Input_account)
+        
+        # Print confirmation after logging setup
+        if is_azure_environment():
+            print(f"[STRATEGY] Azure Blob logging should be configured. Check blob container for logs.")
         
         # Also add file handler to existing logger for backward compatibility
         global file_handler
