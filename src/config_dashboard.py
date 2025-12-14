@@ -1421,8 +1421,31 @@ def start_live_trader():
         
         # Get credentials from authenticated client
         api_key = kite_client_global.api_key
-        api_secret = kite_client_global.api_secret
+        # Use api_secret from kite_client_global, but fall back to global kite_api_secret if empty
+        api_secret = kite_client_global.api_secret or kite_api_secret or ''
         access_token = kite_client_global.access_token
+        
+        # Log credential status for debugging
+        logging.info(f"[LIVE TRADER] Credentials check - api_key: {'SET' if api_key else 'NOT SET'}, api_secret: {'SET' if api_secret else 'NOT SET'}, access_token: {'SET' if access_token else 'NOT SET'}")
+        
+        # Validate that we have all required credentials
+        if not api_key:
+            return jsonify({
+                'success': False,
+                'error': 'API key not available. Please authenticate first.'
+            }), 401
+        
+        if not api_secret:
+            return jsonify({
+                'success': False,
+                'error': 'API secret not available. Please authenticate with API key and secret first.'
+            }), 401
+        
+        if not access_token:
+            return jsonify({
+                'success': False,
+                'error': 'Access token not available. Please authenticate first.'
+            }), 401
         
         # Get account name from authenticated client (use account_holder_name if available)
         # CRITICAL: Use the account name that was used when starting the strategy for log matching
@@ -1949,12 +1972,20 @@ def set_access_token():
                 from src.kite_client import KiteClient
             except ImportError:
                 from kite_client import KiteClient
+            # Use api_secret_override if provided, otherwise use stored kite_api_secret
+            api_secret_to_use = api_secret_override or kite_api_secret or ''
             kite_client_global = KiteClient(
                 api_key,
-                kite_api_secret or '',  # API secret not needed for access token
+                api_secret_to_use,  # Store api_secret in KiteClient so it's available later
                 access_token=access_token,
                 account='DASHBOARD'
             )
+            
+            # Ensure api_secret is stored in the client (even if empty, so we know it was checked)
+            if api_secret_to_use:
+                logging.info("[AUTH] API secret stored in KiteClient")
+            else:
+                logging.warning("[AUTH] API secret is empty - strategy may fail to start without it")
             
             # Verify the token works by getting profile
             is_valid, result = validate_kite_connection(kite_client_global)
