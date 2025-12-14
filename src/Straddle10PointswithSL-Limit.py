@@ -2520,50 +2520,106 @@ def main():
     print("API CREDENTIALS SETUP")
     print("=" * 60)
     
-    # Check if running in Azure - get credentials from web interface
+    # Check if running in Azure - try to get credentials from stdin first (when started as subprocess)
+    # If stdin is available and has data, use that (dashboard passes credentials via stdin)
+    # Otherwise, try to get from web interface API
     if is_azure_environment():
-        logging.info("[ENV] Azure environment detected - waiting for credentials from web interface")
-        logging.info("[ENV] Please visit the web interface to enter credentials")
+        logging.info("[ENV] Azure environment detected")
         
-        # Try to get credentials from dashboard API
-        max_retries = 60  # Wait up to 5 minutes (60 * 5 seconds)
-        retry_count = 0
-        credentials_set = False
+        # First, try to read from stdin (when started as subprocess by dashboard)
+        # Dashboard passes credentials via stdin in this order:
+        # Account\nApi_key\nApi_secret\nRequest_Token\nCall_Quantity\nPut_Quantity\n
+        stdin_available = False
+        try:
+            import sys
+            import select
+            # Check if stdin is a TTY (interactive) or has data
+            # When started as subprocess with stdin=PIPE, stdin is not a TTY but has data
+            if not sys.stdin.isatty():
+                # stdin is a pipe (subprocess mode) - try to read with timeout
+                logging.info("[ENV] stdin is a pipe, attempting to read credentials from stdin (subprocess mode)")
+                try:
+                    # Use select with timeout to check if data is available (Unix/Linux)
+                    # On Windows, select might not work, so we'll try reading directly
+                    if hasattr(select, 'select'):
+                        # Unix/Linux: Check if stdin has data
+                        ready, _, _ = select.select([sys.stdin], [], [], 0.1)
+                        if ready:
+                            Input_account = input().strip() if not Input_account else Input_account
+                            Input_api_key = input().strip() if not Input_api_key else Input_api_key
+                            Input_api_secret = input().strip() if not Input_api_secret else Input_api_secret
+                            Input_request_token = input().strip() if not Input_request_token else Input_request_token
+                            # Also read call_quantity and put_quantity (but we'll use them later)
+                            try:
+                                call_quantity = int(input().strip())
+                                put_quantity = int(input().strip())
+                            except:
+                                pass
+                            stdin_available = True
+                            logging.info(f"[ENV] Credentials read from stdin for account: {Input_account}")
+                    else:
+                        # Windows: Try reading directly (might block, but dashboard sends immediately)
+                        Input_account = input().strip() if not Input_account else Input_account
+                        Input_api_key = input().strip() if not Input_api_key else Input_api_key
+                        Input_api_secret = input().strip() if not Input_api_secret else Input_api_secret
+                        Input_request_token = input().strip() if not Input_request_token else Input_request_token
+                        # Also read call_quantity and put_quantity
+                        try:
+                            call_quantity = int(input().strip())
+                            put_quantity = int(input().strip())
+                        except:
+                            pass
+                        stdin_available = True
+                        logging.info(f"[ENV] Credentials read from stdin for account: {Input_account}")
+                except (EOFError, ValueError) as stdin_error:
+                    # stdin read failed - will try API method
+                    logging.debug(f"[ENV] Could not read from stdin: {stdin_error}, will try API method")
+                    pass
+        except Exception as stdin_error:
+            # stdin not available or error - try API method
+            logging.debug(f"[ENV] stdin check failed: {stdin_error}, trying API method")
+            pass
         
-        while retry_count < max_retries and not credentials_set:
-            try:
-                import requests
-                # Try to get credentials from local dashboard
-                dashboard_port = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))
-                response = requests.get(
-                    f'http://localhost:{dashboard_port}/api/trading/get-credentials',
-                    timeout=2
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get('success') and data.get('credentials'):
-                        creds = data['credentials']
-                        Input_account = creds.get('account')
-                        Input_api_key = creds.get('api_key')
-                        Input_api_secret = creds.get('api_secret')
-                        Input_request_token = creds.get('request_token')
-                        credentials_set = True
-                        logging.info(f"[ENV] Credentials retrieved from web interface for account: {Input_account}")
-                        break
-            except Exception as e:
-                # Credentials not set yet, wait and retry
-                if retry_count % 12 == 0:  # Log every minute
-                    logging.info(f"[ENV] Waiting for credentials... ({retry_count * 5} seconds)")
-                time_module.sleep(5)  # Wait 5 seconds before retry
-                retry_count += 1
-        
-        if not credentials_set:
-            logging.error("[ENV] Credentials not set via web interface!")
-            logging.error("[ENV] Please visit the web interface to enter credentials")
-            logging.error("[ENV] The application will continue waiting, but trading will not start until credentials are provided")
-            # Don't raise error, just log - let the user know they need to set credentials
-            # The app can continue running and checking for credentials
+        # If stdin didn't work, try to get credentials from dashboard API
+        if not stdin_available and not all([Input_account, Input_api_key, Input_api_secret, Input_request_token]):
+            logging.info("[ENV] Waiting for credentials from web interface API")
+            # Try to get credentials from dashboard API
+            max_retries = 60  # Wait up to 5 minutes (60 * 5 seconds)
+            retry_count = 0
+            credentials_set = False
+            
+            while retry_count < max_retries and not credentials_set:
+                try:
+                    import requests
+                    # Try to get credentials from local dashboard
+                    dashboard_port = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))
+                    response = requests.get(
+                        f'http://localhost:{dashboard_port}/api/trading/get-credentials',
+                        timeout=2
+                    )
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get('success') and data.get('credentials'):
+                            creds = data['credentials']
+                            Input_account = creds.get('account')
+                            Input_api_key = creds.get('api_key')
+                            Input_api_secret = creds.get('api_secret')
+                            Input_request_token = creds.get('request_token')
+                            credentials_set = True
+                            logging.info(f"[ENV] Credentials retrieved from web interface for account: {Input_account}")
+                            break
+                except Exception as e:
+                    # Credentials not set yet, wait and retry
+                    if retry_count % 12 == 0:  # Log every minute
+                        logging.info(f"[ENV] Waiting for credentials... ({retry_count * 5} seconds)")
+                    time_module.sleep(5)  # Wait 5 seconds before retry
+                    retry_count += 1
+            
+            if not credentials_set:
+                logging.error("[ENV] Credentials not set via web interface!")
+                logging.error("[ENV] Please visit the web interface to enter credentials")
+                logging.error("[ENV] The application will continue waiting, but trading will not start until credentials are provided")
     else:
         # Local environment - prompt for credentials via CLI
         if not Input_account:

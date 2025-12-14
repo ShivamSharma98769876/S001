@@ -1101,11 +1101,24 @@ def get_live_trader_logs():
         
         if subprocess_logs:
             logging.info(f"[LOGS] Found {len(subprocess_logs)} lines in subprocess output buffer")
+            # Log first few lines for debugging
+            preview_lines = subprocess_logs[:5] if len(subprocess_logs) >= 5 else subprocess_logs
+            logging.info(f"[LOGS] Buffer preview (first {len(preview_lines)} lines): {preview_lines}")
             # Add subprocess logs to all_lines (these are the most recent/real-time)
             all_lines = list(subprocess_logs)
         else:
             all_lines = []
             logging.info(f"[LOGS] No subprocess output in buffer yet (strategy may be starting or not running)")
+            # Check if strategy process exists
+            if strategy_process is not None:
+                try:
+                    poll_result = strategy_process.poll()
+                    if poll_result is None:
+                        logging.info(f"[LOGS] Strategy process is running (PID: {strategy_process.pid}) but no output in buffer yet")
+                    else:
+                        logging.warning(f"[LOGS] Strategy process terminated (return code: {poll_result}) - no output captured")
+                except Exception as e:
+                    logging.warning(f"[LOGS] Could not check strategy process status: {e}")
         
         # THEN: Check log files (as fallback/persistent storage)
         if not log_files:
