@@ -223,7 +223,7 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
             print("[AZURE BLOB] ERROR: Azure Blob Storage connection string not available.")
             print("[AZURE BLOB] Required environment variables in Azure Portal:")
             print("[AZURE BLOB]   1. AzureBlobStorageKey = <your-storage-account-key>")
-            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001strangle")
+            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001str")
             print("[AZURE BLOB]   3. AZURE_BLOB_CONTAINER_NAME = s0001strangle")
             print("[AZURE BLOB]   4. AZURE_BLOB_LOGGING_ENABLED = True")
             print("[AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
