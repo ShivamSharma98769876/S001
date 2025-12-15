@@ -119,21 +119,27 @@ class AzureBlobStorageHandler(logging.Handler):
         except Exception:
             self.handleError(record)
     
-    def _flush_to_blob(self):
-        """Flush buffer contents to Azure Blob Storage"""
+    def _flush_to_blob(self, force=False):
+        """Flush buffer contents to Azure Blob Storage
+        
+        Args:
+            force: If True, create blob even if buffer is empty (for initial blob creation)
+        """
         try:
             with self.buffer_lock:
-                if self.buffer.tell() == 0:
-                    return
-                
                 # Get current buffer content
                 self.buffer.seek(0)
                 content = self.buffer.read()
                 self.buffer.seek(0)
                 self.buffer.truncate(0)
                 
-                if not content:
+                # If buffer is empty and not forcing, skip
+                if not content and not force:
                     return
+                
+                # Ensure we have at least a newline for empty blob creation
+                if not content and force:
+                    content = "\n"
                 
                 # Upload to Azure Blob Storage
                 from azure.storage.blob import BlobServiceClient
@@ -152,7 +158,7 @@ class AzureBlobStorageHandler(logging.Handler):
                     # Blob doesn't exist yet, create new one
                     pass
                 
-                # Upload the content
+                # Upload the content (this creates the blob if it doesn't exist)
                 blob_client.upload_blob(content, overwrite=True)
                 
                 import time
@@ -161,20 +167,33 @@ class AzureBlobStorageHandler(logging.Handler):
                 # Log success (to console only, to avoid recursion)
                 print(f"[AZURE BLOB] Successfully uploaded {len(content)} bytes to {self.container_name}/{self.blob_path}")
                 
+                # Verify blob exists
+                try:
+                    if blob_client.exists():
+                        print(f"[AZURE BLOB] Verified: Blob exists at {self.container_name}/{self.blob_path}")
+                    else:
+                        print(f"[AZURE BLOB] Warning: Blob verification failed - blob may not exist")
+                except Exception as verify_error:
+                    print(f"[AZURE BLOB] Warning: Could not verify blob existence: {verify_error}")
+                
         except Exception as e:
             error_msg = f"[AZURE BLOB] Error flushing to blob {self.container_name}/{self.blob_path}: {e}"
             print(error_msg)
             import traceback
             print(f"[AZURE BLOB] Traceback: {traceback.format_exc()}")
             # Put content back in buffer for retry if we have content
-            if 'content' in locals() and content:
+            if 'content' in locals() and content and content != "\n":
                 with self.buffer_lock:
                     self.buffer.seek(0, 2)  # Seek to end
                     self.buffer.write(content)
     
-    def flush(self):
-        """Flush any buffered logs to Azure Blob Storage"""
-        self._flush_to_blob()
+    def flush(self, force=False):
+        """Flush any buffered logs to Azure Blob Storage
+        
+        Args:
+            force: If True, create blob even if buffer is empty (for initial blob creation)
+        """
+        self._flush_to_blob(force=force)
         super().flush()
     
     def close(self):
@@ -223,7 +242,7 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
             print("[AZURE BLOB] ERROR: Azure Blob Storage connection string not available.")
             print("[AZURE BLOB] Required environment variables in Azure Portal:")
             print("[AZURE BLOB]   1. AzureBlobStorageKey = <your-storage-account-key>")
-            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001str")
+            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001strangle")
             print("[AZURE BLOB]   3. AZURE_BLOB_CONTAINER_NAME = s0001strangle")
             print("[AZURE BLOB]   4. AZURE_BLOB_LOGGING_ENABLED = True")
             print("[AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
@@ -261,7 +280,28 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         # Write initial test message to verify it works
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
-        blob_handler.flush()  # Force immediate flush of initial message
+        
+        # Give a small delay to ensure the log message is written to buffer
+        import time
+        time.sleep(0.5)
+        
+        # Force immediate flush of initial message (force=True ensures blob is created even if empty)
+        blob_handler.flush(force=True)
+        
+        # Verify blob was created
+        try:
+            from azure.storage.blob import BlobServiceClient
+            blob_service_client = BlobServiceClient.from_connection_string(AZURE_BLOB_CONNECTION_STRING)
+            blob_client = blob_service_client.get_blob_client(
+                container=AZURE_BLOB_CONTAINER_NAME,
+                blob=blob_path
+            )
+            if blob_client.exists():
+                print(f"{prefix} [AZURE BLOB] ✓ Blob verified: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+            else:
+                print(f"{prefix} [AZURE BLOB] ⚠ Warning: Blob not found after creation attempt")
+        except Exception as verify_error:
+            print(f"{prefix} [AZURE BLOB] ⚠ Warning: Could not verify blob: {verify_error}")
         
         print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
         print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
