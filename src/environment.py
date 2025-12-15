@@ -99,10 +99,23 @@ class AzureBlobStorageHandler(logging.Handler):
             from azure.storage.blob import BlobServiceClient
             blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
             container_client = blob_service_client.get_container_client(self.container_name)
-            if not container_client.exists():
+            
+            if container_client.exists():
+                print(f"[AZURE BLOB] Container '{self.container_name}' already exists")
+            else:
+                print(f"[AZURE BLOB] Container '{self.container_name}' does not exist, creating...")
                 container_client.create_container()
+                print(f"[AZURE BLOB] ✓ Container '{self.container_name}' created successfully")
+                
+                # Verify container was created
+                if container_client.exists():
+                    print(f"[AZURE BLOB] ✓✓ Verified: Container '{self.container_name}' exists")
+                else:
+                    print(f"[AZURE BLOB] ⚠ Warning: Container '{self.container_name}' creation verification failed")
         except Exception as e:
-            print(f"[AZURE BLOB] Warning: Could not ensure container exists: {e}")
+            print(f"[AZURE BLOB] ✗ ERROR: Could not ensure container exists: {type(e).__name__}: {e}")
+            import traceback
+            print(f"[AZURE BLOB] Container creation traceback: {traceback.format_exc()}")
     
     def emit(self, record):
         """Emit a log record to the buffer"""
@@ -150,31 +163,55 @@ class AzureBlobStorageHandler(logging.Handler):
                 )
                 
                 # Append to existing blob or create new one
+                existing_content = None
                 try:
                     # Try to download existing content and append
                     existing_content = blob_client.download_blob().readall().decode('utf-8')
                     content = existing_content + content
-                except Exception:
+                    print(f"[AZURE BLOB] Appending to existing blob (existing size: {len(existing_content)} bytes)")
+                except Exception as download_error:
                     # Blob doesn't exist yet, create new one
-                    pass
+                    print(f"[AZURE BLOB] Blob doesn't exist yet, creating new blob: {download_error}")
                 
                 # Upload the content (this creates the blob if it doesn't exist)
-                blob_client.upload_blob(content, overwrite=True)
-                
-                import time
-                self.last_flush = time.time()
-                
-                # Log success (to console only, to avoid recursion)
-                print(f"[AZURE BLOB] Successfully uploaded {len(content)} bytes to {self.container_name}/{self.blob_path}")
-                
-                # Verify blob exists
                 try:
-                    if blob_client.exists():
-                        print(f"[AZURE BLOB] Verified: Blob exists at {self.container_name}/{self.blob_path}")
-                    else:
-                        print(f"[AZURE BLOB] Warning: Blob verification failed - blob may not exist")
-                except Exception as verify_error:
-                    print(f"[AZURE BLOB] Warning: Could not verify blob existence: {verify_error}")
+                    print(f"[AZURE BLOB] Attempting to upload {len(content)} bytes to {self.container_name}/{self.blob_path}")
+                    blob_client.upload_blob(content, overwrite=True)
+                    print(f"[AZURE BLOB] ✓ Upload successful: {len(content)} bytes uploaded")
+                    
+                    import time
+                    self.last_flush = time.time()
+                    
+                    # Verify blob exists immediately after upload
+                    import time as time_module
+                    time_module.sleep(0.5)  # Small delay for Azure to propagate
+                    
+                    verification_attempts = 3
+                    blob_exists = False
+                    for attempt in range(verification_attempts):
+                        try:
+                            if blob_client.exists():
+                                blob_exists = True
+                                print(f"[AZURE BLOB] ✓✓ Verified: Blob exists at {self.container_name}/{self.blob_path} (attempt {attempt + 1})")
+                                break
+                            else:
+                                print(f"[AZURE BLOB] ⚠ Verification attempt {attempt + 1}: Blob not found yet, retrying...")
+                                time_module.sleep(1)
+                        except Exception as verify_error:
+                            print(f"[AZURE BLOB] ⚠ Verification attempt {attempt + 1} failed: {verify_error}")
+                            time_module.sleep(1)
+                    
+                    if not blob_exists:
+                        print(f"[AZURE BLOB] ⚠⚠ WARNING: Blob verification failed after {verification_attempts} attempts")
+                        print(f"[AZURE BLOB] Container: {self.container_name}, Blob path: {self.blob_path}")
+                        print(f"[AZURE BLOB] Full URL would be: https://<account>.blob.core.windows.net/{self.container_name}/{self.blob_path}")
+                        
+                except Exception as upload_error:
+                    error_details = f"[AZURE BLOB] ✗✗ UPLOAD FAILED: {type(upload_error).__name__}: {str(upload_error)}"
+                    print(error_details)
+                    import traceback
+                    print(f"[AZURE BLOB] Upload traceback: {traceback.format_exc()}")
+                    raise  # Re-raise to be caught by outer exception handler
                 
         except Exception as e:
             error_msg = f"[AZURE BLOB] Error flushing to blob {self.container_name}/{self.blob_path}: {e}"
@@ -279,29 +316,52 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         
         # Write initial test message to verify it works
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
+        print(f"{prefix} [AZURE BLOB] Writing initial test message to blob...")
         logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
         
         # Give a small delay to ensure the log message is written to buffer
         import time
-        time.sleep(0.5)
+        time.sleep(1.0)  # Increased delay to ensure message is in buffer
         
         # Force immediate flush of initial message (force=True ensures blob is created even if empty)
-        blob_handler.flush(force=True)
-        
-        # Verify blob was created
+        print(f"{prefix} [AZURE BLOB] Flushing buffer to create blob...")
         try:
-            from azure.storage.blob import BlobServiceClient
-            blob_service_client = BlobServiceClient.from_connection_string(AZURE_BLOB_CONNECTION_STRING)
-            blob_client = blob_service_client.get_blob_client(
-                container=AZURE_BLOB_CONTAINER_NAME,
-                blob=blob_path
-            )
-            if blob_client.exists():
-                print(f"{prefix} [AZURE BLOB] ✓ Blob verified: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
-            else:
-                print(f"{prefix} [AZURE BLOB] ⚠ Warning: Blob not found after creation attempt")
-        except Exception as verify_error:
-            print(f"{prefix} [AZURE BLOB] ⚠ Warning: Could not verify blob: {verify_error}")
+            blob_handler.flush(force=True)
+            print(f"{prefix} [AZURE BLOB] Flush completed")
+        except Exception as flush_error:
+            print(f"{prefix} [AZURE BLOB] ✗ Flush failed: {flush_error}")
+            import traceback
+            print(f"{prefix} [AZURE BLOB] Flush traceback: {traceback.format_exc()}")
+        
+        # Verify blob was created with retries
+        print(f"{prefix} [AZURE BLOB] Verifying blob creation...")
+        blob_verified = False
+        for verify_attempt in range(5):
+            try:
+                from azure.storage.blob import BlobServiceClient
+                blob_service_client = BlobServiceClient.from_connection_string(AZURE_BLOB_CONNECTION_STRING)
+                blob_client = blob_service_client.get_blob_client(
+                    container=AZURE_BLOB_CONTAINER_NAME,
+                    blob=blob_path
+                )
+                if blob_client.exists():
+                    print(f"{prefix} [AZURE BLOB] ✓✓✓ SUCCESS: Blob verified at attempt {verify_attempt + 1}")
+                    print(f"{prefix} [AZURE BLOB] Blob URL: https://<account>.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+                    blob_verified = True
+                    break
+                else:
+                    print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1}: Blob not found, waiting...")
+                    time.sleep(2)
+            except Exception as verify_error:
+                print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1} error: {verify_error}")
+                time.sleep(2)
+        
+        if not blob_verified:
+            print(f"{prefix} [AZURE BLOB] ✗✗✗ WARNING: Blob verification FAILED after 5 attempts")
+            print(f"{prefix} [AZURE BLOB] Container: {AZURE_BLOB_CONTAINER_NAME}")
+            print(f"{prefix} [AZURE BLOB] Blob path: {blob_path}")
+            print(f"{prefix} [AZURE BLOB] Expected URL: https://<account>.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] Please check Azure Portal > Storage Account > Container for errors")
         
         print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
         print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
