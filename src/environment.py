@@ -108,6 +108,13 @@ class AzureBlobStorageHandler(logging.Handler):
         """Ensure the container exists in Azure Blob Storage"""
         try:
             from azure.storage.blob import BlobServiceClient
+            from azure.core.exceptions import (
+                ClientAuthenticationError, 
+                HttpResponseError, 
+                ResourceExistsError,
+                ResourceNotFoundError
+            )
+            
             blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
             container_client = blob_service_client.get_container_client(self.container_name)
             
@@ -123,10 +130,74 @@ class AzureBlobStorageHandler(logging.Handler):
                     print(f"[AZURE BLOB] ✓✓ Verified: Container '{self.container_name}' exists")
                 else:
                     print(f"[AZURE BLOB] ⚠ Warning: Container '{self.container_name}' creation verification failed")
+                    
+        except ClientAuthenticationError as auth_error:
+            print(f"[AZURE BLOB] ✗✗✗ AUTHENTICATION ERROR: Invalid credentials or connection string")
+            print(f"[AZURE BLOB] Error Details: {auth_error}")
+            print(f"[AZURE BLOB] ========================================")
+            print(f"[AZURE BLOB] TROUBLESHOOTING:")
+            print(f"[AZURE BLOB] 1. Check your connection string in environment.py")
+            print(f"[AZURE BLOB] 2. Verify Storage Account Name: {AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}")
+            print(f"[AZURE BLOB] 3. Verify Storage Account Key is correct")
+            print(f"[AZURE BLOB] 4. Check if the storage account key has been rotated")
+            print(f"[AZURE BLOB] 5. Go to Azure Portal > Storage Account > Access Keys")
+            print(f"[AZURE BLOB]    and verify the key matches your connection string")
+            print(f"[AZURE BLOB] ========================================")
+            raise
+            
+        except HttpResponseError as http_error:
+            error_code = getattr(http_error, 'status_code', 'Unknown')
+            error_message = str(http_error)
+            print(f"[AZURE BLOB] ✗✗✗ HTTP ERROR ({error_code}): {error_message}")
+            print(f"[AZURE BLOB] ========================================")
+            print(f"[AZURE BLOB] TROUBLESHOOTING:")
+            
+            if error_code == 403:
+                print(f"[AZURE BLOB] ACCESS DENIED (403):")
+                print(f"[AZURE BLOB] 1. Check if your storage account key has proper permissions")
+                print(f"[AZURE BLOB] 2. Verify the storage account allows access from your location")
+                print(f"[AZURE BLOB] 3. Check Network settings in Azure Portal:")
+                print(f"[AZURE BLOB]    Storage Account > Networking > Firewalls and virtual networks")
+                print(f"[AZURE BLOB] 4. Ensure 'Allow access from all networks' is enabled (for testing)")
+                print(f"[AZURE BLOB] 5. Check if the storage account has IP restrictions")
+            elif error_code == 404:
+                print(f"[AZURE BLOB] NOT FOUND (404):")
+                print(f"[AZURE BLOB] 1. Verify storage account name: {AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}")
+                print(f"[AZURE BLOB] 2. Check if the storage account exists in your Azure subscription")
+                print(f"[AZURE BLOB] 3. Verify you're using the correct Azure region")
+            elif error_code == 409:
+                print(f"[AZURE BLOB] CONFLICT (409): Container may already exist or name is invalid")
+            else:
+                print(f"[AZURE BLOB] 1. Check Azure Portal for storage account status")
+                print(f"[AZURE BLOB] 2. Verify network connectivity")
+                print(f"[AZURE BLOB] 3. Check Azure Service Health for outages")
+            print(f"[AZURE BLOB] ========================================")
+            raise
+            
+        except ResourceExistsError:
+            print(f"[AZURE BLOB] Container '{self.container_name}' already exists (ResourceExistsError)")
+            
+        except ResourceNotFoundError:
+            print(f"[AZURE BLOB] ✗✗✗ RESOURCE NOT FOUND:")
+            print(f"[AZURE BLOB] Storage account or container not found")
+            print(f"[AZURE BLOB] Verify storage account name: {AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}")
+            print(f"[AZURE BLOB] Verify container name: {self.container_name}")
+            raise
+            
         except Exception as e:
-            print(f"[AZURE BLOB] ✗ ERROR: Could not ensure container exists: {type(e).__name__}: {e}")
+            error_type = type(e).__name__
+            print(f"[AZURE BLOB] ✗✗✗ UNEXPECTED ERROR ({error_type}): {e}")
+            print(f"[AZURE BLOB] ========================================")
+            print(f"[AZURE BLOB] TROUBLESHOOTING:")
+            print(f"[AZURE BLOB] 1. Check network connectivity to Azure")
+            print(f"[AZURE BLOB] 2. Verify storage account is accessible")
+            print(f"[AZURE BLOB] 3. Check Azure Portal > Storage Account > Overview")
+            print(f"[AZURE BLOB] 4. Verify connection string format is correct")
+            print(f"[AZURE BLOB] 5. Check if azure-storage-blob package is installed: pip install azure-storage-blob")
+            print(f"[AZURE BLOB] ========================================")
             import traceback
-            print(f"[AZURE BLOB] Container creation traceback: {traceback.format_exc()}")
+            print(f"[AZURE BLOB] Full traceback: {traceback.format_exc()}")
+            raise
     
     def emit(self, record):
         """Emit a log record to the buffer"""
@@ -187,8 +258,10 @@ class AzureBlobStorageHandler(logging.Handler):
                 # Upload the content (this creates the blob if it doesn't exist)
                 try:
                     print(f"[AZURE BLOB] Attempting to upload {len(content)} bytes to {self.container_name}/{self.blob_path}")
+                    print(f"[AZURE BLOB] Full blob path: {self.blob_path}")
+                    print(f"[AZURE BLOB] This will create folder structure: {self.blob_path.split('/')[0]}/logs/")
                     blob_client.upload_blob(content, overwrite=True)
-                    print(f"[AZURE BLOB] ✓ Upload successful: {len(content)} bytes uploaded")
+                    print(f"[AZURE BLOB] ✓ Upload successful: {len(content)} bytes uploaded to {self.container_name}/{self.blob_path}")
                     
                     import time
                     self.last_flush = time.time()
@@ -218,22 +291,84 @@ class AzureBlobStorageHandler(logging.Handler):
                         print(f"[AZURE BLOB] Full URL would be: https://<account>.blob.core.windows.net/{self.container_name}/{self.blob_path}")
                         
                 except Exception as upload_error:
-                    error_details = f"[AZURE BLOB] ✗✗ UPLOAD FAILED: {type(upload_error).__name__}: {str(upload_error)}"
+                    error_type = type(upload_error).__name__
+                    error_details = f"[AZURE BLOB] ✗✗ UPLOAD FAILED: {error_type}: {str(upload_error)}"
                     print(error_details)
+                    
+                    # Check for specific Azure errors
+                    from azure.core.exceptions import (
+                        ClientAuthenticationError,
+                        HttpResponseError,
+                        ResourceNotFoundError
+                    )
+                    
+                    if isinstance(upload_error, ClientAuthenticationError):
+                        print(f"[AZURE BLOB] ========================================")
+                        print(f"[AZURE BLOB] AUTHENTICATION ERROR DURING UPLOAD:")
+                        print(f"[AZURE BLOB] Your credentials are invalid or expired")
+                        print(f"[AZURE BLOB] Action: Update connection string in environment.py")
+                        print(f"[AZURE BLOB] ========================================")
+                    elif isinstance(upload_error, HttpResponseError):
+                        status_code = getattr(upload_error, 'status_code', 'Unknown')
+                        print(f"[AZURE BLOB] ========================================")
+                        print(f"[AZURE BLOB] HTTP ERROR ({status_code}) DURING UPLOAD:")
+                        if status_code == 403:
+                            print(f"[AZURE BLOB] ACCESS DENIED: Check container permissions")
+                            print(f"[AZURE BLOB] Container: {self.container_name}")
+                            print(f"[AZURE BLOB] Blob Path: {self.blob_path}")
+                            print(f"[AZURE BLOB] Action: Verify storage account key has write permissions")
+                        elif status_code == 404:
+                            print(f"[AZURE BLOB] NOT FOUND: Container or blob path issue")
+                            print(f"[AZURE BLOB] Container: {self.container_name}")
+                            print(f"[AZURE BLOB] Blob Path: {self.blob_path}")
+                            print(f"[AZURE BLOB] Action: Verify container exists and path is correct")
+                        else:
+                            print(f"[AZURE BLOB] Error Code: {status_code}")
+                            print(f"[AZURE BLOB] Action: Check Azure Portal for storage account status")
+                        print(f"[AZURE BLOB] ========================================")
+                    elif isinstance(upload_error, ResourceNotFoundError):
+                        print(f"[AZURE BLOB] ========================================")
+                        print(f"[AZURE BLOB] RESOURCE NOT FOUND:")
+                        print(f"[AZURE BLOB] Container '{self.container_name}' may not exist")
+                        print(f"[AZURE BLOB] Action: Container will be created automatically on next attempt")
+                        print(f"[AZURE BLOB] ========================================")
+                    else:
+                        print(f"[AZURE BLOB] ========================================")
+                        print(f"[AZURE BLOB] UNEXPECTED ERROR TYPE: {error_type}")
+                        print(f"[AZURE BLOB] Container: {self.container_name}")
+                        print(f"[AZURE BLOB] Blob Path: {self.blob_path}")
+                        print(f"[AZURE BLOB] ========================================")
+                    
                     import traceback
                     print(f"[AZURE BLOB] Upload traceback: {traceback.format_exc()}")
                     raise  # Re-raise to be caught by outer exception handler
                 
         except Exception as e:
-            error_msg = f"[AZURE BLOB] Error flushing to blob {self.container_name}/{self.blob_path}: {e}"
+            error_type = type(e).__name__
+            error_msg = f"[AZURE BLOB] Error flushing to blob {self.container_name}/{self.blob_path}: {error_type}: {e}"
             print(error_msg)
+            
+            # Check for connection/network errors
+            if "timeout" in str(e).lower() or "connection" in str(e).lower():
+                print(f"[AZURE BLOB] ========================================")
+                print(f"[AZURE BLOB] NETWORK/CONNECTION ERROR:")
+                print(f"[AZURE BLOB] Unable to connect to Azure Blob Storage")
+                print(f"[AZURE BLOB] Possible causes:")
+                print(f"[AZURE BLOB] 1. Network connectivity issues")
+                print(f"[AZURE BLOB] 2. Firewall blocking Azure endpoints")
+                print(f"[AZURE BLOB] 3. Azure service outage")
+                print(f"[AZURE BLOB] Action: Check network connectivity and Azure status")
+                print(f"[AZURE BLOB] ========================================")
+            
             import traceback
-            print(f"[AZURE BLOB] Traceback: {traceback.format_exc()}")
+            print(f"[AZURE BLOB] Full traceback: {traceback.format_exc()}")
+            
             # Put content back in buffer for retry if we have content
             if 'content' in locals() and content and content != "\n":
                 with self.buffer_lock:
                     self.buffer.seek(0, 2)  # Seek to end
                     self.buffer.write(content)
+                    print(f"[AZURE BLOB] Content saved to buffer for retry")
     
     def flush(self, force=False):
         """Flush any buffered logs to Azure Blob Storage
@@ -248,6 +383,127 @@ class AzureBlobStorageHandler(logging.Handler):
         """Close the handler and flush any remaining logs"""
         self.flush()
         super().close()
+
+def test_azure_blob_access(connection_string=None, container_name=None):
+    """
+    Test Azure Blob Storage access and report any issues
+    Returns: (success: bool, error_message: str, diagnostics: dict)
+    """
+    diagnostics = {
+        'connection_test': False,
+        'container_test': False,
+        'write_test': False,
+        'read_test': False,
+        'errors': []
+    }
+    
+    try:
+        # Use hardcoded credentials if not provided
+        if not connection_string:
+            if is_azure_environment() and AZURE_BLOB_LOGGING_ENABLED_HARDCODED:
+                connection_string = AZURE_BLOB_CONNECTION_STRING_HARDCODED
+                container_name = container_name or AZURE_BLOB_CONTAINER_NAME_HARDCODED
+            else:
+                return False, "No connection string provided", diagnostics
+        
+        if not container_name:
+            container_name = AZURE_BLOB_CONTAINER_NAME_HARDCODED if is_azure_environment() else "test-container"
+        
+        from azure.storage.blob import BlobServiceClient
+        from azure.core.exceptions import (
+            ClientAuthenticationError,
+            HttpResponseError,
+            ResourceNotFoundError
+        )
+        
+        print("[AZURE BLOB DIAGNOSTIC] Testing Azure Blob Storage access...")
+        print(f"[AZURE BLOB DIAGNOSTIC] Container: {container_name}")
+        
+        # Test 1: Connection
+        try:
+            blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+            # Try to list containers to test connection
+            list(blob_service_client.list_containers(max_results=1))
+            diagnostics['connection_test'] = True
+            print("[AZURE BLOB DIAGNOSTIC] ✓ Connection test: PASSED")
+        except ClientAuthenticationError as e:
+            diagnostics['errors'].append(f"Authentication failed: {e}")
+            return False, f"Authentication Error: Invalid credentials - {e}", diagnostics
+        except Exception as e:
+            diagnostics['errors'].append(f"Connection failed: {e}")
+            return False, f"Connection Error: {e}", diagnostics
+        
+        # Test 2: Container access
+        try:
+            container_client = blob_service_client.get_container_client(container_name)
+            if container_client.exists():
+                diagnostics['container_test'] = True
+                print(f"[AZURE BLOB DIAGNOSTIC] ✓ Container '{container_name}' exists")
+            else:
+                print(f"[AZURE BLOB DIAGNOSTIC] ⚠ Container '{container_name}' does not exist, attempting to create...")
+                try:
+                    container_client.create_container()
+                    diagnostics['container_test'] = True
+                    print(f"[AZURE BLOB DIAGNOSTIC] ✓ Container '{container_name}' created successfully")
+                except HttpResponseError as e:
+                    if e.status_code == 403:
+                        diagnostics['errors'].append(f"Container creation denied (403): Check permissions")
+                        return False, "Access Denied: Cannot create container. Check storage account permissions.", diagnostics
+                    else:
+                        diagnostics['errors'].append(f"Container creation failed: {e}")
+                        return False, f"Cannot create container: {e}", diagnostics
+        except HttpResponseError as e:
+            if e.status_code == 403:
+                diagnostics['errors'].append(f"Container access denied (403)")
+                return False, f"Access Denied: Cannot access container '{container_name}'. Check permissions.", diagnostics
+            else:
+                diagnostics['errors'].append(f"Container access error: {e}")
+                return False, f"Container access error: {e}", diagnostics
+        
+        # Test 3: Write access
+        try:
+            import time as time_module
+            test_blob_name = f"test_access_{int(time_module.time())}.txt"
+            blob_client = blob_service_client.get_blob_client(
+                container=container_name,
+                blob=test_blob_name
+            )
+            blob_client.upload_blob("test", overwrite=True)
+            diagnostics['write_test'] = True
+            print(f"[AZURE BLOB DIAGNOSTIC] ✓ Write test: PASSED")
+            
+            # Test 4: Read access
+            try:
+                content = blob_client.download_blob().readall().decode('utf-8')
+                if content == "test":
+                    diagnostics['read_test'] = True
+                    print(f"[AZURE BLOB DIAGNOSTIC] ✓ Read test: PASSED")
+                
+                # Cleanup test blob
+                blob_client.delete_blob()
+                print(f"[AZURE BLOB DIAGNOSTIC] ✓ Test blob cleaned up")
+            except Exception as e:
+                diagnostics['errors'].append(f"Read test failed: {e}")
+                print(f"[AZURE BLOB DIAGNOSTIC] ⚠ Read test: FAILED - {e}")
+        except HttpResponseError as e:
+            if e.status_code == 403:
+                diagnostics['errors'].append(f"Write access denied (403)")
+                return False, "Access Denied: Cannot write to container. Check write permissions.", diagnostics
+            else:
+                diagnostics['errors'].append(f"Write test failed: {e}")
+                return False, f"Write test failed: {e}", diagnostics
+        
+        if all([diagnostics['connection_test'], diagnostics['container_test'], diagnostics['write_test']]):
+            print("[AZURE BLOB DIAGNOSTIC] ✓✓✓ ALL TESTS PASSED - Azure Blob Storage is accessible")
+            return True, "All access tests passed", diagnostics
+        else:
+            return False, "Some tests failed", diagnostics
+            
+    except Exception as e:
+        diagnostics['errors'].append(f"Unexpected error: {e}")
+        import traceback
+        print(f"[AZURE BLOB DIAGNOSTIC] ✗ Unexpected error: {traceback.format_exc()}")
+        return False, f"Unexpected error: {e}", diagnostics
 
 def setup_azure_blob_logging(account_name=None, logger_name='root'):
     """
@@ -329,18 +585,62 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
                 print(f"{prefix} [AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
             return None, None
         
+        # Test access before proceeding (optional diagnostic)
+        if is_azure_environment():
+            print(f"{prefix} [AZURE BLOB] Testing Azure Blob Storage access...")
+            try:
+                import time
+                success, error_msg, diagnostics = test_azure_blob_access(connection_string, container_name)
+                if not success:
+                    print(f"{prefix} [AZURE BLOB] ⚠⚠⚠ ACCESS TEST FAILED: {error_msg}")
+                    print(f"{prefix} [AZURE BLOB] Diagnostics: {diagnostics}")
+                    print(f"{prefix} [AZURE BLOB] Continuing anyway - errors will be reported during actual operations")
+                else:
+                    print(f"{prefix} [AZURE BLOB] ✓ Access test passed - Azure Blob Storage is accessible")
+            except Exception as test_error:
+                print(f"{prefix} [AZURE BLOB] ⚠ Access test error (non-critical): {test_error}")
+                print(f"{prefix} [AZURE BLOB] Continuing with blob logging setup...")
+        
         logger = logging.getLogger(logger_name)
         
         # Determine blob path
-        if account_name:
-            sanitized_account = sanitize_account_name_for_filename(account_name)
-            date_str = format_date_for_filename(date.today())
-            # Folder structure: {sanitized_account_name}/logs/{sanitized_account}_{date_str}.log
-            # Use sanitized account name for folder to avoid blob path issues
-            blob_path = f"{sanitized_account}/logs/{sanitized_account}_{date_str}.log"
+        # IMPORTANT: Always create account folder structure, even if account_name is None or empty
+        # In Azure, if account_name is not provided, use a default folder name
+        
+        # Check if account_name is valid (not None and not empty string)
+        if account_name and str(account_name).strip():
+            sanitized_account = sanitize_account_name_for_filename(str(account_name).strip())
+            # Validate sanitized account name is not empty
+            if not sanitized_account or sanitized_account.strip() == '':
+                print(f"{prefix} [AZURE BLOB] WARNING: Account name '{account_name}' sanitized to empty string. Using default.")
+                sanitized_account = "default_account"
+            else:
+                print(f"{prefix} [AZURE BLOB] Account name provided: '{account_name}' -> sanitized: '{sanitized_account}'")
         else:
-            date_str = format_date_for_filename(date.today())
-            blob_path = f"logs/trading_{date_str}.log"
+            # In Azure, if no account_name provided, use default folder
+            if is_azure_environment():
+                sanitized_account = "default_account"
+                print(f"{prefix} [AZURE BLOB] WARNING: No account_name provided in Azure. Using default folder: '{sanitized_account}'")
+            else:
+                sanitized_account = "trading"
+                print(f"{prefix} [AZURE BLOB] No account_name provided. Using folder: '{sanitized_account}'")
+        
+        # Ensure sanitized_account is not empty (final safety check)
+        if not sanitized_account or sanitized_account.strip() == '':
+            sanitized_account = "default_account"
+            print(f"{prefix} [AZURE BLOB] CRITICAL: Sanitized account name was empty, using: '{sanitized_account}'")
+        
+        date_str = format_date_for_filename(date.today())
+        # Folder structure: {sanitized_account_name}/logs/{sanitized_account}_{date_str}.log
+        # Always use account folder structure to ensure proper organization
+        blob_path = f"{sanitized_account}/logs/{sanitized_account}_{date_str}.log"
+        print(f"{prefix} [AZURE BLOB] ========================================")
+        print(f"{prefix} [AZURE BLOB] BLOB PATH CONFIGURATION:")
+        print(f"{prefix} [AZURE BLOB]   Container: {container_name}")
+        print(f"{prefix} [AZURE BLOB]   Account Folder: {sanitized_account}")
+        print(f"{prefix} [AZURE BLOB]   Blob Path: {blob_path}")
+        print(f"{prefix} [AZURE BLOB]   Full Location: {container_name}/{blob_path}")
+        print(f"{prefix} [AZURE BLOB] ========================================")
         
         # Create Azure Blob handler
         blob_handler = AzureBlobStorageHandler(
@@ -383,6 +683,8 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         for verify_attempt in range(5):
             try:
                 from azure.storage.blob import BlobServiceClient
+                from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
+                
                 blob_service_client = BlobServiceClient.from_connection_string(connection_string)
                 blob_client = blob_service_client.get_blob_client(
                     container=container_name,
@@ -390,22 +692,43 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
                 )
                 if blob_client.exists():
                     print(f"{prefix} [AZURE BLOB] ✓✓✓ SUCCESS: Blob verified at attempt {verify_attempt + 1}")
-                    print(f"{prefix} [AZURE BLOB] Blob URL: https://<account>.blob.core.windows.net/{container_name}/{blob_path}")
+                    print(f"{prefix} [AZURE BLOB] Blob URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
                     blob_verified = True
                     break
                 else:
                     print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1}: Blob not found, waiting...")
                     time.sleep(2)
+            except ClientAuthenticationError as auth_error:
+                print(f"{prefix} [AZURE BLOB] ✗✗✗ AUTHENTICATION ERROR during verification: {auth_error}")
+                print(f"{prefix} [AZURE BLOB] Your credentials may be invalid. Check connection string.")
+                break  # Don't retry on auth errors
+            except HttpResponseError as http_error:
+                status_code = getattr(http_error, 'status_code', 'Unknown')
+                print(f"{prefix} [AZURE BLOB] ✗✗✗ HTTP ERROR ({status_code}) during verification: {http_error}")
+                if status_code == 403:
+                    print(f"{prefix} [AZURE BLOB] ACCESS DENIED: Check container and blob permissions")
+                break  # Don't retry on permission errors
             except Exception as verify_error:
-                print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1} error: {verify_error}")
-                time.sleep(2)
+                error_type = type(verify_error).__name__
+                print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1} error ({error_type}): {verify_error}")
+                if verify_attempt < 4:  # Don't sleep on last attempt
+                    time.sleep(2)
         
         if not blob_verified:
+            print(f"{prefix} [AZURE BLOB] ========================================")
             print(f"{prefix} [AZURE BLOB] ✗✗✗ WARNING: Blob verification FAILED after 5 attempts")
             print(f"{prefix} [AZURE BLOB] Container: {container_name}")
             print(f"{prefix} [AZURE BLOB] Blob path: {blob_path}")
-            print(f"{prefix} [AZURE BLOB] Expected URL: https://<account>.blob.core.windows.net/{container_name}/{blob_path}")
-            print(f"{prefix} [AZURE BLOB] Please check Azure Portal > Storage Account > Container for errors")
+            print(f"{prefix} [AZURE BLOB] Expected URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] ========================================")
+            print(f"{prefix} [AZURE BLOB] TROUBLESHOOTING:")
+            print(f"{prefix} [AZURE BLOB] 1. Go to Azure Portal > Storage Account > Containers")
+            print(f"{prefix} [AZURE BLOB] 2. Check if container '{container_name}' exists")
+            print(f"{prefix} [AZURE BLOB] 3. Verify blob path: {blob_path}")
+            print(f"{prefix} [AZURE BLOB] 4. Check container access level (Private/Blob/Container)")
+            print(f"{prefix} [AZURE BLOB] 5. Verify storage account key has read permissions")
+            print(f"{prefix} [AZURE BLOB] 6. Check Azure Portal > Storage Account > Access Keys")
+            print(f"{prefix} [AZURE BLOB] ========================================")
         
         print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {container_name}/{blob_path}")
         print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {container_name}")
