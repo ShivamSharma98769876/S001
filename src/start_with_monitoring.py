@@ -44,9 +44,11 @@ def setup_logging():
     """Setup logging for the monitoring system"""
     if is_azure_environment():
         # Use environment-aware logging for Azure
+        # For dashboard startup, we need fast initialization to prevent 504 timeout
         try:
-            from environment import setup_logging as setup_env_logging
-            logger, log_file = setup_env_logging(logger_name='config_monitor')
+            from environment import setup_azure_logging
+            # Pass account_name=None for dashboard, which will trigger fast startup mode
+            logger, log_file = setup_azure_logging(logger_name='config_monitor', account_name=None)
             logging.info(f"[ENV] Azure environment detected - Logs: {log_file}")
         except ImportError:
             # Fallback to basic logging

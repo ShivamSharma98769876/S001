@@ -517,7 +517,7 @@ def test_azure_blob_access(connection_string=None, container_name=None):
         print(f"[AZURE BLOB DIAGNOSTIC] ✗ Unexpected error: {traceback.format_exc()}")
         return False, f"Unexpected error: {e}", diagnostics
 
-def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mode=False):
+def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mode=False, skip_verification=False):
     """
     Setup Azure Blob Storage logging handler
     Creates logs in Azure Blob Storage with folder structure: {account_name}/logs/{filename}.log
@@ -525,6 +525,12 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
     Priority:
     1. If running in Azure and hardcoded credentials are enabled, use hardcoded credentials
     2. Otherwise, use environment variables from config
+    
+    Args:
+        account_name: Account name for folder structure
+        logger_name: Logger name to attach handler to
+        streaming_mode: Enable real-time streaming logs
+        skip_verification: If True, skip time-consuming verification (useful for fast startup)
     """
     try:
         # Add prefix to identify if this is from trading strategy (has account_name) vs dashboard (no account_name)
@@ -597,8 +603,8 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
                 print(f"{prefix} [AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
             return None, None
         
-        # Test access before proceeding (optional diagnostic)
-        if is_azure_environment():
+        # Test access before proceeding (optional diagnostic) - skip if fast startup needed
+        if is_azure_environment() and not skip_verification:
             print(f"{prefix} [AZURE BLOB] Testing Azure Blob Storage access...")
             try:
                 import time
@@ -612,6 +618,8 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
             except Exception as test_error:
                 print(f"{prefix} [AZURE BLOB] ⚠ Access test error (non-critical): {test_error}")
                 print(f"{prefix} [AZURE BLOB] Continuing with blob logging setup...")
+        elif skip_verification:
+            print(f"{prefix} [AZURE BLOB] Skipping access test for fast startup (verification will happen on first log write)")
         
         logger = logging.getLogger(logger_name)
         
@@ -671,80 +679,90 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
         # Add handler to logger
         logger.addHandler(blob_handler)
         
-        # Write initial test message to verify it works
+        # Write initial test message and verify (skip verification if fast startup needed)
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
-        print(f"{prefix} [AZURE BLOB] Writing initial test message to blob...")
-        logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {container_name}/{blob_path}")
         
-        # Give a small delay to ensure the log message is written to buffer
-        import time
-        time.sleep(1.0)  # Increased delay to ensure message is in buffer
-        
-        # Force immediate flush of initial message (force=True ensures blob is created even if empty)
-        print(f"{prefix} [AZURE BLOB] Flushing buffer to create blob...")
-        try:
-            blob_handler.flush(force=True)
-            print(f"{prefix} [AZURE BLOB] Flush completed")
-        except Exception as flush_error:
-            print(f"{prefix} [AZURE BLOB] ✗ Flush failed: {flush_error}")
-            import traceback
-            print(f"{prefix} [AZURE BLOB] Flush traceback: {traceback.format_exc()}")
-        
-        # Verify blob was created with retries
-        print(f"{prefix} [AZURE BLOB] Verifying blob creation...")
-        blob_verified = False
-        for verify_attempt in range(5):
+        if not skip_verification:
+            print(f"{prefix} [AZURE BLOB] Writing initial test message to blob...")
+            logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {container_name}/{blob_path}")
+            
+            # Give a small delay to ensure the log message is written to buffer
+            import time
+            time.sleep(1.0)  # Increased delay to ensure message is in buffer
+            
+            # Force immediate flush of initial message (force=True ensures blob is created even if empty)
+            print(f"{prefix} [AZURE BLOB] Flushing buffer to create blob...")
             try:
-                from azure.storage.blob import BlobServiceClient
-                from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
-                
-                blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-                blob_client = blob_service_client.get_blob_client(
-                    container=container_name,
-                    blob=blob_path
-                )
-                if blob_client.exists():
-                    print(f"{prefix} [AZURE BLOB] ✓✓✓ SUCCESS: Blob verified at attempt {verify_attempt + 1}")
-                    print(f"{prefix} [AZURE BLOB] Blob URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
-                    blob_verified = True
-                    break
-                else:
-                    print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1}: Blob not found, waiting...")
-                    time.sleep(2)
-            except ClientAuthenticationError as auth_error:
-                print(f"{prefix} [AZURE BLOB] ✗✗✗ AUTHENTICATION ERROR during verification: {auth_error}")
-                print(f"{prefix} [AZURE BLOB] Your credentials may be invalid. Check connection string.")
-                break  # Don't retry on auth errors
-            except HttpResponseError as http_error:
-                status_code = getattr(http_error, 'status_code', 'Unknown')
-                print(f"{prefix} [AZURE BLOB] ✗✗✗ HTTP ERROR ({status_code}) during verification: {http_error}")
-                if status_code == 403:
-                    print(f"{prefix} [AZURE BLOB] ACCESS DENIED: Check container and blob permissions")
-                break  # Don't retry on permission errors
-            except Exception as verify_error:
-                error_type = type(verify_error).__name__
-                print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1} error ({error_type}): {verify_error}")
-                if verify_attempt < 4:  # Don't sleep on last attempt
-                    time.sleep(2)
+                blob_handler.flush(force=True)
+                print(f"{prefix} [AZURE BLOB] Flush completed")
+            except Exception as flush_error:
+                print(f"{prefix} [AZURE BLOB] ✗ Flush failed: {flush_error}")
+                import traceback
+                print(f"{prefix} [AZURE BLOB] Flush traceback: {traceback.format_exc()}")
+            
+            # Verify blob was created with retries
+            print(f"{prefix} [AZURE BLOB] Verifying blob creation...")
+            blob_verified = False
+            for verify_attempt in range(5):
+                try:
+                    from azure.storage.blob import BlobServiceClient
+                    from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
+                    
+                    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+                    blob_client = blob_service_client.get_blob_client(
+                        container=container_name,
+                        blob=blob_path
+                    )
+                    if blob_client.exists():
+                        print(f"{prefix} [AZURE BLOB] ✓✓✓ SUCCESS: Blob verified at attempt {verify_attempt + 1}")
+                        print(f"{prefix} [AZURE BLOB] Blob URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
+                        blob_verified = True
+                        break
+                    else:
+                        print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1}: Blob not found, waiting...")
+                        time.sleep(2)
+                except ClientAuthenticationError as auth_error:
+                    print(f"{prefix} [AZURE BLOB] ✗✗✗ AUTHENTICATION ERROR during verification: {auth_error}")
+                    print(f"{prefix} [AZURE BLOB] Your credentials may be invalid. Check connection string.")
+                    break  # Don't retry on auth errors
+                except HttpResponseError as http_error:
+                    status_code = getattr(http_error, 'status_code', 'Unknown')
+                    print(f"{prefix} [AZURE BLOB] ✗✗✗ HTTP ERROR ({status_code}) during verification: {http_error}")
+                    if status_code == 403:
+                        print(f"{prefix} [AZURE BLOB] ACCESS DENIED: Check container and blob permissions")
+                    break  # Don't retry on permission errors
+                except Exception as verify_error:
+                    error_type = type(verify_error).__name__
+                    print(f"{prefix} [AZURE BLOB] ⚠ Verification attempt {verify_attempt + 1} error ({error_type}): {verify_error}")
+                    if verify_attempt < 4:  # Don't sleep on last attempt
+                        time.sleep(2)
+            
+            if not blob_verified:
+                print(f"{prefix} [AZURE BLOB] ========================================")
+                print(f"{prefix} [AZURE BLOB] ✗✗✗ WARNING: Blob verification FAILED after 5 attempts")
+                print(f"{prefix} [AZURE BLOB] Container: {container_name}")
+                print(f"{prefix} [AZURE BLOB] Blob path: {blob_path}")
+                print(f"{prefix} [AZURE BLOB] Expected URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
+                print(f"{prefix} [AZURE BLOB] ========================================")
+                print(f"{prefix} [AZURE BLOB] TROUBLESHOOTING:")
+                print(f"{prefix} [AZURE BLOB] 1. Go to Azure Portal > Storage Account > Containers")
+                print(f"{prefix} [AZURE BLOB] 2. Check if container '{container_name}' exists")
+                print(f"{prefix} [AZURE BLOB] 3. Verify blob path: {blob_path}")
+                print(f"{prefix} [AZURE BLOB] 4. Check container access level (Private/Blob/Container)")
+                print(f"{prefix} [AZURE BLOB] 5. Verify storage account key has read permissions")
+                print(f"{prefix} [AZURE BLOB] 6. Check Azure Portal > Storage Account > Access Keys")
+                print(f"{prefix} [AZURE BLOB] ========================================")
+            
+            print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {container_name}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {container_name}")
+        else:
+            # Fast startup mode: skip verification, just log that it's configured
+            print(f"{prefix} [AZURE BLOB] Azure Blob Storage logging configured (fast startup mode)")
+            print(f"{prefix} [AZURE BLOB] Blob path: {container_name}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] Verification will happen on first log write")
+            # Write a quick initialization message without waiting
+            logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {container_name}/{blob_path}")
         
-        if not blob_verified:
-            print(f"{prefix} [AZURE BLOB] ========================================")
-            print(f"{prefix} [AZURE BLOB] ✗✗✗ WARNING: Blob verification FAILED after 5 attempts")
-            print(f"{prefix} [AZURE BLOB] Container: {container_name}")
-            print(f"{prefix} [AZURE BLOB] Blob path: {blob_path}")
-            print(f"{prefix} [AZURE BLOB] Expected URL: https://{AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}.blob.core.windows.net/{container_name}/{blob_path}")
-            print(f"{prefix} [AZURE BLOB] ========================================")
-            print(f"{prefix} [AZURE BLOB] TROUBLESHOOTING:")
-            print(f"{prefix} [AZURE BLOB] 1. Go to Azure Portal > Storage Account > Containers")
-            print(f"{prefix} [AZURE BLOB] 2. Check if container '{container_name}' exists")
-            print(f"{prefix} [AZURE BLOB] 3. Verify blob path: {blob_path}")
-            print(f"{prefix} [AZURE BLOB] 4. Check container access level (Private/Blob/Container)")
-            print(f"{prefix} [AZURE BLOB] 5. Verify storage account key has read permissions")
-            print(f"{prefix} [AZURE BLOB] 6. Check Azure Portal > Storage Account > Access Keys")
-            print(f"{prefix} [AZURE BLOB] ========================================")
-        
-        print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {container_name}/{blob_path}")
-        print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {container_name}")
         if account_name:
             print(f"{prefix} [AZURE BLOB] Full blob path: {container_name}/{blob_path}")
         return blob_handler, blob_path
@@ -858,10 +876,13 @@ def setup_azure_logging(logger_name='root', account_name=None):
         # Setup Azure Blob Storage logging
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         print(f"{prefix} [LOG SETUP] Setting up Azure Blob Storage logging for account: {account_name}")
+        # For dashboard (no account_name), skip verification for fast startup to prevent 504 timeout
+        skip_verification = (account_name is None)  # Skip verification for dashboard startup
         blob_handler, blob_path = setup_azure_blob_logging(
             account_name=account_name, 
             logger_name=logger_name,
-            streaming_mode=True  # Enable streaming for real-time logs
+            streaming_mode=True,  # Enable streaming for real-time logs
+            skip_verification=skip_verification  # Fast startup for dashboard
         )
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
@@ -992,10 +1013,13 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         logger.propagate = True
         
         # Setup Azure Blob Storage logging
+        # For dashboard (no account_name), skip verification for fast startup to prevent 504 timeout
+        skip_verification = (account_name is None)  # Skip verification for dashboard startup
         blob_handler, blob_path = setup_azure_blob_logging(
             account_name=account_name, 
             logger_name=logger_name,
-            streaming_mode=True  # Enable streaming for real-time logs
+            streaming_mode=True,  # Enable streaming for real-time logs
+            skip_verification=skip_verification  # Fast startup for dashboard
         )
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
