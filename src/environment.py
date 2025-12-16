@@ -10,6 +10,17 @@ import threading
 from datetime import date
 import sys
 
+# ============================================================================
+# AZURE BLOB STORAGE CONFIGURATION (Hardcoded for Azure deployment)
+# ============================================================================
+# These credentials will be used when running in Azure environment
+# Update these values with your Azure Blob Storage credentials
+AZURE_BLOB_CONNECTION_STRING_HARDCODED = "DefaultEndpointsProtocol=https;AccountName=s0001s0001;AccountKey=o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA==;EndpointSuffix=core.windows.net"
+AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED = "s0001s0001"
+AZURE_BLOB_STORAGE_KEY_HARDCODED = "o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA=="
+AZURE_BLOB_CONTAINER_NAME_HARDCODED = "str-container1"
+AZURE_BLOB_LOGGING_ENABLED_HARDCODED = True  # Set to True to enable blob logging in Azure
+
 # Safe formatter that handles Unicode encoding errors gracefully
 class SafeFormatter(logging.Formatter):
     """Formatter that safely handles Unicode characters"""
@@ -242,47 +253,80 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
     """
     Setup Azure Blob Storage logging handler
     Creates logs in Azure Blob Storage with folder structure: {account_name}/logs/{filename}.log
+    
+    Priority:
+    1. If running in Azure and hardcoded credentials are enabled, use hardcoded credentials
+    2. Otherwise, use environment variables from config
     """
     try:
-        # Try different import paths to work in both local and Azure environments
-        try:
-            from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
-        except ImportError:
-            # Fallback for Azure environment where 'src' might not be in path
-            import sys
-            import os
-            # Add parent directory to path if not already there
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            parent_dir = os.path.dirname(current_dir)
-            if parent_dir not in sys.path:
-                sys.path.insert(0, parent_dir)
-            # Try importing again
-            from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
-        
         # Add prefix to identify if this is from trading strategy (has account_name) vs dashboard (no account_name)
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         
+        # Determine which credentials to use
+        use_hardcoded = False
+        connection_string = None
+        container_name = None
+        logging_enabled = False
+        
+        # Check if we should use hardcoded credentials (when running in Azure)
+        if is_azure_environment() and AZURE_BLOB_LOGGING_ENABLED_HARDCODED:
+            print(f"{prefix} [AZURE BLOB] Azure environment detected - using hardcoded credentials")
+            use_hardcoded = True
+            connection_string = AZURE_BLOB_CONNECTION_STRING_HARDCODED
+            container_name = AZURE_BLOB_CONTAINER_NAME_HARDCODED
+            logging_enabled = AZURE_BLOB_LOGGING_ENABLED_HARDCODED
+            print(f"{prefix} [AZURE BLOB] Using hardcoded credentials from environment.py")
+            print(f"{prefix} [AZURE BLOB] Storage Account: {AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED}")
+            print(f"{prefix} [AZURE BLOB] Container: {container_name}")
+        else:
+            # Try to get credentials from environment variables (config.py)
+            try:
+                from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
+            except ImportError:
+                # Fallback for Azure environment where 'src' might not be in path
+                import sys
+                import os
+                # Add parent directory to path if not already there
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                parent_dir = os.path.dirname(current_dir)
+                if parent_dir not in sys.path:
+                    sys.path.insert(0, parent_dir)
+                # Try importing again
+                from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_LOGGING_ENABLED
+            
+            connection_string = AZURE_BLOB_CONNECTION_STRING
+            container_name = AZURE_BLOB_CONTAINER_NAME
+            logging_enabled = AZURE_BLOB_LOGGING_ENABLED
+            print(f"{prefix} [AZURE BLOB] Using environment variables from config")
+        
         # Always print diagnostic info (even if disabled)
         print(f"{prefix} [AZURE BLOB] Checking configuration...")
-        print(f"{prefix} [AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = {AZURE_BLOB_LOGGING_ENABLED}")
-        print(f"{prefix} [AZURE BLOB] Connection string available: {AZURE_BLOB_CONNECTION_STRING is not None}")
-        print(f"{prefix} [AZURE BLOB] Container name: {AZURE_BLOB_CONTAINER_NAME}")
+        print(f"{prefix} [AZURE BLOB] AZURE_BLOB_LOGGING_ENABLED = {logging_enabled}")
+        print(f"{prefix} [AZURE BLOB] Connection string available: {connection_string is not None}")
+        print(f"{prefix} [AZURE BLOB] Container name: {container_name}")
         if account_name:
             print(f"{prefix} [AZURE BLOB] Account name: {account_name} (will create folder: {sanitize_account_name_for_filename(account_name)})")
         
-        if not AZURE_BLOB_LOGGING_ENABLED:
-            print("[AZURE BLOB] Logging is DISABLED. Set AZURE_BLOB_LOGGING_ENABLED=True in Azure Portal.")
+        if not logging_enabled:
+            print(f"{prefix} [AZURE BLOB] Logging is DISABLED.")
+            if use_hardcoded:
+                print(f"{prefix} [AZURE BLOB] Set AZURE_BLOB_LOGGING_ENABLED_HARDCODED = True in environment.py to enable.")
+            else:
+                print(f"{prefix} [AZURE BLOB] Set AZURE_BLOB_LOGGING_ENABLED=True in Azure Portal or environment variables.")
             return None, None
         
         # Check if connection string is available
-        if not AZURE_BLOB_CONNECTION_STRING:
-            print("[AZURE BLOB] ERROR: Azure Blob Storage connection string not available.")
-            print("[AZURE BLOB] Required environment variables in Azure Portal:")
-            print("[AZURE BLOB]   1. AzureBlobStorageKey = <your-storage-account-key>")
-            print("[AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001strangle")
-            print("[AZURE BLOB]   3. AZURE_BLOB_CONTAINER_NAME = s0001strangle")
-            print("[AZURE BLOB]   4. AZURE_BLOB_LOGGING_ENABLED = True")
-            print("[AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
+        if not connection_string:
+            print(f"{prefix} [AZURE BLOB] ERROR: Azure Blob Storage connection string not available.")
+            if use_hardcoded:
+                print(f"{prefix} [AZURE BLOB] Please check hardcoded credentials in environment.py")
+            else:
+                print(f"{prefix} [AZURE BLOB] Required environment variables in Azure Portal:")
+                print(f"{prefix} [AZURE BLOB]   1. AzureBlobStorageKey = <your-storage-account-key>")
+                print(f"{prefix} [AZURE BLOB]   2. AZURE_BLOB_ACCOUNT_NAME = s0001strangle")
+                print(f"{prefix} [AZURE BLOB]   3. AZURE_BLOB_CONTAINER_NAME = s0001strangle")
+                print(f"{prefix} [AZURE BLOB]   4. AZURE_BLOB_LOGGING_ENABLED = True")
+                print(f"{prefix} [AZURE BLOB] Go to: Azure Portal > App Service > Configuration > Application settings")
             return None, None
         
         logger = logging.getLogger(logger_name)
@@ -300,8 +344,8 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         
         # Create Azure Blob handler
         blob_handler = AzureBlobStorageHandler(
-            connection_string=AZURE_BLOB_CONNECTION_STRING,
-            container_name=AZURE_BLOB_CONTAINER_NAME,
+            connection_string=connection_string,
+            container_name=container_name,
             blob_path=blob_path,
             account_name=account_name
         )
@@ -317,7 +361,7 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         # Write initial test message to verify it works
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         print(f"{prefix} [AZURE BLOB] Writing initial test message to blob...")
-        logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+        logger.info(f"[AZURE BLOB] Azure Blob Storage logging initialized: {container_name}/{blob_path}")
         
         # Give a small delay to ensure the log message is written to buffer
         import time
@@ -339,14 +383,14 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         for verify_attempt in range(5):
             try:
                 from azure.storage.blob import BlobServiceClient
-                blob_service_client = BlobServiceClient.from_connection_string(AZURE_BLOB_CONNECTION_STRING)
+                blob_service_client = BlobServiceClient.from_connection_string(connection_string)
                 blob_client = blob_service_client.get_blob_client(
-                    container=AZURE_BLOB_CONTAINER_NAME,
+                    container=container_name,
                     blob=blob_path
                 )
                 if blob_client.exists():
                     print(f"{prefix} [AZURE BLOB] ✓✓✓ SUCCESS: Blob verified at attempt {verify_attempt + 1}")
-                    print(f"{prefix} [AZURE BLOB] Blob URL: https://<account>.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+                    print(f"{prefix} [AZURE BLOB] Blob URL: https://<account>.blob.core.windows.net/{container_name}/{blob_path}")
                     blob_verified = True
                     break
                 else:
@@ -358,15 +402,15 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
         
         if not blob_verified:
             print(f"{prefix} [AZURE BLOB] ✗✗✗ WARNING: Blob verification FAILED after 5 attempts")
-            print(f"{prefix} [AZURE BLOB] Container: {AZURE_BLOB_CONTAINER_NAME}")
+            print(f"{prefix} [AZURE BLOB] Container: {container_name}")
             print(f"{prefix} [AZURE BLOB] Blob path: {blob_path}")
-            print(f"{prefix} [AZURE BLOB] Expected URL: https://<account>.blob.core.windows.net/{AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] Expected URL: https://<account>.blob.core.windows.net/{container_name}/{blob_path}")
             print(f"{prefix} [AZURE BLOB] Please check Azure Portal > Storage Account > Container for errors")
         
-        print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
-        print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {AZURE_BLOB_CONTAINER_NAME}")
+        print(f"{prefix} [AZURE BLOB] Logging to Azure Blob: {container_name}/{blob_path}")
+        print(f"{prefix} [AZURE BLOB] Initial test message sent. Check container: {container_name}")
         if account_name:
-            print(f"{prefix} [AZURE BLOB] Full blob path: {AZURE_BLOB_CONTAINER_NAME}/{blob_path}")
+            print(f"{prefix} [AZURE BLOB] Full blob path: {container_name}/{blob_path}")
         return blob_handler, blob_path
         
     except ImportError as e:
