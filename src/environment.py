@@ -89,20 +89,26 @@ def format_date_for_filename(date_obj):
 class AzureBlobStorageHandler(logging.Handler):
     """
     Custom logging handler that writes logs to Azure Blob Storage
-    Logs are buffered and uploaded periodically to maintain performance
+    Supports both buffered mode (default) and streaming mode (real-time)
     """
-    def __init__(self, connection_string, container_name, blob_path, account_name=None):
+    def __init__(self, connection_string, container_name, blob_path, account_name=None, streaming_mode=False):
         super().__init__()
         self.connection_string = connection_string
         self.container_name = container_name
         self.blob_path = blob_path  # Full path including folder structure
         self.account_name = account_name
+        self.streaming_mode = streaming_mode  # If True, flush immediately (real-time logs)
         self.buffer = io.StringIO()
         self.buffer_lock = threading.Lock()
-        self.flush_interval = 30  # Flush every 30 seconds
+        self.flush_interval = 30 if not streaming_mode else 0  # Flush immediately in streaming mode
         import time
         self.last_flush = time.time()
         self._ensure_container_exists()
+        
+        if streaming_mode:
+            print(f"[AZURE BLOB] Streaming mode ENABLED - logs will be written in real-time")
+        else:
+            print(f"[AZURE BLOB] Buffered mode - logs will be flushed every {self.flush_interval} seconds")
         
     def _ensure_container_exists(self):
         """Ensure the container exists in Azure Blob Storage"""
@@ -205,12 +211,18 @@ class AzureBlobStorageHandler(logging.Handler):
             msg = self.format(record)
             with self.buffer_lock:
                 self.buffer.write(msg + '\n')
-                # Flush if buffer is large enough or enough time has passed
-                import time
-                current_time = time.time()
-                if (self.buffer.tell() > 8192 or  # 8KB buffer
-                    current_time - self.last_flush > self.flush_interval):
+                
+                # In streaming mode, flush immediately for real-time logs
+                if self.streaming_mode:
+                    # Flush immediately in streaming mode
                     self._flush_to_blob()
+                else:
+                    # Buffered mode: flush if buffer is large enough or enough time has passed
+                    import time
+                    current_time = time.time()
+                    if (self.buffer.tell() > 8192 or  # 8KB buffer
+                        current_time - self.last_flush > self.flush_interval):
+                        self._flush_to_blob()
         except Exception:
             self.handleError(record)
     
@@ -505,7 +517,7 @@ def test_azure_blob_access(connection_string=None, container_name=None):
         print(f"[AZURE BLOB DIAGNOSTIC] ✗ Unexpected error: {traceback.format_exc()}")
         return False, f"Unexpected error: {e}", diagnostics
 
-def setup_azure_blob_logging(account_name=None, logger_name='root'):
+def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mode=False):
     """
     Setup Azure Blob Storage logging handler
     Creates logs in Azure Blob Storage with folder structure: {account_name}/logs/{filename}.log
@@ -647,7 +659,8 @@ def setup_azure_blob_logging(account_name=None, logger_name='root'):
             connection_string=connection_string,
             container_name=container_name,
             blob_path=blob_path,
-            account_name=account_name
+            account_name=account_name,
+            streaming_mode=streaming_mode  # Enable streaming for real-time logs
         )
         
         # Set formatter (same format as file handler)
@@ -845,7 +858,11 @@ def setup_azure_logging(logger_name='root', account_name=None):
         # Setup Azure Blob Storage logging
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         print(f"{prefix} [LOG SETUP] Setting up Azure Blob Storage logging for account: {account_name}")
-        blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
+        blob_handler, blob_path = setup_azure_blob_logging(
+            account_name=account_name, 
+            logger_name=logger_name,
+            streaming_mode=True  # Enable streaming for real-time logs
+        )
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
             print(f"{prefix} [LOG SETUP] SUCCESS: Azure Blob Storage logging configured: {blob_path}")
@@ -975,7 +992,11 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         logger.propagate = True
         
         # Setup Azure Blob Storage logging
-        blob_handler, blob_path = setup_azure_blob_logging(account_name=account_name, logger_name=logger_name)
+        blob_handler, blob_path = setup_azure_blob_logging(
+            account_name=account_name, 
+            logger_name=logger_name,
+            streaming_mode=True  # Enable streaming for real-time logs
+        )
         if blob_handler:
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
         
