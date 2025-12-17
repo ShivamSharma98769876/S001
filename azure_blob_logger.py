@@ -23,12 +23,12 @@ import traceback
 # ============================================================================
 
 # Option 1: Use Connection String (Recommended - easiest to use)
-CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=s0001s0001;AccountKey=o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA==;EndpointSuffix=core.windows.net"
+CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=a001storage;AccountKey=HhyHFmea7TsmbuAyysRDwJNs2CtTLvaTmTlzRy8rHuzTtD70/E33jDDpP5oAfW/BG1PjnXHzSN4X+AStG5GXtw==;EndpointSuffix=core.windows.net"
 
 # Option 2: Use individual credentials (Alternative method)
-STORAGE_ACCOUNT_NAME = "s0001s0001"
-STORAGE_ACCOUNT_KEY = "o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA=="
-CONTAINER_NAME = "str-container1"
+STORAGE_ACCOUNT_NAME = "a001storage"
+STORAGE_ACCOUNT_KEY = "HhyHFmea7TsmbuAyysRDwJNs2CtTLvaTmTlzRy8rHuzTtD70/E33jDDpP5oAfW/BG1PjnXHzSN4X+AStG5GXtw=="
+CONTAINER_NAME = "a001-strangle"
 
 # Blob path where logs will be stored (folder structure in blob)
 # Example: "logs/app_logs.log" will create a "logs" folder in the container

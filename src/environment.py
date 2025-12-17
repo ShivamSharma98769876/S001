@@ -10,6 +10,35 @@ import threading
 from datetime import date
 import sys
 
+# Import AzureBlobHandler from azure_blob_logger.py for Azure blob logging
+# This handler works correctly with Azure Blob Storage (as demonstrated in azure_blob_logger.py)
+AZURE_BLOB_HANDLER_AVAILABLE = False
+AzureBlobHandler = None
+
+try:
+    # Try importing from the root directory (where azure_blob_logger.py is located)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    
+    # Try to import AzureBlobHandler
+    from azure_blob_logger import AzureBlobHandler
+    AZURE_BLOB_HANDLER_AVAILABLE = True
+    print("[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py")
+except ImportError as e:
+    # If import fails, AzureBlobHandler won't be available - fall back to AzureBlobStorageHandler
+    AZURE_BLOB_HANDLER_AVAILABLE = False
+    AzureBlobHandler = None
+    print(f"[ENVIRONMENT] Could not import AzureBlobHandler from azure_blob_logger.py: {e}")
+    print("[ENVIRONMENT] Will use AzureBlobStorageHandler from environment.py as fallback")
+except Exception as e:
+    # Handle any other import errors
+    AZURE_BLOB_HANDLER_AVAILABLE = False
+    AzureBlobHandler = None
+    print(f"[ENVIRONMENT] Error importing AzureBlobHandler: {e}")
+    print("[ENVIRONMENT] Will use AzureBlobStorageHandler from environment.py as fallback")
+
 # ============================================================================
 # AZURE BLOB STORAGE CONFIGURATION (Hardcoded for Azure deployment)
 # ============================================================================
@@ -668,13 +697,24 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
         print(f"{prefix} [AZURE BLOB] ========================================")
         
         # Create Azure Blob handler
-        blob_handler = AzureBlobStorageHandler(
-            connection_string=connection_string,
-            container_name=container_name,
-            blob_path=blob_path,
-            account_name=account_name,
-            streaming_mode=streaming_mode  # Enable streaming for real-time logs
-        )
+        # Use AzureBlobHandler from azure_blob_logger.py if available (works correctly with blob storage)
+        # Otherwise fall back to AzureBlobStorageHandler from environment.py
+        if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler:
+            print(f"{prefix} [AZURE BLOB] Using AzureBlobHandler from azure_blob_logger.py")
+            blob_handler = AzureBlobHandler(
+                connection_string=connection_string,
+                container_name=container_name,
+                blob_path=blob_path
+            )
+        else:
+            print(f"{prefix} [AZURE BLOB] Using AzureBlobStorageHandler from environment.py (fallback)")
+            blob_handler = AzureBlobStorageHandler(
+                connection_string=connection_string,
+                container_name=container_name,
+                blob_path=blob_path,
+                account_name=account_name,
+                streaming_mode=streaming_mode  # Enable streaming for real-time logs
+            )
         
         # Set formatter (same format as file handler)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -695,10 +735,20 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
             import time
             time.sleep(1.0)  # Increased delay to ensure message is in buffer
             
-            # Force immediate flush of initial message (force=True ensures blob is created even if empty)
+            # Force immediate flush of initial message
+            # AzureBlobHandler from azure_blob_logger.py uses flush() without parameters
+            # AzureBlobStorageHandler from environment.py uses flush(force=True)
             print(f"{prefix} [AZURE BLOB] Flushing buffer to create blob...")
             try:
-                blob_handler.flush(force=True)
+                if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler and isinstance(blob_handler, AzureBlobHandler):
+                    blob_handler.flush()  # AzureBlobHandler doesn't take parameters
+                else:
+                    # Use AzureBlobStorageHandler flush method (with force parameter if available)
+                    if hasattr(blob_handler, 'flush') and callable(getattr(blob_handler, 'flush')):
+                        try:
+                            blob_handler.flush(force=True)  # Try with force parameter first
+                        except TypeError:
+                            blob_handler.flush()  # Fallback if force parameter not supported
                 print(f"{prefix} [AZURE BLOB] Flush completed")
             except Exception as flush_error:
                 print(f"{prefix} [AZURE BLOB] ✗ Flush failed: {flush_error}")
@@ -1017,17 +1067,8 @@ def setup_local_logging(log_dir=None, account_name=None, logger_name='root'):
         # Ensure named logger propagates to root (default behavior, but make explicit)
         logger.propagate = True
         
-        # Setup Azure Blob Storage logging
-        # For dashboard (no account_name), skip verification for fast startup to prevent 504 timeout
-        skip_verification = (account_name is None)  # Skip verification for dashboard startup
-        blob_handler, blob_path = setup_azure_blob_logging(
-            account_name=account_name, 
-            logger_name=logger_name,
-            streaming_mode=True,  # Enable streaming for real-time logs
-            skip_verification=skip_verification  # Fast startup for dashboard
-        )
-        if blob_handler:
-            logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
+        # NOTE: Local environment uses file-based logging only (no blob storage)
+        # Blob storage logging is only used in Azure environment (see setup_azure_logging)
         
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
