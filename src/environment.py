@@ -10,6 +10,14 @@ import threading
 from datetime import date
 import sys
 
+# Disable Azure SDK HTTP logging globally to prevent verbose request/response logs
+# These logs clutter the blob storage log files with unnecessary HTTP details
+# Set to WARNING level so only warnings and errors are logged, not INFO/DEBUG
+azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+azure_http_logger.setLevel(logging.WARNING)
+azure_core_logger = logging.getLogger('azure.core')
+azure_core_logger.setLevel(logging.WARNING)
+
 # Import AzureBlobHandler from azure_blob_logger.py for Azure blob logging
 # This handler works correctly with Azure Blob Storage (as demonstrated in azure_blob_logger.py)
 AZURE_BLOB_HANDLER_AVAILABLE = False
@@ -142,6 +150,10 @@ class AzureBlobStorageHandler(logging.Handler):
     def _ensure_container_exists(self):
         """Ensure the container exists in Azure Blob Storage"""
         try:
+            # Disable Azure SDK HTTP logging to prevent verbose request/response logs
+            azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+            azure_http_logger.setLevel(logging.WARNING)
+            
             from azure.storage.blob import BlobServiceClient
             from azure.core.exceptions import (
                 ClientAuthenticationError, 
@@ -276,6 +288,10 @@ class AzureBlobStorageHandler(logging.Handler):
                 # Ensure we have at least a newline for empty blob creation
                 if not content and force:
                     content = "\n"
+                
+                # Disable Azure SDK HTTP logging to prevent verbose request/response logs
+                azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+                azure_http_logger.setLevel(logging.WARNING)
                 
                 # Upload to Azure Blob Storage
                 from azure.storage.blob import BlobServiceClient
@@ -450,6 +466,10 @@ def test_azure_blob_access(connection_string=None, container_name=None):
         if not container_name:
             container_name = AZURE_BLOB_CONTAINER_NAME_HARDCODED if is_azure_environment() else "test-container"
         
+        # Disable Azure SDK HTTP logging to prevent verbose request/response logs
+        azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+        azure_http_logger.setLevel(logging.WARNING)
+        
         from azure.storage.blob import BlobServiceClient
         from azure.core.exceptions import (
             ClientAuthenticationError,
@@ -567,6 +587,14 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
         skip_verification: If True, skip time-consuming verification (useful for fast startup)
     """
     try:
+        # Disable Azure SDK HTTP logging to prevent verbose request/response logs from being written to blob
+        # These logs clutter the blob storage log files with unnecessary HTTP details
+        azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+        azure_http_logger.setLevel(logging.WARNING)  # Only show warnings and errors, not INFO/DEBUG
+        # Also disable for the broader azure.core logger
+        azure_core_logger = logging.getLogger('azure.core')
+        azure_core_logger.setLevel(logging.WARNING)
+        
         # Add prefix to identify if this is from trading strategy (has account_name) vs dashboard (no account_name)
         prefix = "[STRATEGY]" if account_name else "[DASHBOARD]"
         
@@ -760,6 +788,10 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
             blob_verified = False
             for verify_attempt in range(5):
                 try:
+                    # Disable Azure SDK HTTP logging to prevent verbose request/response logs
+                    azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+                    azure_http_logger.setLevel(logging.WARNING)
+                    
                     from azure.storage.blob import BlobServiceClient
                     from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
                     

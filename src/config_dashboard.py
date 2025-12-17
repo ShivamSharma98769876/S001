@@ -337,7 +337,7 @@ def reconnect_kite_client():
 def dashboard():
     """Main dashboard page - Zero Touch Strangle landing page"""
     import os
-    from environment import is_azure_environment
+    from src.environment import is_azure_environment
     
     # Always show the landing page first
     # Get API key for authentication link (if available)
@@ -1084,7 +1084,7 @@ def get_live_trader_logs():
         
         # Import environment functions at the start
         from datetime import date
-        from environment import format_date_for_filename, is_azure_environment, sanitize_account_name_for_filename
+        from src.environment import format_date_for_filename, is_azure_environment, sanitize_account_name_for_filename
         
         # Try to read from log file if strategy is running
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1146,33 +1146,76 @@ def get_live_trader_logs():
                 else:
                     logging.info(f"[LOGS] Today's log file does not exist: {today_log_path}")
             
-            # AZURE ENVIRONMENT: Check /tmp/{account}/logs/ directory
+            # AZURE ENVIRONMENT: Read from Azure Blob Storage
             else:
-                from environment import get_log_directory
-                if account:
-                    sanitized_account = sanitize_account_name_for_filename(account)
-                    azure_log_dir = os.path.join('/tmp', sanitized_account, 'logs')
-                else:
-                    azure_log_dir = '/tmp/logs'
-                
-                # Ensure directory exists
-                os.makedirs(azure_log_dir, exist_ok=True)
-                logging.info(f"[LOGS] Azure environment - checking log directory: {azure_log_dir}")
-                
-                # Look for today's log file
-                today_log_path = os.path.join(azure_log_dir, log_filename)
-                if os.path.exists(today_log_path):
-                    log_files.append(today_log_path)
-                    logging.info(f"[LOGS] ✓ Found today's log file: {today_log_path}")
-                else:
-                    logging.info(f"[LOGS] Today's log file does not exist: {today_log_path}")
-                    # List files in directory for debugging
-                    try:
-                        if os.path.exists(azure_log_dir):
-                            all_files = os.listdir(azure_log_dir)
-                            logging.info(f"[LOGS] Files in Azure log directory: {all_files}")
-                    except Exception as e:
-                        logging.warning(f"[LOGS] Could not list Azure log directory: {e}")
+                # In Azure, read logs directly from blob storage
+                # Blob path format: {account_name}/logs/{account_name}_{YYYYMONDD}.log
+                # Full URL: https://{storage_account}.blob.core.windows.net/{container}/{account_name}/logs/{account_name}_{YYYYMONDD}.log
+                try:
+                    # Get Azure Blob Storage credentials
+                    from src.config import AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER_NAME, AZURE_BLOB_ACCOUNT_NAME
+                    from src.environment import AZURE_BLOB_CONNECTION_STRING_HARDCODED, AZURE_BLOB_CONTAINER_NAME_HARDCODED, AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED
+                    
+                    # Use hardcoded credentials if available, otherwise use config
+                    if AZURE_BLOB_CONNECTION_STRING_HARDCODED and is_azure_environment():
+                        connection_string = AZURE_BLOB_CONNECTION_STRING_HARDCODED
+                        container_name = AZURE_BLOB_CONTAINER_NAME_HARDCODED
+                        storage_account = AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED.strip()
+                    elif AZURE_BLOB_CONNECTION_STRING:
+                        connection_string = AZURE_BLOB_CONNECTION_STRING
+                        container_name = AZURE_BLOB_CONTAINER_NAME
+                        storage_account = AZURE_BLOB_ACCOUNT_NAME
+                    else:
+                        logging.warning(f"[LOGS] Azure Blob Storage credentials not available")
+                        connection_string = None
+                    
+                    if connection_string and container_name and sanitized_account:
+                        # Construct blob path: {account_name}/logs/{account_name}_{YYYYMONDD}.log
+                        blob_path = f"{sanitized_account}/logs/{log_filename}"
+                        blob_url = f"https://{storage_account}.blob.core.windows.net/{container_name}/{blob_path}"
+                        
+                        logging.info(f"[LOGS] Azure environment - reading from blob: {blob_path}")
+                        logging.info(f"[LOGS] Blob URL: {blob_url}")
+                        
+                        # Disable Azure SDK HTTP logging
+                        azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+                        azure_http_logger.setLevel(logging.WARNING)
+                        
+                        # Read from Azure Blob Storage
+                        from azure.storage.blob import BlobServiceClient
+                        from azure.core.exceptions import ResourceNotFoundError
+                        
+                        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+                        blob_client = blob_service_client.get_blob_client(
+                            container=container_name,
+                            blob=blob_path
+                        )
+                        
+                        # Check if blob exists
+                        if blob_client.exists():
+                            # Download blob content
+                            blob_content = blob_client.download_blob().readall().decode('utf-8')
+                            blob_lines = blob_content.split('\n')
+                            
+                            # Store blob content in a temporary file path for compatibility with existing code
+                            # Use a special marker to indicate this is from blob storage
+                            blob_file_path = f"AZURE_BLOB:{blob_url}"
+                            log_files.append(blob_file_path)
+                            
+                            # Store blob lines for later processing
+                            if not hasattr(get_live_trader_logs, 'blob_cache'):
+                                get_live_trader_logs.blob_cache = {}
+                            get_live_trader_logs.blob_cache[blob_file_path] = blob_lines
+                            
+                            logging.info(f"[LOGS] ✓ Found today's log file in blob: {blob_path} ({len(blob_lines)} lines)")
+                        else:
+                            logging.info(f"[LOGS] Today's log file does not exist in blob: {blob_path}")
+                    else:
+                        logging.warning(f"[LOGS] Cannot read from blob - missing credentials or account name")
+                except Exception as e:
+                    logging.error(f"[LOGS] Error reading from Azure Blob Storage: {e}")
+                    import traceback
+                    logging.error(f"[LOGS] Traceback: {traceback.format_exc()}")
         
         # FIRST: Check subprocess output buffer (real-time logs) - this should always be checked
         subprocess_logs = []
@@ -1206,7 +1249,7 @@ def get_live_trader_logs():
             # Log checked directories based on environment
             if is_azure_environment():
                 # For error message, try to get account-specific directory
-                from environment import sanitize_account_name_for_filename
+                from src.environment import sanitize_account_name_for_filename
                 if account:
                     sanitized_account = sanitize_account_name_for_filename(account)
                     checked_dirs = f"Azure log directory: /tmp/{sanitized_account}/logs/"
@@ -1272,30 +1315,54 @@ def get_live_trader_logs():
         for log_path in log_files:
             try:
                 logging.info(f"[LOGS] Attempting to read log file: {log_path}")
-                if not os.path.exists(log_path):
-                    logging.warning(f"[LOGS] Log file does not exist: {log_path}")
-                    continue
-                    
-                # Check file size
-                file_size = os.path.getsize(log_path)
-                logging.info(f"[LOGS] Log file size: {file_size} bytes")
                 
-                with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    lines = f.readlines()
-                    # Get last 500 lines from each file to show more detailed logs
-                    file_lines = lines[-500:] if len(lines) > 500 else lines
-                    # Merge file lines with subprocess buffer (avoid duplicates)
-                    # File logs are older, subprocess buffer has latest
-                    # Combine: file logs + new subprocess logs not in file
-                    existing_texts = set(all_lines)  # What we already have
-                    for file_line in file_lines:
-                        file_line_stripped = file_line.strip()
-                        if file_line_stripped and file_line_stripped not in existing_texts:
-                            all_lines.append(file_line_stripped)
-                            existing_texts.add(file_line_stripped)
+                # Check if this is a blob storage path (starts with "AZURE_BLOB:")
+                if log_path.startswith("AZURE_BLOB:"):
+                    # Extract blob URL and get cached content
+                    blob_url = log_path.replace("AZURE_BLOB:", "")
+                    if hasattr(get_live_trader_logs, 'blob_cache') and log_path in get_live_trader_logs.blob_cache:
+                        lines = get_live_trader_logs.blob_cache[log_path]
+                        # Get last 500 lines from blob content
+                        file_lines = lines[-500:] if len(lines) > 500 else lines
+                        # Merge blob lines with subprocess buffer (avoid duplicates)
+                        existing_texts = set(all_lines)  # What we already have
+                        for file_line in file_lines:
+                            file_line_stripped = file_line.strip()
+                            if file_line_stripped and file_line_stripped not in existing_texts:
+                                all_lines.append(file_line_stripped)
+                                existing_texts.add(file_line_stripped)
+                        
+                        log_files_read.append(blob_url)  # Use actual blob URL for response
+                        logging.info(f"[LOGS] Successfully read {len(file_lines)} lines from blob {blob_url} (total lines: {len(lines)})")
+                    else:
+                        logging.warning(f"[LOGS] Blob content not found in cache for: {blob_url}")
+                        continue
+                else:
+                    # Local file reading (for local environment)
+                    if not os.path.exists(log_path):
+                        logging.warning(f"[LOGS] Log file does not exist: {log_path}")
+                        continue
+                        
+                    # Check file size
+                    file_size = os.path.getsize(log_path)
+                    logging.info(f"[LOGS] Log file size: {file_size} bytes")
                     
-                    log_files_read.append(log_path)
-                    logging.info(f"[LOGS] Successfully read {len(file_lines)} lines from {log_path} (total lines in file: {len(lines)})")
+                    with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        lines = f.readlines()
+                        # Get last 500 lines from each file to show more detailed logs
+                        file_lines = lines[-500:] if len(lines) > 500 else lines
+                        # Merge file lines with subprocess buffer (avoid duplicates)
+                        # File logs are older, subprocess buffer has latest
+                        # Combine: file logs + new subprocess logs not in file
+                        existing_texts = set(all_lines)  # What we already have
+                        for file_line in file_lines:
+                            file_line_stripped = file_line.strip()
+                            if file_line_stripped and file_line_stripped not in existing_texts:
+                                all_lines.append(file_line_stripped)
+                                existing_texts.add(file_line_stripped)
+                        
+                        log_files_read.append(log_path)
+                        logging.info(f"[LOGS] Successfully read {len(file_lines)} lines from {log_path} (total lines in file: {len(lines)})")
             except PermissionError as e:
                 logging.error(f"[LOGS] Permission denied reading log file {log_path}: {e}")
             except Exception as e:
@@ -1331,13 +1398,22 @@ def get_live_trader_logs():
                 unique_logs.append(log)
         
         # Include log file path and any error messages in response
+        # For blob storage, use the actual blob URL instead of the marker
+        log_file_path_display = None
+        if log_files:
+            first_file = log_files[0]
+            if first_file.startswith("AZURE_BLOB:"):
+                log_file_path_display = first_file.replace("AZURE_BLOB:", "")
+            else:
+                log_file_path_display = first_file
+        
         response_data = {
             'success': True,
             'logs': unique_logs[-1000:],  # Last 1000 entries (increased for better visibility)
-            'log_file_path': log_files[0] if log_files else None,  # Return log file path for reference
+            'log_file_path': log_file_path_display,  # Return blob URL or file path for reference
             'log_files_found': len(log_files),
             'log_files_read': len(log_files_read),
-            'log_files': log_files_read if log_files_read else log_files[:5]  # Show up to 5 file paths
+            'log_files': log_files_read if log_files_read else [f.replace("AZURE_BLOB:", "") if f.startswith("AZURE_BLOB:") else f for f in log_files[:5]]  # Show up to 5 file paths
         }
         
         # Add log file path and debug info to logs for visibility

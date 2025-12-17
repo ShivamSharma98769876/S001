@@ -18,6 +18,13 @@ from azure.core.exceptions import AzureError
 import io
 import traceback
 
+# Disable Azure SDK HTTP logging to prevent verbose request/response logs
+# These logs clutter the blob storage log files with unnecessary HTTP details
+azure_http_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+azure_http_logger.setLevel(logging.WARNING)  # Only show warnings and errors, not INFO/DEBUG
+azure_core_logger = logging.getLogger('azure.core')
+azure_core_logger.setLevel(logging.WARNING)
+
 # ============================================================================
 # CONFIGURATION - Update these values with your Azure Blob Storage credentials
 # ============================================================================
@@ -74,6 +81,11 @@ class AzureBlobHandler(logging.Handler):
             
             if not content.strip():
                 return
+            
+            # Disable Azure SDK HTTP logging to prevent verbose request/response logs
+            # These logs clutter the blob storage log files
+            azure_logger = logging.getLogger('azure.core.pipeline.policies.http_logging_policy')
+            azure_logger.setLevel(logging.WARNING)  # Only show warnings and errors, not INFO/DEBUG
             
             # Connect to Azure Blob Storage
             blob_service_client = BlobServiceClient.from_connection_string(
