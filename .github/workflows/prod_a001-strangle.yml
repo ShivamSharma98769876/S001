@@ -63,4 +63,4 @@ jobs:
         with:
           app-name: 'A001-Strangle'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D696E307F2C14947B9F4664F5DC715E2 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8661BDACB0694F7C8BE1D3D71539DA25 }}
