@@ -99,16 +99,26 @@ def setup_dashboard_blob_logging():
         if is_azure_environment():
             # Try to get account name from saved token
             account_name_for_logging = None
-            if kite_api_key:
-                saved_token, saved_account_name = load_access_token(kite_api_key)
-                if saved_account_name:
-                    account_name_for_logging = saved_account_name
-                    print(f"[STARTUP] Using account name from saved token: {account_name_for_logging}")
+            # Check if kite_api_key is defined (it's a global variable)
+            try:
+                global kite_api_key
+                if kite_api_key:
+                    saved_token, saved_account_name = load_access_token(kite_api_key)
+                    if saved_account_name:
+                        account_name_for_logging = saved_account_name
+                        print(f"[STARTUP] Using account name from saved token: {account_name_for_logging}")
+            except (NameError, AttributeError):
+                # kite_api_key not defined yet, that's okay
+                pass
             
             # Also check global account_holder_name if available
-            if not account_name_for_logging and account_holder_name:
-                account_name_for_logging = account_holder_name
-                print(f"[STARTUP] Using account name from global variable: {account_name_for_logging}")
+            try:
+                global account_holder_name
+                if not account_name_for_logging and account_holder_name:
+                    account_name_for_logging = account_holder_name
+                    print(f"[STARTUP] Using account name from global variable: {account_name_for_logging}")
+            except (NameError, AttributeError):
+                pass
             
             print("[STARTUP] Azure environment detected - setting up Azure Blob Storage logging...")
             if account_name_for_logging:
@@ -274,28 +284,36 @@ def reconnect_kite_client():
             logging.info(f"[RECONNECT] Successfully reconnected. Account: {account_holder_name}")
             
             # Re-setup Azure Blob logging with the correct account name
-            try:
-                from src.environment import setup_azure_blob_logging, is_azure_environment
-                if is_azure_environment() and account_holder_name:
-                    print(f"[RECONNECT] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
-                    # Remove old blob handler if exists
-                    logger = logging.getLogger(__name__)
-                    for handler in logger.handlers[:]:
-                        if hasattr(handler, 'container_name'):  # Azure Blob handler
-                            logger.removeHandler(handler)
-                            handler.close()
-                    
-                    # Setup new blob handler with correct account name
-                    blob_handler, blob_path = setup_azure_blob_logging(
-                        account_name=account_holder_name,
-                        logger_name=__name__,
-                        streaming_mode=True
-                    )
-                    if blob_handler:
-                        logger.info(f"[RECONNECT] Azure Blob Storage logging updated: {blob_path}")
-                        print(f"[RECONNECT] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
-            except Exception as e:
-                print(f"[RECONNECT] Warning: Could not update Azure Blob logging: {e}")
+            # Do this in a background thread to avoid blocking
+            def setup_blob_logging_async():
+                try:
+                    from src.environment import setup_azure_blob_logging, is_azure_environment
+                    if is_azure_environment() and account_holder_name:
+                        print(f"[RECONNECT] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
+                        # Remove old blob handler if exists
+                        logger = logging.getLogger(__name__)
+                        for handler in logger.handlers[:]:
+                            if hasattr(handler, 'container_name'):  # Azure Blob handler
+                                logger.removeHandler(handler)
+                                handler.close()
+                        
+                        # Setup new blob handler with correct account name
+                        blob_handler, blob_path = setup_azure_blob_logging(
+                            account_name=account_holder_name,
+                            logger_name=__name__,
+                            streaming_mode=True
+                        )
+                        if blob_handler:
+                            logger.info(f"[RECONNECT] Azure Blob Storage logging updated: {blob_path}")
+                            print(f"[RECONNECT] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
+                except Exception as e:
+                    print(f"[RECONNECT] Warning: Could not update Azure Blob logging: {e}")
+            
+            # Start blob logging setup in background thread (non-blocking)
+            import threading
+            blob_thread = threading.Thread(target=setup_blob_logging_async, daemon=True)
+            blob_thread.start()
+            
             return True
         else:
             logging.warning(f"[RECONNECT] Reconnection failed: {result}")
@@ -1977,28 +1995,35 @@ def authenticate():
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
             # Re-setup Azure Blob logging with the correct account name for streaming logs
-            try:
-                from src.environment import setup_azure_blob_logging, is_azure_environment
-                if is_azure_environment() and account_holder_name:
-                    print(f"[AUTH] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
-                    # Remove old blob handler if exists
-                    logger = logging.getLogger(__name__)
-                    for handler in logger.handlers[:]:
-                        if hasattr(handler, 'container_name'):  # Azure Blob handler
-                            logger.removeHandler(handler)
-                            handler.close()
-                    
-                    # Setup new blob handler with correct account name
-                    blob_handler, blob_path = setup_azure_blob_logging(
-                        account_name=account_holder_name,
-                        logger_name=__name__,
-                        streaming_mode=True
-                    )
-                    if blob_handler:
-                        logger.info(f"[AUTH] Azure Blob Storage logging updated: {blob_path}")
-                        print(f"[AUTH] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
-            except Exception as e:
-                print(f"[AUTH] Warning: Could not update Azure Blob logging: {e}")
+            # Do this in a background thread to avoid blocking the response
+            def setup_blob_logging_async():
+                try:
+                    from src.environment import setup_azure_blob_logging, is_azure_environment
+                    if is_azure_environment() and account_holder_name:
+                        print(f"[AUTH] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
+                        # Remove old blob handler if exists
+                        logger = logging.getLogger(__name__)
+                        for handler in logger.handlers[:]:
+                            if hasattr(handler, 'container_name'):  # Azure Blob handler
+                                logger.removeHandler(handler)
+                                handler.close()
+                        
+                        # Setup new blob handler with correct account name
+                        blob_handler, blob_path = setup_azure_blob_logging(
+                            account_name=account_holder_name,
+                            logger_name=__name__,
+                            streaming_mode=True
+                        )
+                        if blob_handler:
+                            logger.info(f"[AUTH] Azure Blob Storage logging updated: {blob_path}")
+                            print(f"[AUTH] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
+                except Exception as e:
+                    print(f"[AUTH] Warning: Could not update Azure Blob logging: {e}")
+            
+            # Start blob logging setup in background thread (non-blocking)
+            import threading
+            blob_thread = threading.Thread(target=setup_blob_logging_async, daemon=True)
+            blob_thread.start()
             
             return jsonify({
                 'success': True,
@@ -2088,28 +2113,35 @@ def set_access_token():
             logging.info(f"[AUTH] Account holder name: {account_holder_name}")
             
             # Re-setup Azure Blob logging with the correct account name for streaming logs
-            try:
-                from src.environment import setup_azure_blob_logging, is_azure_environment
-                if is_azure_environment() and account_holder_name:
-                    print(f"[AUTH] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
-                    # Remove old blob handler if exists
-                    logger = logging.getLogger(__name__)
-                    for handler in logger.handlers[:]:
-                        if hasattr(handler, 'container_name'):  # Azure Blob handler
-                            logger.removeHandler(handler)
-                            handler.close()
-                    
-                    # Setup new blob handler with correct account name
-                    blob_handler, blob_path = setup_azure_blob_logging(
-                        account_name=account_holder_name,
-                        logger_name=__name__,
-                        streaming_mode=True
-                    )
-                    if blob_handler:
-                        logger.info(f"[AUTH] Azure Blob Storage logging updated: {blob_path}")
-                        print(f"[AUTH] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
-            except Exception as e:
-                print(f"[AUTH] Warning: Could not update Azure Blob logging: {e}")
+            # Do this in a background thread to avoid blocking the response
+            def setup_blob_logging_async():
+                try:
+                    from src.environment import setup_azure_blob_logging, is_azure_environment
+                    if is_azure_environment() and account_holder_name:
+                        print(f"[AUTH] Re-setting up Azure Blob Storage logging with account: {account_holder_name}")
+                        # Remove old blob handler if exists
+                        logger = logging.getLogger(__name__)
+                        for handler in logger.handlers[:]:
+                            if hasattr(handler, 'container_name'):  # Azure Blob handler
+                                logger.removeHandler(handler)
+                                handler.close()
+                        
+                        # Setup new blob handler with correct account name
+                        blob_handler, blob_path = setup_azure_blob_logging(
+                            account_name=account_holder_name,
+                            logger_name=__name__,
+                            streaming_mode=True
+                        )
+                        if blob_handler:
+                            logger.info(f"[AUTH] Azure Blob Storage logging updated: {blob_path}")
+                            print(f"[AUTH] ✓ Azure Blob Storage logging updated with account: {account_holder_name}")
+                except Exception as e:
+                    print(f"[AUTH] Warning: Could not update Azure Blob logging: {e}")
+            
+            # Start blob logging setup in background thread (non-blocking)
+            import threading
+            blob_thread = threading.Thread(target=setup_blob_logging_async, daemon=True)
+            blob_thread.start()
             
             # Store API key if provided
             if data.get('api_key'):
