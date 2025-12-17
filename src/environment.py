@@ -725,24 +725,41 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
         print(f"{prefix} [AZURE BLOB] ========================================")
         
         # Create Azure Blob handler
-        # Use AzureBlobHandler from azure_blob_logger.py if available (works correctly with blob storage)
-        # Otherwise fall back to AzureBlobStorageHandler from environment.py
-        if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler:
-            print(f"{prefix} [AZURE BLOB] Using AzureBlobHandler from azure_blob_logger.py")
-            blob_handler = AzureBlobHandler(
-                connection_string=connection_string,
-                container_name=container_name,
-                blob_path=blob_path
-            )
+        # CRITICAL: In Azure, ONLY use AzureBlobHandler from azure_blob_logger.py
+        # Do NOT use AzureBlobStorageHandler as fallback in Azure
+        if is_azure_environment():
+            if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler:
+                print(f"{prefix} [AZURE BLOB] Using AzureBlobHandler from azure_blob_logger.py (Azure environment)")
+                blob_handler = AzureBlobHandler(
+                    connection_string=connection_string,
+                    container_name=container_name,
+                    blob_path=blob_path
+                )
+            else:
+                # In Azure, we MUST use AzureBlobHandler - fail if not available
+                error_msg = f"{prefix} [AZURE BLOB] ERROR: AzureBlobHandler from azure_blob_logger.py is not available in Azure environment"
+                print(error_msg)
+                print(f"{prefix} [AZURE BLOB] Cannot write logs to blob storage without AzureBlobHandler")
+                print(f"{prefix} [AZURE BLOB] Please ensure azure_blob_logger.py is accessible and AzureBlobHandler can be imported")
+                return None, None
         else:
-            print(f"{prefix} [AZURE BLOB] Using AzureBlobStorageHandler from environment.py (fallback)")
-            blob_handler = AzureBlobStorageHandler(
-                connection_string=connection_string,
-                container_name=container_name,
-                blob_path=blob_path,
-                account_name=account_name,
-                streaming_mode=streaming_mode  # Enable streaming for real-time logs
-            )
+            # Local environment: can use AzureBlobStorageHandler as fallback
+            if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler:
+                print(f"{prefix} [AZURE BLOB] Using AzureBlobHandler from azure_blob_logger.py (local environment)")
+                blob_handler = AzureBlobHandler(
+                    connection_string=connection_string,
+                    container_name=container_name,
+                    blob_path=blob_path
+                )
+            else:
+                print(f"{prefix} [AZURE BLOB] Using AzureBlobStorageHandler from environment.py (local fallback)")
+                blob_handler = AzureBlobStorageHandler(
+                    connection_string=connection_string,
+                    container_name=container_name,
+                    blob_path=blob_path,
+                    account_name=account_name,
+                    streaming_mode=streaming_mode  # Enable streaming for real-time logs
+                )
         
         # Set formatter (same format as file handler)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -765,13 +782,14 @@ def setup_azure_blob_logging(account_name=None, logger_name='root', streaming_mo
             
             # Force immediate flush of initial message
             # AzureBlobHandler from azure_blob_logger.py uses flush() without parameters
-            # AzureBlobStorageHandler from environment.py uses flush(force=True)
+            # AzureBlobStorageHandler from environment.py uses flush(force=True) (only used in local environment)
             print(f"{prefix} [AZURE BLOB] Flushing buffer to create blob...")
             try:
-                if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler and isinstance(blob_handler, AzureBlobHandler):
+                if isinstance(blob_handler, AzureBlobHandler) if AZURE_BLOB_HANDLER_AVAILABLE and AzureBlobHandler else False:
+                    # Azure environment: Use AzureBlobHandler from azure_blob_logger.py
                     blob_handler.flush()  # AzureBlobHandler doesn't take parameters
                 else:
-                    # Use AzureBlobStorageHandler flush method (with force parameter if available)
+                    # Local environment: Use AzureBlobStorageHandler flush method (with force parameter if available)
                     if hasattr(blob_handler, 'flush') and callable(getattr(blob_handler, 'flush')):
                         try:
                             blob_handler.flush(force=True)  # Try with force parameter first
@@ -975,10 +993,15 @@ def setup_azure_logging(logger_name='root', account_name=None):
             logger.info(f"[LOG SETUP] Azure Blob Storage logging enabled: {blob_path}")
             print(f"{prefix} [LOG SETUP] SUCCESS: Azure Blob Storage logging configured: {blob_path}")
             if account_name:
-                print(f"{prefix} [LOG SETUP] Strategy logs will be written to: s0001strangle/{blob_path}")
+                print(f"{prefix} [LOG SETUP] Strategy logs will be written to blob: {blob_path}")
         else:
-            print(f"{prefix} [LOG SETUP] ERROR: Azure Blob Storage logging NOT configured (check environment variables)")
-            logger.warning(f"[LOG SETUP] Azure Blob Storage logging not available - check environment variables")
+            if is_azure_environment():
+                print(f"{prefix} [LOG SETUP] ERROR: Azure Blob Storage logging NOT configured")
+                print(f"{prefix} [LOG SETUP] In Azure, AzureBlobHandler from azure_blob_logger.py is REQUIRED")
+                print(f"{prefix} [LOG SETUP] Please ensure azure_blob_logger.py is accessible and AzureBlobHandler can be imported")
+            else:
+                print(f"{prefix} [LOG SETUP] ERROR: Azure Blob Storage logging NOT configured (check environment variables)")
+            logger.warning(f"[LOG SETUP] Azure Blob Storage logging not available")
         
         # Force file creation by writing an initial log message
         # This ensures the file exists immediately
