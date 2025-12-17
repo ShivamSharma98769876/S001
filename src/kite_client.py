@@ -24,6 +24,8 @@ class KiteClient:
             self.kite.set_access_token(access_token)
         elif request_token:
             self.access_token = self.generate_access_token(request_token)
+            if self.access_token is None:
+                raise Exception("Failed to generate access token. Please check your API credentials and request token.")
             self.kite.set_access_token(self.access_token)
         
         # VIX caching
@@ -49,8 +51,24 @@ class KiteClient:
             logging.info("Access token generated successfully")
             return access_token
         except Exception as e:
-            logging.error(f"Error generating access token: {e}")
-            return None
+            error_msg = str(e)
+            logging.error(f"Error generating access token: {error_msg}")
+            
+            # Check for specific error types
+            if "JSON" in error_msg or "json" in error_msg.lower():
+                logging.error("JSON parsing error detected. This usually means:")
+                logging.error("1. Invalid API key or secret")
+                logging.error("2. Request token is expired or invalid")
+                logging.error("3. Network issue or API endpoint problem")
+                raise Exception(f"Invalid API credentials or request token. Please verify your API key, secret, and request token are correct. Original error: {error_msg}")
+            elif "Invalid" in error_msg or "invalid" in error_msg.lower():
+                raise Exception(f"Invalid credentials: {error_msg}")
+            elif "expired" in error_msg.lower():
+                raise Exception(f"Request token expired. Please generate a new request token from Kite Connect.")
+            elif "network" in error_msg.lower() or "timeout" in error_msg.lower():
+                raise Exception(f"Network error. Please check your internet connection and try again.")
+            else:
+                raise Exception(f"Failed to generate access token: {error_msg}")
     
     def get_underlying_price(self, symbol="NSE:NIFTY 50"):
         """Get the current price of the underlying asset"""
