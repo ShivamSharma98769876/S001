@@ -1392,12 +1392,92 @@
         let isLiveTraderActive = false;
         let lotSize = 75; // Default lot size, will be fetched from API
 
+        // Helper function to safely parse JSON responses
+        async function safeJsonParse(response) {
+            const responseText = await response.text();
+            if (!responseText || !responseText.trim()) {
+                throw new Error('Empty response from server');
+            }
+            
+            // Trim whitespace
+            let trimmedText = responseText.trim();
+            
+            // Try parsing the full response first
+            try {
+                return JSON.parse(trimmedText);
+            } catch (jsonError) {
+                // If error mentions "non-whitespace character after JSON", try to extract just the JSON part
+                if (jsonError.message.includes('non-whitespace character after JSON') || 
+                    jsonError.message.includes('Unexpected token')) {
+                    // Try to find the first complete JSON object/array
+                    let jsonStart = trimmedText.indexOf('{');
+                    if (jsonStart === -1) {
+                        jsonStart = trimmedText.indexOf('[');
+                    }
+                    
+                    if (jsonStart !== -1) {
+                        // Find the matching closing brace/bracket
+                        let braceCount = 0;
+                        let bracketCount = 0;
+                        let inString = false;
+                        let escapeNext = false;
+                        let jsonEnd = -1;
+                        
+                        for (let i = jsonStart; i < trimmedText.length; i++) {
+                            const char = trimmedText[i];
+                            
+                            if (escapeNext) {
+                                escapeNext = false;
+                                continue;
+                            }
+                            
+                            if (char === '\\') {
+                                escapeNext = true;
+                                continue;
+                            }
+                            
+                            if (char === '"' && !escapeNext) {
+                                inString = !inString;
+                                continue;
+                            }
+                            
+                            if (!inString) {
+                                if (char === '{') braceCount++;
+                                if (char === '}') braceCount--;
+                                if (char === '[') bracketCount++;
+                                if (char === ']') bracketCount--;
+                                
+                                if (braceCount === 0 && bracketCount === 0) {
+                                    jsonEnd = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (jsonEnd > jsonStart) {
+                            const jsonOnly = trimmedText.substring(jsonStart, jsonEnd);
+                            try {
+                                return JSON.parse(jsonOnly);
+                            } catch (e) {
+                                // If extraction failed, fall through to error reporting
+                            }
+                        }
+                    }
+                }
+                
+                // If all parsing attempts failed, log and throw with context
+                console.error('Invalid JSON response:', responseText);
+                console.error('JSON Error:', jsonError.message);
+                throw new Error(`Invalid response from server: ${jsonError.message}. Response preview: ${responseText.substring(0, 200)}`);
+            }
+        }
+
         // Fetch lot size from config
         async function fetchLotSize() {
             try {
                 const response = await fetch('/api/config/lot-size');
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = await safeJsonParse(response);
                     if (data.success) {
                         lotSize = data.lot_size;
                         // Update input fields with lot size
@@ -1612,7 +1692,7 @@
         async function loadMetrics() {
             try {
                 const response = await fetch('/api/dashboard/metrics');
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success') {
                     // Update only Total Day P&L
@@ -1632,7 +1712,7 @@
         async function loadAllPositions() {
             try {
                 const response = await fetch('/api/dashboard/positions');
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success') {
                     updateAllPositions(data.positions || [], data.totalPnl || 0);
@@ -1693,7 +1773,7 @@
         async function updateChart() {
             try {
                 const response = await fetch('/api/dashboard/pnl-chart');
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success' && pnlChart) {
                     pnlChart.data.labels = data.labels || [];
@@ -1855,7 +1935,7 @@
         async function stopStrategy() {
             try {
                 const response = await fetch('/api/strategy/stop', { method: 'POST' });
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success') {
                     isLiveTraderActive = false;
@@ -1893,7 +1973,7 @@
         async function loadAdminConfig() {
             try {
                 const response = await fetch('/api/config/current');
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success' && data.config) {
                     populateAdminForm(data.config);
@@ -2012,7 +2092,7 @@
                     })
                 });
                 
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 if (data.status === 'success') {
                     showNotification(`✓ Updated ${paramName} to ${value}`, 'success');
@@ -2072,7 +2152,7 @@
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 console.log('[AUTH STATUS] Response:', data);
                 
@@ -2269,7 +2349,7 @@
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
-                const data = await response.json();
+                const data = await safeJsonParse(response);
                 
                 const connectionStatus = document.getElementById('connectionStatus');
                 const connectionDot = document.getElementById('connectionDot');
