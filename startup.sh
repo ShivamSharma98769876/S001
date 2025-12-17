@@ -33,18 +33,19 @@ cd "$(dirname "$0")" || exit 1
 # Try gunicorn first (better for production), fallback to Flask dev server
 if command -v gunicorn &> /dev/null; then
     echo "Starting with gunicorn..."
-    exec gunicorn --bind 0.0.0.0:$PORT --timeout 600 --workers 1 --threads 2 --access-logfile - --error-logfile - --log-level info "src.config_dashboard:app"
+    # Use app.py which imports the Flask app from src.config_dashboard
+    exec gunicorn --bind 0.0.0.0:$PORT --timeout 600 --workers 1 --threads 2 --access-logfile - --error-logfile - --log-level info "app:app"
 else
     echo "Starting with Flask (gunicorn not found, using dev server)..."
     python -c "
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from src.config_dashboard import start_dashboard
+from app import app
 import os
 port = int(os.getenv('PORT', os.getenv('HTTP_PLATFORM_PORT', 8080)))
 print(f'Starting dashboard on port {port}...')
-start_dashboard(host='0.0.0.0', port=port, debug=False)
+app.run(host='0.0.0.0', port=port, debug=False)
 "
 fi
 
