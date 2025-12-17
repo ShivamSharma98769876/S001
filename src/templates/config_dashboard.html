@@ -2533,15 +2533,8 @@
                     body: JSON.stringify(requestBody)
                 });
                 
-                // Get response text first to handle non-JSON responses
-                const responseText = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (jsonError) {
-                    console.error('Invalid JSON response:', responseText);
-                    throw new Error(`Server returned invalid response: ${jsonError.message}. Response: ${responseText.substring(0, 200)}`);
-                }
+                // Safely parse JSON response (handles empty/HTML/error responses)
+                const data = await safeJsonParse(response);
                 
                 if (data.success) {
                     hideAuthModal();
@@ -2627,15 +2620,8 @@
                     })
                 });
                 
-                // Get response text first to handle non-JSON responses
-                const responseText = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (jsonError) {
-                    console.error('Invalid JSON response:', responseText);
-                    throw new Error(`Server returned invalid response: ${jsonError.message}. Response: ${responseText.substring(0, 200)}`);
-                }
+                // Safely parse JSON response (handles empty/HTML/error responses)
+                const data = await safeJsonParse(response);
                 
                 if (data.success) {
                     hideAuthModal();
@@ -2644,7 +2630,6 @@
                         updateAccountNameDisplay(data.account_name);
                     }
                     // Immediately update auth status (don't wait for polling)
-                    await                     // Immediately update auth status (don't wait for polling)
                     await checkAuthStatus();
                     checkConnectivity();
                     // Show success notification
