@@ -142,8 +142,17 @@ def setup_dashboard_blob_logging():
         print(traceback.format_exc())
         return None, None
 
-# Setup blob logging on startup
-setup_dashboard_blob_logging()
+# Setup blob logging on startup (non-blocking to prevent 504 timeout)
+# Do this in a background thread so it doesn't block Flask app startup
+def setup_blob_logging_async():
+    try:
+        setup_dashboard_blob_logging()
+    except Exception as e:
+        print(f"[STARTUP] Warning: Could not setup blob logging in background: {e}")
+
+# Start blob logging setup in background thread (non-blocking)
+blob_setup_thread = threading.Thread(target=setup_blob_logging_async, daemon=True)
+blob_setup_thread.start()
 
 logger.info("[DASHBOARD] Dashboard application initialized")
 
