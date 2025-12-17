@@ -1394,25 +1394,53 @@
 
         // Helper function to safely parse JSON responses
         async function safeJsonParse(response) {
+            // Check HTTP status code first
+            if (!response.ok) {
+                const statusText = response.statusText || '';
+                const status = response.status;
+                
+                // Handle specific HTTP error codes
+                if (status === 504 || statusText.includes('Gateway') || statusText.includes('Timeout')) {
+                    throw new Error('Gateway Timeout: The server took too long to respond. Please try again or check if the server is running.');
+                } else if (status === 502 || statusText.includes('Bad Gateway')) {
+                    throw new Error('Bad Gateway: The server is temporarily unavailable. Please try again in a moment.');
+                } else if (status === 503 || statusText.includes('Service Unavailable')) {
+                    throw new Error('Service Unavailable: The server is temporarily down for maintenance. Please try again later.');
+                } else if (status === 500) {
+                    throw new Error('Internal Server Error: The server encountered an error. Please try again or contact support.');
+                }
+            }
+            
             const responseText = await response.text();
             if (!responseText || !responseText.trim()) {
+                if (!response.ok) {
+                    throw new Error(`Server error (HTTP ${response.status}): ${response.statusText || 'Unknown error'}`);
+                }
                 throw new Error('Empty response from server');
             }
             
+            // Check if response looks like an error message (not JSON)
+            const trimmedText = responseText.trim();
+            if ((trimmedText.startsWith('504') || trimmedText.includes('GatewayTimeout') || 
+                 trimmedText.includes('Bad Gateway') || trimmedText.includes('Service Unavailable')) &&
+                !trimmedText.startsWith('{') && !trimmedText.startsWith('[')) {
+                throw new Error(`Server error: ${trimmedText}. The server may be experiencing issues. Please try again.`);
+            }
+            
             // Trim whitespace
-            let trimmedText = responseText.trim();
+            let textToParse = trimmedText;
             
             // Try parsing the full response first
             try {
-                return JSON.parse(trimmedText);
+                return JSON.parse(textToParse);
             } catch (jsonError) {
                 // If error mentions "non-whitespace character after JSON", try to extract just the JSON part
                 if (jsonError.message.includes('non-whitespace character after JSON') || 
                     jsonError.message.includes('Unexpected token')) {
                     // Try to find the first complete JSON object/array
-                    let jsonStart = trimmedText.indexOf('{');
+                    let jsonStart = textToParse.indexOf('{');
                     if (jsonStart === -1) {
-                        jsonStart = trimmedText.indexOf('[');
+                        jsonStart = textToParse.indexOf('[');
                     }
                     
                     if (jsonStart !== -1) {
@@ -1423,8 +1451,8 @@
                         let escapeNext = false;
                         let jsonEnd = -1;
                         
-                        for (let i = jsonStart; i < trimmedText.length; i++) {
-                            const char = trimmedText[i];
+                        for (let i = jsonStart; i < textToParse.length; i++) {
+                            const char = textToParse[i];
                             
                             if (escapeNext) {
                                 escapeNext = false;
@@ -1455,7 +1483,7 @@
                         }
                         
                         if (jsonEnd > jsonStart) {
-                            const jsonOnly = trimmedText.substring(jsonStart, jsonEnd);
+                            const jsonOnly = textToParse.substring(jsonStart, jsonEnd);
                             try {
                                 return JSON.parse(jsonOnly);
                             } catch (e) {
@@ -1468,6 +1496,13 @@
                 // If all parsing attempts failed, log and throw with context
                 console.error('Invalid JSON response:', responseText);
                 console.error('JSON Error:', jsonError.message);
+                console.error('HTTP Status:', response.status, response.statusText);
+                
+                // Provide user-friendly error message
+                if (responseText.includes('504') || responseText.includes('GatewayTimeout')) {
+                    throw new Error('Gateway Timeout: The server took too long to respond. This may happen if the authentication process is slow. Please try again.');
+                }
+                
                 throw new Error(`Invalid response from server: ${jsonError.message}. Response preview: ${responseText.substring(0, 200)}`);
             }
         }
