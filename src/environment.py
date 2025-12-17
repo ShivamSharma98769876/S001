@@ -435,7 +435,12 @@ def test_azure_blob_access(connection_string=None, container_name=None):
         try:
             blob_service_client = BlobServiceClient.from_connection_string(connection_string)
             # Try to list containers to test connection
-            list(blob_service_client.list_containers(max_results=1))
+            # In newer Azure SDK versions, list_containers() returns an iterator without max_results parameter
+            # Just iterate once to test the connection
+            try:
+                next(iter(blob_service_client.list_containers()), None)
+            except StopIteration:
+                pass  # No containers exist, but connection works
             diagnostics['connection_test'] = True
             print("[AZURE BLOB DIAGNOSTIC] ✓ Connection test: PASSED")
         except ClientAuthenticationError as e:

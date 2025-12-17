@@ -74,14 +74,15 @@ print("3. Checking Logging Status:")
 print("-" * 60)
 
 azure_blob_logging_enabled = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False')
-is_enabled = azure_blob_logging_enabled.lower() == 'true'
+# Accept multiple formats: 'true', 'yes', '1', 'on' (case-insensitive)
+is_enabled = azure_blob_logging_enabled.lower().strip() in ('true', 'yes', '1', 'on')
 
 if is_enabled:
     print(f"   ✓ Logging is ENABLED")
 else:
     print(f"   ✗ Logging is DISABLED")
     print(f"      Current value: '{azure_blob_logging_enabled}'")
-    print(f"      Required value: 'True' (exact case)")
+    print(f"      Required value: 'True', 'Yes', '1', or 'On' (case-insensitive)")
 
 print()
 print("4. Summary:")
