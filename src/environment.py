@@ -15,10 +15,10 @@ import sys
 # ============================================================================
 # These credentials will be used when running in Azure environment
 # Update these values with your Azure Blob Storage credentials
-AZURE_BLOB_CONNECTION_STRING_HARDCODED = "DefaultEndpointsProtocol=https;AccountName=s0001s0001;AccountKey=o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA==;EndpointSuffix=core.windows.net"
-AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED = "s0001s0001"
-AZURE_BLOB_STORAGE_KEY_HARDCODED = "o1t4swp/blCqs68G8ibe3J2p17FBf5FIGTRqr2iFeif/KsZXPNShmyVMZuBKbFtzU2csyjmPXhhF+AStCPP2xA=="
-AZURE_BLOB_CONTAINER_NAME_HARDCODED = "str-container1"
+AZURE_BLOB_CONNECTION_STRING_HARDCODED = "DefaultEndpointsProtocol=https;AccountName=a001storage;AccountKey=HhyHFmea7TsmbuAyysRDwJNs2CtTLvaTmTlzRy8rHuzTtD70/E33jDDpP5oAfW/BG1PjnXHzSN4X+AStG5GXtw==;EndpointSuffix=core.windows.net"
+AZURE_BLOB_STORAGE_ACCOUNT_NAME_HARDCODED = "a001storage "
+AZURE_BLOB_STORAGE_KEY_HARDCODED = "HhyHFmea7TsmbuAyysRDwJNs2CtTLvaTmTlzRy8rHuzTtD70/E33jDDpP5oAfW/BG1PjnXHzSN4X+AStG5GXtw=="
+AZURE_BLOB_CONTAINER_NAME_HARDCODED = "a001-strangle"
 AZURE_BLOB_LOGGING_ENABLED_HARDCODED = True  # Set to True to enable blob logging in Azure
 
 # Safe formatter that handles Unicode encoding errors gracefully

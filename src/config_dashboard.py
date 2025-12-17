@@ -1186,7 +1186,7 @@ def get_live_trader_logs():
                 else:
                     checked_dirs = f"Azure log directory: /tmp/logs/"
             else:
-                checked_dirs = f"src_logs_dir={src_logs_dir}, src_dir={src_dir}, root={script_dir}, root_logs={log_dir}"
+                checked_dirs = f"src_logs_dir={src_logs_dir}, src_dir={src_dir}, root={script_dir}"
             logging.warning(f"[LOGS] Checked directories: {checked_dirs}")
             
             # List existing files for debugging

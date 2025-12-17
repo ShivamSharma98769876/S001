@@ -137,7 +137,7 @@ DASHBOARD_PORT = int(os.getenv('HTTP_PLATFORM_PORT', os.getenv('PORT', 8080)))  
 # These are read from environment variables in Azure App Service
 # Format: DefaultEndpointsProtocol=https;AccountName=<account_name>;AccountKey=<account_key>;EndpointSuffix=core.windows.net
 AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME', '')
-AZURE_BLOB_STORAGE_KEY = os.getenv('AzureBlobStorageKey', '')  # Note: Azure App Service uses this name
+AZURE_BLOB_STORAGE_KEY = os.getenv('AZURE_BLOB_STORAGE_KEY', '')  # Note: Azure App Service uses this name
 AZURE_BLOB_CONTAINER_NAME = os.getenv('AZURE_BLOB_CONTAINER_NAME', '')
 AZURE_BLOB_LOGGING_ENABLED_RAW = os.getenv('AZURE_BLOB_LOGGING_ENABLED', 'False')
 AZURE_BLOB_LOGGING_ENABLED = AZURE_BLOB_LOGGING_ENABLED_RAW.lower() == 'true'
