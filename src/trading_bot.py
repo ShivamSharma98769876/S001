@@ -4,7 +4,7 @@ Orchestrates the entire options trading strategy
 """
 import logging
 import time as time_module
-from datetime import datetime, time
+from datetime import datetime, time, timezone, timedelta
 from config import (
     TARGET_DELTA_LOW, TARGET_DELTA_HIGH, MAX_STOP_LOSS_TRIGGER,
     MARKET_START_TIME, MARKET_END_TIME, TRADING_START_TIME,
@@ -14,6 +14,13 @@ from src.kite_client import KiteClient
 from src.options_calculator import OptionsCalculator
 from src.vix_calculator import VIXCalculator
 from src.vix_delta_manager import VIXDeltaManager
+
+# IST timezone (UTC+5:30)
+IST_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
+
+def get_ist_time():
+    """Get current time in IST timezone"""
+    return datetime.now(IST_TIMEZONE).time()
 
 # Greek analysis removed - not needed for core trading functionality
 
@@ -425,12 +432,15 @@ class TradingBot:
         # Greek analysis removed - core trading functionality only
         
         while not self.stop_requested:
-            now = datetime.now().time()
+            now = get_ist_time()  # Use IST timezone for time comparison
             underlying_price = self.kite_client.get_underlying_price()
             if underlying_price:
                 logging.info(f"Underlying price: {underlying_price}")
             
             # Greek analysis removed - core trading functionality only
+            
+            # Log current IST time and trading start time for debugging
+            logging.debug(f"Current IST time: {now}, Trading start time: {TRADING_START_TIME}")
             
             if now >= TRADING_START_TIME:
                 logging.info("Executing trade")

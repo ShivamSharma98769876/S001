@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 import logging
 from kiteconnect import KiteConnect
 from scipy.stats import norm
@@ -21,6 +21,13 @@ from environment import is_azure_environment, setup_logging, get_config_value, s
 
 # Import config monitoring system
 from config_monitor import initialize_config_monitor, start_config_monitoring, stop_config_monitoring, get_config_monitor
+
+# IST timezone (UTC+5:30) for time comparisons
+IST_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
+
+def get_ist_time():
+    """Get current time in IST timezone for time comparisons"""
+    return datetime.now(IST_TIMEZONE).time()
 
 # Import P&L recorder - must be after logging setup or handle import error gracefully
 PnLRecorder = None
@@ -1381,7 +1388,7 @@ def find_strikes(options, underlying_price, target_delta_low, target_delta_high,
                             return None  # Return None to indicate no trade should be executed
                         
                         # Check if we're in market hours
-                        now = datetime.now().time()
+                        now = get_ist_time()  # Use IST timezone
                         market_start = time(9, 15)
                         market_end = time(14, 50)
                         is_amo = not (market_start <= now <= market_end)
@@ -1804,7 +1811,7 @@ def monitor_trades(call_order_id, put_order_id, call_strike, put_strike, call_sl
     profit_booking_occurred = False  # Flag to prevent new trades after profit booking
 
     while True:
-        now = datetime.now().time()
+        now = get_ist_time()  # Use IST timezone
 
         # Stop trades if stop-loss has been triggered maximum times
         if stop_loss_trigger_count >= MAX_STOP_LOSS_TRIGGER:
@@ -2204,8 +2211,9 @@ def execute_trade(target_delta_low, target_delta_high, hedge_points=None, use_ne
     global last_hedge_fetch_time
     current_time = datetime.now()
 
-    # Check clock and flag before starting
-    now_time = datetime.now().time()
+    # Check clock and flag before starting (use IST timezone)
+    now_time = get_ist_time()
+    logging.debug(f"[TIME CHECK] Current IST time: {now_time}, Market end time: {MARKET_END_TIME}")
     if now_time >= MARKET_END_TIME:
         logging.warning("[MARKET CLOSED] Market is already closed, exiting execute_trade immediately")
         return
@@ -2267,7 +2275,7 @@ def execute_trade(target_delta_low, target_delta_high, hedge_points=None, use_ne
 
             call_strike, put_strike = strikes
 
-            now = datetime.now().time()
+            now = get_ist_time()  # Use IST timezone
             market_start = time(9, 15)
             market_end = time(14, 50)
             is_amo = not (market_start <= now <= market_end)
@@ -2649,7 +2657,7 @@ def main():
     # Greek analysis removed - core trading functionality only
 
     while True:
-        now = datetime.now().time()
+        now = get_ist_time()  # Use IST timezone for time comparison
         try:
             underlying_price = get_cached_ltp('NSE:NIFTY 50')
             if underlying_price is not None:
@@ -2690,8 +2698,10 @@ def main():
             
             break
 
+        # Log time comparison for debugging
+        logging.debug(f"[TIME CHECK] Current IST time: {now}, Trading start time: {target_time}, Market end time: {end_time}")
         if now >= target_time:
-            logging.info("Executing trade")
+            logging.info(f"[TRADING START] Executing trade at IST time: {now} (target: {target_time})")
             
             # Get VIX-based delta range
             delta_low, delta_high, hedge_points, use_next_week = get_vix_based_delta_range()
