@@ -1082,6 +1082,31 @@ def get_live_trader_logs():
         
         logs = []
         
+        # Filter out setup/diagnostic logs from display (these remain in file/blob but not shown on screen)
+        # Log identifiers to filter from UI display
+        filtered_identifiers = [
+            '[LOG SETUP]',
+            'ENVIRONMENT',
+            'CONFIG',
+            'ENV',
+            '[STRATEGY] [LOG SETUP]',
+            '[STRATEGY] [AZURE BLOB]',
+            '[AZURE BLOB DIAGNOSTIC]',
+            '[STRATEGY] [SETUP LOGGING]',
+            '[CONFIG]'
+        ]
+        
+        def should_filter_log(line):
+            """Check if a log line should be filtered from UI display"""
+            if not line:
+                return True
+            line_upper = str(line).upper()
+            # Check if line contains any of the filtered identifiers
+            for identifier in filtered_identifiers:
+                if identifier.upper() in line_upper:
+                    return True
+            return False
+        
         # Import environment functions at the start
         from datetime import date
         from src.environment import format_date_for_filename, is_azure_environment, sanitize_account_name_for_filename
@@ -1285,11 +1310,12 @@ def get_live_trader_logs():
             # If we have subprocess logs, return them even if no log files exist
             if subprocess_logs:
                 logging.info(f"[LOGS] Returning {len(subprocess_logs)} lines from subprocess buffer (no log files found yet)")
-                # Remove duplicates while preserving order
+                
+                # Remove duplicates and filter setup logs while preserving order
                 seen = set()
                 unique_logs = []
                 for log in subprocess_logs:
-                    if log not in seen:
+                    if log not in seen and not should_filter_log(log):
                         seen.add(log)
                         unique_logs.append(log)
                 
@@ -1378,7 +1404,7 @@ def get_live_trader_logs():
         else:
             logging.warning(f"[LOGS] No log files were successfully read from {len(log_files)} attempted file(s) and no subprocess output available")
         
-        # Show ALL logs (remove filtering to display complete log details)
+        # Show logs (filter out setup/diagnostic logs from display)
         # Sort by timestamp if available, otherwise keep order
         # Use all_lines which already contains subprocess buffer + file logs
         for line in all_lines[-1000:]:  # Show last 1000 lines (increased for better visibility)
@@ -1386,7 +1412,8 @@ def get_live_trader_logs():
                 line = line.strip()
             else:
                 line = str(line).strip()
-            if line:  # Only add non-empty lines
+            # Only add non-empty lines that don't match filtered identifiers
+            if line and not should_filter_log(line):
                 logs.append(line)
         
         # Remove duplicates while preserving order
@@ -1416,23 +1443,8 @@ def get_live_trader_logs():
             'log_files': log_files_read if log_files_read else [f.replace("AZURE_BLOB:", "") if f.startswith("AZURE_BLOB:") else f for f in log_files[:5]]  # Show up to 5 file paths
         }
         
-        # Add log file path and debug info to logs for visibility
-        if log_files and log_files[0]:
-            log_path_msg = f"[LOG SETUP] Log file path: {log_files[0]}"
-            # Check if already in logs to avoid duplicates
-            if not any(log_path_msg in log for log in unique_logs):
-                unique_logs.insert(0, log_path_msg)
-            
-            # Add info about log file search
-            if response_data.get('log_files_found', 0) > 0:
-                search_info = f"[LOG SETUP] Found {response_data['log_files_found']} log file(s), read {response_data['log_files_read']} successfully"
-                if search_info not in unique_logs:
-                    unique_logs.insert(1, search_info)
-        else:
-            # No log files found - add helpful message
-            no_logs_msg = f"[LOG SETUP] No log files found yet. Logs will appear here once the strategy starts running."
-            if no_logs_msg not in unique_logs:
-                unique_logs.insert(0, no_logs_msg)
+        # Note: We don't add [LOG SETUP] messages to unique_logs anymore since they're filtered from display
+        # Log file path and debug info are still available in response_data for reference if needed
         
         response_data['logs'] = unique_logs[-500:]
         return jsonify(response_data)
