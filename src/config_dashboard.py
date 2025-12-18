@@ -1093,7 +1093,9 @@ def get_live_trader_logs():
             '[STRATEGY] [AZURE BLOB]',
             '[AZURE BLOB DIAGNOSTIC]',
             '[STRATEGY] [SETUP LOGGING]',
-            '[CONFIG]'
+            '[CONFIG]',
+            'INFO - [AZURE BLOB]',
+            '[LOG]'
         ]
         
         def should_filter_log(line):

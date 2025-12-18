@@ -61,6 +61,36 @@ import sys
 
 # Create a custom formatter that handles Unicode gracefully
 class SafeFormatter(logging.Formatter):
+    """Formatter that safely handles Unicode characters and uses IST timezone"""
+    def __init__(self, fmt=None, datefmt=None):
+        super().__init__(fmt, datefmt)
+        # Set IST timezone (UTC+5:30)
+        try:
+            from datetime import timezone, timedelta
+            self.ist_timezone = timezone(timedelta(hours=5, minutes=30))
+        except ImportError:
+            self.ist_timezone = None
+    
+    def formatTime(self, record, datefmt=None):
+        """Format time in IST timezone"""
+        try:
+            from datetime import datetime
+            # Convert record.created (timestamp) to IST
+            if self.ist_timezone:
+                dt = datetime.fromtimestamp(record.created, tz=self.ist_timezone)
+            else:
+                # Fallback if timezone not available
+                dt = datetime.fromtimestamp(record.created)
+            
+            if datefmt:
+                return dt.strftime(datefmt)
+            else:
+                # Default format: YYYY-MM-DD HH:MM:SS.mmm
+                return dt.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Remove last 3 digits of microseconds
+        except Exception:
+            # Fallback to default formatting
+            return super().formatTime(record, datefmt)
+    
     def format(self, record):
         try:
             return super().format(record)
@@ -2296,6 +2326,10 @@ def execute_trade(target_delta_low, target_delta_high, hedge_points=None, use_ne
 def main():
     global Input_account, Input_api_key, Input_api_secret, Input_request_token, api_key, api_secret, request_token, account, kite, today_sl, call_quantity, put_quantity, PnLRecorder
     
+    # Initialize quantities to None to track if they were read from stdin
+    # (default values are 1, so we use None to indicate "not yet read")
+    quantities_from_stdin = None
+    
     logging.info("Script started")
     
     # Get user account and API details
@@ -2332,11 +2366,16 @@ def main():
                             Input_api_key = input().strip() if not Input_api_key else Input_api_key
                             Input_api_secret = input().strip() if not Input_api_secret else Input_api_secret
                             Input_request_token = input().strip() if not Input_request_token else Input_request_token
-                            # Also read call_quantity and put_quantity (but we'll use them later)
+                            # Also read call_quantity and put_quantity from stdin
                             try:
-                                call_quantity = int(input().strip())
-                                put_quantity = int(input().strip())
-                            except:
+                                call_qty = int(input().strip())
+                                put_qty = int(input().strip())
+                                call_quantity = call_qty
+                                put_quantity = put_qty
+                                quantities_from_stdin = (call_qty, put_qty)
+                                logging.info(f"[ENV] Quantities read from stdin: Call={call_quantity}, Put={put_quantity}")
+                            except (EOFError, ValueError) as qty_error:
+                                logging.warning(f"[ENV] Could not read quantities from stdin: {qty_error}")
                                 pass
                             stdin_available = True
                             logging.info(f"[ENV] Credentials read from stdin for account: {Input_account}")
@@ -2346,11 +2385,16 @@ def main():
                         Input_api_key = input().strip() if not Input_api_key else Input_api_key
                         Input_api_secret = input().strip() if not Input_api_secret else Input_api_secret
                         Input_request_token = input().strip() if not Input_request_token else Input_request_token
-                        # Also read call_quantity and put_quantity
+                        # Also read call_quantity and put_quantity from stdin
                         try:
-                            call_quantity = int(input().strip())
-                            put_quantity = int(input().strip())
-                        except:
+                            call_qty = int(input().strip())
+                            put_qty = int(input().strip())
+                            call_quantity = call_qty
+                            put_quantity = put_qty
+                            quantities_from_stdin = (call_qty, put_qty)
+                            logging.info(f"[ENV] Quantities read from stdin: Call={call_quantity}, Put={put_quantity}")
+                        except (EOFError, ValueError) as qty_error:
+                            logging.warning(f"[ENV] Could not read quantities from stdin: {qty_error}")
                             pass
                         stdin_available = True
                         logging.info(f"[ENV] Credentials read from stdin for account: {Input_account}")
@@ -2525,20 +2569,39 @@ def main():
     print("=" * 60)
     
     try:
-        # Read quantities from stdin (sent by dashboard) or prompt if running locally
-        if is_azure_environment():
-            # On Azure, quantities are passed via stdin from dashboard
-            call_quantity = int(input("Enter Call Quantity: ").strip())
-            put_quantity = int(input("Enter Put Quantity: ").strip())
+        # Check if quantities were already read from stdin (when started as subprocess by dashboard)
+        # Quantities are read from stdin earlier in the function (lines ~2365 and ~2378)
+        # If they were already read, use those values instead of reading again
+        if quantities_from_stdin is not None:
+            # Quantities were already read from stdin, use them
+            call_quantity, put_quantity = quantities_from_stdin
+            logging.info(f"[QUANTITY] Using quantities read from stdin: Call={call_quantity}, Put={put_quantity}")
         else:
-            # Local: try stdin first (if called from dashboard), otherwise prompt
-            try:
-                call_quantity = int(input("Enter Call Quantity: ").strip())
-                put_quantity = int(input("Enter Put Quantity: ").strip())
-            except (EOFError, ValueError):
-                # If stdin is empty or invalid, use defaults or prompt
-                call_quantity = int(input("Enter Call Quantity (default 150): ").strip() or "150")
-                put_quantity = int(input("Enter Put Quantity (default 150): ").strip() or "150")
+            # Read quantities from stdin (sent by dashboard) or prompt if running locally
+            if is_azure_environment():
+                # On Azure, quantities are passed via stdin from dashboard
+                try:
+                    call_quantity = int(input("Enter Call Quantity: ").strip())
+                    put_quantity = int(input("Enter Put Quantity: ").strip())
+                except (EOFError, ValueError) as e:
+                    # If stdin is empty (already consumed), use defaults
+                    logging.warning(f"[QUANTITY] Could not read quantities from stdin: {e}. Using default values.")
+                    call_quantity = 150  # Default to 150 (2 lots)
+                    put_quantity = 150
+            else:
+                # Local: try stdin first (if called from dashboard), otherwise prompt
+                try:
+                    call_quantity = int(input("Enter Call Quantity: ").strip())
+                    put_quantity = int(input("Enter Put Quantity: ").strip())
+                except (EOFError, ValueError):
+                    # If stdin is empty or invalid, use defaults or prompt
+                    try:
+                        call_quantity = int(input("Enter Call Quantity (default 150): ").strip() or "150")
+                        put_quantity = int(input("Enter Put Quantity (default 150): ").strip() or "150")
+                    except (EOFError, ValueError):
+                        # If still fails, use defaults
+                        call_quantity = 150
+                        put_quantity = 150
         
         # Get lot size from config (imported via 'from config import *')
         try:

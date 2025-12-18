@@ -58,9 +58,38 @@ AZURE_BLOB_STORAGE_KEY_HARDCODED = "HhyHFmea7TsmbuAyysRDwJNs2CtTLvaTmTlzRy8rHuzT
 AZURE_BLOB_CONTAINER_NAME_HARDCODED = "a001-strangle"
 AZURE_BLOB_LOGGING_ENABLED_HARDCODED = True  # Set to True to enable blob logging in Azure
 
-# Safe formatter that handles Unicode encoding errors gracefully
+# Safe formatter that handles Unicode encoding errors gracefully and uses IST timezone
 class SafeFormatter(logging.Formatter):
-    """Formatter that safely handles Unicode characters"""
+    """Formatter that safely handles Unicode characters and uses IST timezone"""
+    def __init__(self, fmt=None, datefmt=None):
+        super().__init__(fmt, datefmt)
+        # Set IST timezone (UTC+5:30)
+        try:
+            from datetime import timezone, timedelta
+            self.ist_timezone = timezone(timedelta(hours=5, minutes=30))
+        except ImportError:
+            self.ist_timezone = None
+    
+    def formatTime(self, record, datefmt=None):
+        """Format time in IST timezone"""
+        try:
+            from datetime import datetime
+            # Convert record.created (timestamp) to IST
+            if self.ist_timezone:
+                dt = datetime.fromtimestamp(record.created, tz=self.ist_timezone)
+            else:
+                # Fallback if timezone not available
+                dt = datetime.fromtimestamp(record.created)
+            
+            if datefmt:
+                return dt.strftime(datefmt)
+            else:
+                # Default format: YYYY-MM-DD HH:MM:SS.mmm
+                return dt.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Remove last 3 digits of microseconds
+        except Exception:
+            # Fallback to default formatting
+            return super().formatTime(record, datefmt)
+    
     def format(self, record):
         try:
             return super().format(record)

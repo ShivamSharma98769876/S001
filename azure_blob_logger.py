@@ -147,8 +147,39 @@ def setup_logger(connection_string, container_name, blob_path):
     )
     blob_handler.setLevel(logging.DEBUG)
     
-    # Create formatter
-    formatter = logging.Formatter(
+    # Create formatter with IST timezone
+    class ISTFormatter(logging.Formatter):
+        """Formatter that uses IST timezone (UTC+5:30)"""
+        def __init__(self, fmt=None, datefmt=None):
+            super().__init__(fmt, datefmt)
+            # Set IST timezone (UTC+5:30)
+            try:
+                from datetime import timezone, timedelta
+                self.ist_timezone = timezone(timedelta(hours=5, minutes=30))
+            except ImportError:
+                self.ist_timezone = None
+        
+        def formatTime(self, record, datefmt=None):
+            """Format time in IST timezone"""
+            try:
+                from datetime import datetime
+                # Convert record.created (timestamp) to IST
+                if self.ist_timezone:
+                    dt = datetime.fromtimestamp(record.created, tz=self.ist_timezone)
+                else:
+                    # Fallback if timezone not available
+                    dt = datetime.fromtimestamp(record.created)
+                
+                if datefmt:
+                    return dt.strftime(datefmt)
+                else:
+                    # Default format: YYYY-MM-DD HH:MM:SS.mmm
+                    return dt.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # Remove last 3 digits of microseconds
+            except Exception:
+                # Fallback to default formatting
+                return super().formatTime(record, datefmt)
+    
+    formatter = ISTFormatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
