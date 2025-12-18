@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Zero Touch Strangle</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -869,8 +872,205 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Responsive */
+        /* Mobile-First Responsive Design */
+        @media (max-width: 480px) {
+            /* Extra small phones */
+            body {
+                padding: 10px;
+            }
+            
+            .dashboard-container {
+                max-width: 100%;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+            }
+            
+            .header-title h1 {
+                font-size: 18px;
+            }
+            
+            .header-title .icon {
+                font-size: 22px;
+            }
+            
+            .header-controls {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 15px;
+                min-height: 44px; /* Touch-friendly */
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .metric-card {
+                padding: 16px;
+            }
+            
+            .metric-value {
+                font-size: 24px;
+            }
+            
+            .metric-label {
+                font-size: 12px;
+            }
+            
+            .description-box {
+                padding: 16px;
+                font-size: 13px;
+            }
+            
+            .config-section {
+                padding: 16px;
+            }
+            
+            .config-section h2 {
+                font-size: 18px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .input-group input,
+            .input-group select {
+                width: 100%;
+                padding: 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 44px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 44px;
+                margin-bottom: 10px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                margin: 10px;
+                padding: 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .modal-header h2 {
+                font-size: 20px;
+            }
+            
+            .modal-body {
+                padding: 16px 0;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            .form-group label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .form-group input,
+            .form-group select {
+                padding: 14px;
+                font-size: 16px;
+                min-height: 44px;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            table {
+                font-size: 12px;
+                min-width: 600px;
+            }
+            
+            table th,
+            table td {
+                padding: 10px 8px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            /* Small tablets and large phones */
+            body {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 18px;
+            }
+            
+            .header-title h1 {
+                font-size: 20px;
+            }
+            
+            .header-controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .header-btn {
+                padding: 12px 18px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 15px;
+                min-height: 44px;
+            }
+            
+            .modal-content {
+                width: 90%;
+                max-width: 500px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .input-group input,
+            .input-group select {
+                width: 100%;
+            }
+        }
+        
         @media (max-width: 768px) {
+            /* General mobile styles */
             .metrics-grid {
                 grid-template-columns: 1fr;
             }
@@ -882,6 +1082,78 @@
             
             .header-controls {
                 flex-wrap: wrap;
+                width: 100%;
+            }
+            
+            /* Touch-friendly buttons */
+            .btn,
+            .header-btn {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation; /* Prevents double-tap zoom */
+            }
+            
+            /* Better spacing for mobile */
+            .config-section {
+                margin-bottom: 20px;
+            }
+            
+            /* Scrollable tables on mobile */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -10px;
+                padding: 0 10px;
+            }
+            
+            /* Mobile-optimized modals */
+            .modal {
+                padding: 10px;
+            }
+            
+            .modal-content {
+                margin: auto;
+                width: calc(100% - 20px);
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            /* Better form inputs */
+            input[type="text"],
+            input[type="number"],
+            input[type="password"],
+            select,
+            textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+            
+            /* Collapsible sections for mobile */
+            .config-section {
+                position: relative;
+            }
+            
+            /* Better chart sizing on mobile */
+            .chart-container {
+                height: 300px;
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 85vh;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .status-dot {
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
         }
     </style>

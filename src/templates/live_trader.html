@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Live Trader - Zero Touch Strangle</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -31,6 +34,11 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* Better scrolling on mobile */
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
         }
 
         .container {
@@ -408,6 +416,251 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* Mobile-First Responsive Design */
+        @media (max-width: 480px) {
+            /* Extra small phones */
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px;
+            }
+            
+            .header-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .header-title h1 {
+                font-size: 20px;
+            }
+            
+            .header-title i {
+                font-size: 24px;
+            }
+            
+            .account-name-display {
+                font-size: 14px !important;
+                margin-left: 0 !important;
+                margin-top: 4px;
+            }
+            
+            .header-controls {
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .status-indicator,
+            .status-badge {
+                width: 100%;
+                justify-content: center;
+                padding: 12px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+            
+            .header-btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 15px;
+                min-height: 44px;
+                justify-content: center;
+            }
+            
+            .status-cards {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .status-card {
+                padding: 16px;
+            }
+            
+            .status-card-value {
+                font-size: 20px;
+            }
+            
+            .panel {
+                padding: 16px;
+            }
+            
+            .panel-header h2 {
+                font-size: 18px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            .form-group label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 14px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 44px;
+            }
+            
+            .form-group small {
+                font-size: 12px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 44px;
+                margin-bottom: 10px;
+            }
+            
+            .logs-container {
+                height: 300px;
+            }
+            
+            .log-entry {
+                font-size: 11px;
+                padding: 8px;
+            }
+            
+            .pyramiding-config {
+                padding: 12px;
+            }
+            
+            .pyramiding-item {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            /* Small tablets and large phones */
+            body {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 18px;
+            }
+            
+            .header-title h1 {
+                font-size: 24px;
+            }
+            
+            .header-controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .status-indicator,
+            .status-badge {
+                min-height: 44px;
+                padding: 10px 16px;
+            }
+            
+            .header-btn {
+                padding: 12px 18px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+            
+            .status-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 15px;
+                min-height: 44px;
+            }
+            
+            .form-group input,
+            .form-group select {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* General mobile styles */
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-controls {
+                width: 100%;
+            }
+            
+            /* Touch-friendly buttons */
+            .btn,
+            .header-btn {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation; /* Prevents double-tap zoom */
+            }
+            
+            /* Better spacing for mobile */
+            .panel {
+                margin-bottom: 20px;
+            }
+            
+            /* Scrollable logs on mobile */
+            .logs-container {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Better form inputs */
+            input[type="text"],
+            input[type="number"],
+            input[type="password"],
+            select,
+            textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+            
+            /* Status badges stack on mobile */
+            .status-badge {
+                flex: 1 1 auto;
+                min-width: 120px;
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .logs-container {
+                height: 200px;
+            }
+            
+            .header {
+                padding: 12px;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .status-dot {
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
         }
     </style>
 </head>
