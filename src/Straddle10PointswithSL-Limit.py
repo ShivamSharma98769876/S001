@@ -27,7 +27,14 @@ IST_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
 
 def get_ist_time():
     """Get current time in IST timezone for time comparisons"""
-    return datetime.now(IST_TIMEZONE).time()
+    ist_now = datetime.now(IST_TIMEZONE)
+    ist_time = ist_now.time()
+    # Log for debugging (only once per minute to avoid spam)
+    if not hasattr(get_ist_time, 'last_log_time') or (ist_now - getattr(get_ist_time, 'last_log_time', ist_now)).total_seconds() > 60:
+        utc_now = datetime.now(timezone.utc)
+        logging.info(f"[IST TIME] Current UTC: {utc_now.strftime('%H:%M:%S')}, Current IST: {ist_time}, IST timezone offset: +5:30")
+        get_ist_time.last_log_time = ist_now
+    return ist_time
 
 # Import P&L recorder - must be after logging setup or handle import error gracefully
 PnLRecorder = None
@@ -2654,6 +2661,15 @@ def main():
     target_time = TRADING_START_TIME
     end_time = MARKET_END_TIME
     
+    # Check if we're starting after trading start time
+    initial_time = get_ist_time()
+    logging.info(f"[STARTUP] Strategy started at IST time: {initial_time}")
+    logging.info(f"[STARTUP] Trading start time: {target_time}, Market end time: {end_time}")
+    
+    if initial_time >= target_time:
+        logging.warning(f"[STARTUP] Strategy started AFTER trading start time ({target_time}). Current time: {initial_time}")
+        logging.warning(f"[STARTUP] Will proceed to execute trade immediately if market is still open")
+    
     # Greek analysis removed - core trading functionality only
 
     while True:
@@ -2698,8 +2714,9 @@ def main():
             
             break
 
-        # Log time comparison for debugging
-        logging.debug(f"[TIME CHECK] Current IST time: {now}, Trading start time: {target_time}, Market end time: {end_time}")
+        # Log time comparison for debugging (INFO level so it's always visible)
+        logging.info(f"[TIME CHECK] Current IST time: {now}, Trading start time: {target_time}, Market end time: {end_time}")
+        logging.info(f"[TIME CHECK] Time comparison: {now} >= {target_time} = {now >= target_time}")
         if now >= target_time:
             logging.info(f"[TRADING START] Executing trade at IST time: {now} (target: {target_time})")
             

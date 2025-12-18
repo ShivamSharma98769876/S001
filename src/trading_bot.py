@@ -20,7 +20,14 @@ IST_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
 
 def get_ist_time():
     """Get current time in IST timezone"""
-    return datetime.now(IST_TIMEZONE).time()
+    ist_now = datetime.now(IST_TIMEZONE)
+    ist_time = ist_now.time()
+    # Log for debugging (only once per minute to avoid spam)
+    if not hasattr(get_ist_time, 'last_log_time') or (ist_now - getattr(get_ist_time, 'last_log_time', ist_now)).total_seconds() > 60:
+        utc_now = datetime.now(timezone.utc)
+        logging.info(f"[IST TIME] Current UTC: {utc_now.strftime('%H:%M:%S')}, Current IST: {ist_time}, IST timezone offset: +5:30")
+        get_ist_time.last_log_time = ist_now
+    return ist_time
 
 # Greek analysis removed - not needed for core trading functionality
 
@@ -439,8 +446,9 @@ class TradingBot:
             
             # Greek analysis removed - core trading functionality only
             
-            # Log current IST time and trading start time for debugging
-            logging.debug(f"Current IST time: {now}, Trading start time: {TRADING_START_TIME}")
+            # Log current IST time and trading start time for debugging (INFO level)
+            logging.info(f"[TIME CHECK] Current IST time: {now}, Trading start time: {TRADING_START_TIME}")
+            logging.info(f"[TIME CHECK] Time comparison: {now} >= {TRADING_START_TIME} = {now >= TRADING_START_TIME}")
             
             if now >= TRADING_START_TIME:
                 logging.info("Executing trade")
