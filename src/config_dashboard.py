@@ -890,56 +890,135 @@ def get_dashboard_positions():
 
 @app.route('/api/dashboard/trade-history')
 def get_trade_history():
-    """Get trade history"""
+    """Get trade history from database"""
     try:
-        date_filter = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+        # Get query parameters
+        date_filter = request.args.get('date')
         show_all = request.args.get('showAll', 'false').lower() == 'true'
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        symbol = request.args.get('symbol')
+        exchange = request.args.get('exchange')
         
-        # Try to load from P&L data files
-        trades = []
-        summary = {
-            'totalTrades': 0,
-            'totalProfit': 0.0,
-            'totalLoss': 0.0,
-            'netPnl': 0.0,
-            'winRate': 0.0
-        }
-        
+        # Try to use database first
         try:
-            pnl_data_path = os.path.join('src', 'pnl_data', 'daily_pnl.json')
-            if os.path.exists(pnl_data_path):
-                with open(pnl_data_path, 'r') as f:
-                    pnl_data = json.load(f)
-                    
-                # Filter by date if needed
-                for trade in pnl_data.get('trades', []):
-                    trade_date = trade.get('date', '')
-                    if show_all or trade_date == date_filter:
-                        trades.append({
-                            'symbol': trade.get('symbol', 'N/A'),
-                            'entryTime': trade.get('entry_time', ''),
-                            'exitTime': trade.get('exit_time', ''),
-                            'entryPrice': trade.get('entry_price', 0),
-                            'exitPrice': trade.get('exit_price', 0),
-                            'quantity': trade.get('quantity', 0),
-                            'pnl': trade.get('pnl', 0),
-                            'type': trade.get('type', 'SELL')
-                        })
+            from src.database.models import DatabaseManager
+            from src.database.repository import TradeRepository
+            
+            db_manager = DatabaseManager()
+            trade_repo = TradeRepository(db_manager)
+            
+            # Get broker_id (default to 'DEFAULT' for now)
+            broker_id = 'DEFAULT'
+            # TODO: Get broker_id from authentication if available
+            
+            # Parse dates
+            start_datetime = None
+            end_datetime = None
+            
+            if start_date:
+                try:
+                    start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+                except:
+                    pass
+            
+            if end_date:
+                try:
+                    end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+                    # Set to end of day
+                    end_datetime = end_datetime.replace(hour=23, minute=59, second=59)
+                except:
+                    pass
+            
+            # If date filter is provided (single date), use it
+            if date_filter and not show_all:
+                try:
+                    filter_date = datetime.strptime(date_filter, '%Y-%m-%d')
+                    start_datetime = filter_date.replace(hour=0, minute=0, second=0)
+                    end_datetime = filter_date.replace(hour=23, minute=59, second=59)
+                except:
+                    pass
+            
+            # Get trades from database
+            trades_list = trade_repo.get_trades(
+                broker_id=broker_id,
+                start_date=start_datetime,
+                end_date=end_datetime,
+                symbol=symbol,
+                exchange=exchange,
+                limit=1000  # Limit to prevent huge responses
+            )
+            
+            # Format trades for response
+            trades = []
+            for trade in trades_list:
+                trades.append({
+                    'symbol': trade.trading_symbol,
+                    'entryTime': trade.entry_time.isoformat() if trade.entry_time else '',
+                    'exitTime': trade.exit_time.isoformat() if trade.exit_time else '',
+                    'entryPrice': trade.entry_price,
+                    'exitPrice': trade.exit_price,
+                    'quantity': trade.quantity,
+                    'pnl': trade.realized_pnl,
+                    'type': trade.transaction_type
+                })
+            
+            # Get summary statistics
+            summary = trade_repo.get_trades_summary(
+                broker_id=broker_id,
+                start_date=start_datetime,
+                end_date=end_datetime
+            )
+            
+            db_manager.close()
+            
+        except ImportError:
+            # Fallback to file-based if database not available
+            logger.warning("Database not available, falling back to file-based trade history")
+            trades = []
+            summary = {
+                'totalTrades': 0,
+                'totalProfit': 0.0,
+                'totalLoss': 0.0,
+                'netPnl': 0.0,
+                'winRate': 0.0
+            }
+            
+            try:
+                pnl_data_path = os.path.join('src', 'pnl_data', 'daily_pnl.json')
+                if os.path.exists(pnl_data_path):
+                    with open(pnl_data_path, 'r') as f:
+                        pnl_data = json.load(f)
                         
-                        # Update summary
-                        summary['totalTrades'] += 1
-                        if trade.get('pnl', 0) >= 0:
-                            summary['totalProfit'] += trade.get('pnl', 0)
-                        else:
-                            summary['totalLoss'] += abs(trade.get('pnl', 0))
-                        summary['netPnl'] += trade.get('pnl', 0)
-                
-                # Calculate win rate
-                if summary['totalTrades'] > 0:
-                    winning_trades = sum(1 for t in trades if t['pnl'] >= 0)
-                    summary['winRate'] = (winning_trades / summary['totalTrades']) * 100
-        except Exception as e:
-            print(f"Error loading trade history: {e}")
+                    # Filter by date if needed
+                    for trade in pnl_data.get('trades', []):
+                        trade_date = trade.get('date', '')
+                        if show_all or trade_date == date_filter:
+                            trades.append({
+                                'symbol': trade.get('symbol', 'N/A'),
+                                'entryTime': trade.get('entry_time', ''),
+                                'exitTime': trade.get('exit_time', ''),
+                                'entryPrice': trade.get('entry_price', 0),
+                                'exitPrice': trade.get('exit_price', 0),
+                                'quantity': trade.get('quantity', 0),
+                                'pnl': trade.get('pnl', 0),
+                                'type': trade.get('type', 'SELL')
+                            })
+                            
+                            # Update summary
+                            summary['totalTrades'] += 1
+                            if trade.get('pnl', 0) >= 0:
+                                summary['totalProfit'] += trade.get('pnl', 0)
+                            else:
+                                summary['totalLoss'] += abs(trade.get('pnl', 0))
+                            summary['netPnl'] += trade.get('pnl', 0)
+                    
+                    # Calculate win rate
+                    if summary['totalTrades'] > 0:
+                        winning_trades = sum(1 for t in trades if t['pnl'] >= 0)
+                        summary['winRate'] = (winning_trades / summary['totalTrades']) * 100
+            except Exception as e:
+                logger.error(f"Error loading trade history from files: {e}")
         
         return jsonify({
             'status': 'success',
@@ -947,6 +1026,209 @@ def get_trade_history():
             'summary': summary
         })
     except Exception as e:
+        logger.error(f"Error in get_trade_history: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/dashboard/cumulative-pnl')
+def get_cumulative_pnl():
+    """Get cumulative P&L for different time periods"""
+    try:
+        from src.database.models import DatabaseManager
+        from src.database.repository import TradeRepository
+        from datetime import datetime, timedelta
+        
+        db_manager = DatabaseManager()
+        trade_repo = TradeRepository(db_manager)
+        
+        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        
+        # Calculate cumulative P&L for different periods
+        now = datetime.now()
+        
+        # All-time cumulative
+        all_time_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id)
+        
+        # Year-to-date
+        year_start = datetime(now.year, 1, 1)
+        ytd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=year_start)
+        
+        # Month-to-date
+        month_start = datetime(now.year, now.month, 1)
+        mtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=month_start)
+        
+        # Week-to-date (Monday)
+        today = now.date()
+        week_start = today - timedelta(days=today.weekday())
+        week_start_datetime = datetime.combine(week_start, datetime.min.time())
+        wtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=week_start_datetime)
+        
+        # Day-to-date
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        dtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=day_start)
+        
+        db_manager.close()
+        
+        return jsonify({
+            'status': 'success',
+            'cumulativePnl': {
+                'allTime': all_time_pnl,
+                'year': ytd_pnl,
+                'month': mtd_pnl,
+                'week': wtd_pnl,
+                'day': dtd_pnl
+            }
+        })
+    except ImportError:
+        # Fallback if database not available
+        return jsonify({
+            'status': 'success',
+            'cumulativePnl': {
+                'allTime': 0.0,
+                'year': 0.0,
+                'month': 0.0,
+                'week': 0.0,
+                'day': 0.0
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error in get_cumulative_pnl: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/dashboard/daily-stats')
+def get_daily_stats():
+    """Get today's daily statistics"""
+    try:
+        from src.database.models import DatabaseManager
+        from src.database.repository import DailyStatsRepository
+        from datetime import date
+        
+        db_manager = DatabaseManager()
+        stats_repo = DailyStatsRepository(db_manager)
+        
+        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        
+        # Get today's stats
+        today_stat = stats_repo.get_today_stats(broker_id=broker_id)
+        
+        if today_stat:
+            daily_loss_used = today_stat.daily_loss_used or 0.0
+            daily_loss_limit = today_stat.daily_loss_limit or 5000.0
+            loss_percentage = (daily_loss_used / daily_loss_limit * 100) if daily_loss_limit > 0 else 0.0
+        else:
+            daily_loss_used = 0.0
+            daily_loss_limit = 5000.0
+            loss_percentage = 0.0
+        
+        db_manager.close()
+        
+        return jsonify({
+            'status': 'success',
+            'dailyStats': {
+                'lossUsed': round(daily_loss_used, 2),
+                'lossLimit': round(daily_loss_limit, 2),
+                'lossPercentage': round(loss_percentage, 2),
+                'tradingBlocked': today_stat.trading_blocked if today_stat else False,
+                'lossLimitHit': today_stat.loss_limit_hit if today_stat else False
+            }
+        })
+    except ImportError:
+        # Fallback if database not available
+        return jsonify({
+            'status': 'success',
+            'dailyStats': {
+                'lossUsed': 0.0,
+                'lossLimit': 5000.0,
+                'lossPercentage': 0.0,
+                'tradingBlocked': False,
+                'lossLimitHit': False
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error in get_daily_stats: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@app.route('/api/dashboard/pnl-calendar')
+def get_pnl_calendar():
+    """Get P&L data for calendar heatmap"""
+    try:
+        from src.database.models import DatabaseManager
+        from src.database.repository import TradeRepository
+        from datetime import date, timedelta
+        
+        db_manager = DatabaseManager()
+        trade_repo = TradeRepository(db_manager)
+        
+        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        
+        # Get date range from query params
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        segment = request.args.get('segment', 'all')
+        pnl_type = request.args.get('pnl_type', 'combined')
+        
+        # Default to last 90 days if not specified
+        if not end_date_str:
+            end_date = date.today()
+        else:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        
+        if not start_date_str:
+            start_date = end_date - timedelta(days=90)
+        else:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        
+        # Get daily P&L
+        daily_pnl = trade_repo.get_daily_pnl(
+            broker_id=broker_id,
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        # Convert to dictionary format for calendar
+        pnl_by_date = {item['date']: item['pnl'] for item in daily_pnl}
+        
+        # Calculate summary
+        total_realized_pnl = sum(item['pnl'] for item in daily_pnl)
+        total_trades = sum(item['trades_count'] for item in daily_pnl)
+        
+        db_manager.close()
+        
+        return jsonify({
+            'status': 'success',
+            'pnlByDate': pnl_by_date,
+            'summary': {
+                'realisedPnl': round(total_realized_pnl, 2),
+                'paperPnl': 0.0,  # Not implemented yet
+                'livePnl': round(total_realized_pnl, 2),
+                'totalTrades': total_trades
+            },
+            'dateRange': {
+                'start': start_date.isoformat(),
+                'end': end_date.isoformat()
+            }
+        })
+    except ImportError:
+        return jsonify({
+            'status': 'success',
+            'pnlByDate': {},
+            'summary': {
+                'realisedPnl': 0.0,
+                'paperPnl': 0.0,
+                'livePnl': 0.0,
+                'totalTrades': 0
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error in get_pnl_calendar: {e}")
         return jsonify({
             'status': 'error',
             'message': str(e)

@@ -1,6 +1,6 @@
 """
 P&L Recorder Module
-Saves daily P&L data for non-equity trades to local files
+Saves daily P&L data for non-equity trades to local files and/or database
 """
 import json
 import csv
@@ -9,21 +9,50 @@ from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# Try to import database modules (optional)
+try:
+    from src.database.models import DatabaseManager
+    from src.database.repository import TradeRepository, DailyStatsRepository
+    DATABASE_AVAILABLE = True
+except ImportError:
+    DATABASE_AVAILABLE = False
+    logging.warning("Database modules not available. PnLRecorder will use file-based storage only.")
+
 
 class PnLRecorder:
     """Records and manages daily P&L data"""
     
-    def __init__(self, data_dir: str = "pnl_data"):
+    def __init__(self, data_dir: str = "pnl_data", use_database: bool = True, broker_id: str = 'DEFAULT'):
         """
         Initialize P&L Recorder
         
         Args:
-            data_dir: Directory to store P&L data files
+            data_dir: Directory to store P&L data files (for backward compatibility)
+            use_database: If True, save to database. If False, save to files only.
+            broker_id: Broker ID for database records (default: 'DEFAULT')
         """
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(exist_ok=True)
         self.json_file = self.data_dir / "daily_pnl.json"
         self.csv_file = self.data_dir / "daily_pnl.csv"
+        
+        # Database setup
+        self.use_database = use_database and DATABASE_AVAILABLE
+        self.broker_id = broker_id
+        self.db_manager = None
+        self.trade_repo = None
+        self.stats_repo = None
+        
+        if self.use_database:
+            try:
+                self.db_manager = DatabaseManager()
+                from src.database.repository import TradeRepository, DailyStatsRepository
+                self.trade_repo = TradeRepository(self.db_manager)
+                self.stats_repo = DailyStatsRepository(self.db_manager)
+                logging.info("[P&L RECORDER] Database mode enabled")
+            except Exception as e:
+                logging.warning(f"[P&L RECORDER] Database initialization failed: {e}. Falling back to file mode.")
+                self.use_database = False
         
     def get_non_equity_pnl(self, kite) -> Dict:
         """
@@ -102,7 +131,7 @@ class PnLRecorder:
     
     def save_daily_pnl(self, kite, account: Optional[str] = None) -> bool:
         """
-        Save today's P&L data to JSON and CSV files
+        Save today's P&L data to database and/or JSON/CSV files
         
         Args:
             kite: KiteConnect instance
@@ -130,11 +159,25 @@ class PnLRecorder:
                 'positions': pnl_data['non_equity_positions']
             }
             
-            # Save to JSON
-            self._save_to_json(daily_record)
+            # Save to database if enabled
+            if self.use_database:
+                try:
+                    self._save_to_database(daily_record, timestamp)
+                except Exception as e:
+                    logging.error(f"Error saving to database: {e}")
+                    # Continue to file save as fallback
             
-            # Save to CSV
-            self._save_to_csv(daily_record)
+            # Save to JSON (for backward compatibility)
+            try:
+                self._save_to_json(daily_record)
+            except Exception as e:
+                logging.warning(f"Error saving to JSON: {e}")
+            
+            # Save to CSV (for backward compatibility)
+            try:
+                self._save_to_csv(daily_record)
+            except Exception as e:
+                logging.warning(f"Error saving to CSV: {e}")
             
             logging.info(f"[P&L RECORD] Saved daily P&L: Non-Equity: ₹{pnl_data['non_equity_pnl']:.2f}, "
                        f"Total: ₹{pnl_data['total_pnl']:.2f}, Positions: {pnl_data['positions_count']}")
@@ -144,6 +187,69 @@ class PnLRecorder:
         except Exception as e:
             logging.error(f"Error saving daily P&L: {e}")
             return False
+    
+    def _save_to_database(self, daily_record: Dict, timestamp: datetime):
+        """Save daily record to database"""
+        if not self.use_database or not self.stats_repo:
+            return
+        
+        try:
+            today = date.today()
+            
+            # Update or create daily stats
+            self.stats_repo.update_daily_stat(
+                today,
+                self.broker_id,
+                total_realized_pnl=daily_record['total_pnl'],
+                number_of_trades=daily_record['positions_count']
+            )
+            
+            # Save individual positions as trades (if they have P&L)
+            positions = daily_record.get('positions', [])
+            for pos in positions:
+                try:
+                    trading_symbol = pos.get('tradingsymbol', '')
+                    if not trading_symbol:
+                        continue
+                    
+                    exchange = pos.get('exchange', 'NFO')
+                    quantity = pos.get('quantity', 0)
+                    pnl = pos.get('pnl', 0.0)
+                    avg_price = pos.get('average_price', 0.0)
+                    last_price = pos.get('last_price', avg_price)
+                    
+                    # Only save if there's actual P&L (non-zero)
+                    if pnl == 0.0 and quantity == 0:
+                        continue
+                    
+                    # Determine transaction type
+                    transaction_type = 'BUY' if quantity > 0 else 'SELL'
+                    
+                    # Create trade record
+                    # Note: Using timestamp for both entry and exit since we don't have exact times
+                    self.trade_repo.create_trade(
+                        instrument_token='',  # Not available from positions API
+                        trading_symbol=trading_symbol,
+                        exchange=exchange,
+                        entry_time=timestamp,
+                        exit_time=timestamp,
+                        entry_price=avg_price,
+                        exit_price=last_price,
+                        quantity=abs(quantity),
+                        transaction_type=transaction_type,
+                        realized_pnl=pnl,
+                        exit_type='daily_snapshot',
+                        broker_id=self.broker_id
+                    )
+                except Exception as e:
+                    logging.warning(f"Error saving position {pos.get('tradingsymbol', 'unknown')} to database: {e}")
+                    continue
+            
+            logging.info(f"[P&L RECORD] Saved to database: {self.broker_id}")
+            
+        except Exception as e:
+            logging.error(f"Error saving to database: {e}")
+            raise
     
     def _save_to_json(self, daily_record: Dict):
         """Save daily record to JSON file"""

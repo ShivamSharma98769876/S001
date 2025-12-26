@@ -1,0 +1,20 @@
+2025-12-17 17:37:04,786 - INFO - [DASHBOARD] Dashboard application initialized
+2025-12-17 17:37:04,795 - INFO - [DASHBOARD] Starting web dashboard on 0.0.0.0:8080...
+2025-12-17 17:37:04,805 - INFO - [DASHBOARD] Starting Flask app on 0.0.0.0:8080
+2025-12-17 17:37:04,811 - INFO - [DASHBOARD] Dashboard will be available at http://0.0.0.0:8080
+2025-12-17 17:37:04,887 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.9:8080
+2025-12-17 17:37:04,888 - INFO - [33mPress CTRL+C to quit[0m
+2025-12-17 17:37:06,200 - INFO - [STARTUP] Loading strategy from: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py
+2025-12-17 17:37:11,207 - INFO - [STARTUP] Starting main trading strategy...
+2025-12-17 17:37:11,207 - INFO - Script started
+2025-12-17 17:37:29,560 - INFO - 127.0.0.1 - - [17/Dec/2025 17:37:29] "GET / HTTP/1.1" 200 -
+2025-12-17 17:38:48,360 - INFO - 127.0.0.1 - - [17/Dec/2025 17:38:48] "GET / HTTP/1.1" 200 -
+2025-12-17 17:39:09,262 - INFO - 127.0.0.1 - - [17/Dec/2025 17:39:09] "GET /api/config/lot-size HTTP/1.1" 200 -
+2025-12-17 17:39:09,292 - INFO - 127.0.0.1 - - [17/Dec/2025 17:39:09] "GET /api/dashboard/positions HTTP/1.1" 200 -
+2025-12-17 17:39:09,297 - INFO - 127.0.0.1 - - [17/Dec/2025 17:39:09] "GET /api/dashboard/metrics HTTP/1.1" 200 -
+2025-12-17 17:39:09,657 - INFO - 127.0.0.1 - - [17/Dec/2025 17:39:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-17 17:43:20,261 - INFO - [STARTUP] Shutdown requested by user
+2025-12-17 17:43:20,264 - INFO - [STARTUP] Shutting down monitoring system...

@@ -10,9 +10,9 @@ ENV/
 .venv
 
 # Logs
-*.log
-logs/
-*.log.*
+#*.log
+#logs/
+#*.log.*
 
 # Environment variables
 .env
@@ -35,8 +35,8 @@ Thumbs.db
 *.zip
 
 # Trading data
-pnl_data/
-data/greeks_*.json
+#pnl_data/
+#data/greeks_*.json
 
 # Local config (if sensitive)
 config_local.py

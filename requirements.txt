@@ -9,3 +9,4 @@ requests>=2.31.0
 flask>=2.3.0
 gunicorn>=21.2.0
 azure-storage-blob>=12.19.0
+sqlalchemy>=2.0.0
