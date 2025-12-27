@@ -102,7 +102,7 @@ After each phase:
 - `src/config_dashboard.py` - Update API endpoints
 
 ### Database File:
-- `data/risk_management.db` - Created automatically
+- `data/strangle.db` - Created automatically
 
 ## Risk Mitigation
 

@@ -10,7 +10,7 @@
 - **Data Access**: File-based reading/writing via `PnLRecorder` class
 
 ### disciplined-Trader (Target Reference)
-- **Data Storage**: SQLite database (`data/risk_management.db`)
+- **Data Storage**: SQLite database (`data/strangle.db`)
 - **ORM**: SQLAlchemy with declarative models
 - **Tables**:
   1. `positions` - Active and inactive positions
@@ -228,7 +228,7 @@ class DailyStats(Base):
     # ... (see full schema above)
 
 class DatabaseManager:
-    def __init__(self, db_path: str = "data/risk_management.db"):
+    def __init__(self, db_path: str = "data/strangle.db"):
         self.db_path = db_path
         self.engine = create_engine(f'sqlite:///{db_path}', echo=False)
         self.SessionLocal = sessionmaker(bind=self.engine)
@@ -532,7 +532,7 @@ Strangle10Points/
 │   ├── pnl_recorder.py        # Update to use database
 │   └── config_dashboard.py    # Update API endpoints
 ├── data/
-│   └── risk_management.db     # SQLite database (created automatically)
+│   └── strangle.db     # SQLite database (created automatically)
 ├── migrations/
 │   └── migrate_json_to_database.py  # One-time migration script
 └── requirements.txt           # Add sqlalchemy

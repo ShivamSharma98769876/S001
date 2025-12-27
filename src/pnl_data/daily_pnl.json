@@ -1,0 +1,15 @@
+{
+  "records": [
+    {
+      "date": "2025-12-27",
+      "timestamp": "2025-12-27T20:40:21.441419",
+      "account": "Priti Sharma",
+      "non_equity_pnl": 0.0,
+      "total_pnl": 0.0,
+      "equity_pnl": 0.0,
+      "positions_count": 0,
+      "positions": []
+    }
+  ],
+  "last_updated": "2025-12-27T20:40:21.457202"
+}

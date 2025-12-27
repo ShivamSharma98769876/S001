@@ -176,7 +176,7 @@ Strangle10Points/
 ├── migrations/
 │   └── migrate_json_to_database.py  ✅ Created
 ├── data/
-│   └── risk_management.db        ⚠️ Will be created on first run
+│   └── strangle.db        ⚠️ Will be created on first run
 ├── requirements.txt              ✅ Updated
 └── IMPLEMENTATION_PLAN.md        ✅ Created
 ```
@@ -229,7 +229,7 @@ recorder = PnLRecorder(use_database=True)  # Also saves to files for backup
 
 - [ ] Install SQLAlchemy: `pip install sqlalchemy`
 - [ ] Run migration script (if you have existing data)
-- [ ] Verify database file created: `data/risk_management.db`
+- [ ] Verify database file created: `data/strangle.db`
 - [ ] Test API endpoints:
   - [ ] `/api/dashboard/cumulative-pnl`
   - [ ] `/api/dashboard/daily-stats`

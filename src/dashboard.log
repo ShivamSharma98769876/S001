@@ -1,0 +1,1060 @@
+2025-12-27 09:30:29,095 - __main__ - INFO - [DASHBOARD] Dashboard application initialized
+2025-12-27 09:30:29,112 - root - INFO - [DASHBOARD] Starting Flask app on 0.0.0.0:8080
+2025-12-27 09:30:29,112 - root - INFO - [DASHBOARD] Dashboard will be available at http://0.0.0.0:8080
+2025-12-27 09:30:29,185 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.9:8080
+2025-12-27 09:30:29,191 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-12-27 09:30:48,610 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:48] "GET / HTTP/1.1" 200 -
+2025-12-27 09:30:49,502 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:49] "GET /static/css/dashboard.css HTTP/1.1" 200 -
+2025-12-27 09:30:49,559 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:49] "GET /static/js/dashboard.js HTTP/1.1" 200 -
+2025-12-27 09:30:50,071 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:50] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:30:50,199 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:50] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-27 09:30:52,184 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:30:52] "GET /api/dashboard/pnl-calendar?start_date=2025-06-27&end_date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:31:00,637 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:31:00] "GET /api/auth/details HTTP/1.1" 200 -
+2025-12-27 09:31:05,388 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:31:05] "GET /api/auth/details HTTP/1.1" 200 -
+2025-12-27 09:31:58,193 - root - INFO - KiteClient initialized for account: DASHBOARD
+2025-12-27 09:31:58,193 - root - INFO - [AUTH] API secret stored in KiteClient
+2025-12-27 09:31:58,363 - root - WARNING - [CONNECTION] Validation attempt 1 failed: Incorrect `api_key` or `access_token`., retrying...
+2025-12-27 09:31:58,955 - root - WARNING - [CONNECTION] Validation attempt 2 failed: Incorrect `api_key` or `access_token`., retrying...
+2025-12-27 09:31:59,539 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:31:59] "[31m[1mPOST /api/auth/set-access-token HTTP/1.1[0m" 401 -
+2025-12-27 09:34:33,544 - root - INFO - KiteClient initialized for account: DASHBOARD
+2025-12-27 09:34:33,544 - root - INFO - [AUTH] API secret stored in KiteClient
+2025-12-27 09:34:33,639 - root - INFO - [TOKEN] Saved access token for API key: 14vxzgva...
+2025-12-27 09:34:33,642 - root - INFO - [AUTH] Account holder name: Priti Sharma
+2025-12-27 09:34:33,642 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "POST /api/auth/set-access-token HTTP/1.1" 200 -
+2025-12-27 09:34:33,742 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/auth/details HTTP/1.1" 200 -
+2025-12-27 09:34:33,807 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:34:33,856 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:34:33,909 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:34:33,927 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:34:33,943 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:34:33,986 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:33] "GET /api/dashboard/cumulative-pnl HTTP/1.1" 200 -
+2025-12-27 09:34:43,928 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:43] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:34:43,969 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:34:48,864 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:34:53,338 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:53] "GET /api/dashboard/pnl-calendar?start_date=2025-06-27&end_date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:34:53,893 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:34:53,938 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:34:53] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:01,266 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:01] "POST /api/dashboard/sync-orders HTTP/1.1" 200 -
+2025-12-27 09:35:02,382 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:02] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:02,398 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:02] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:03,862 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:35:13,935 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:13] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:13,984 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:13] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:18,874 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:35:23,898 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:23,928 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:34,055 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:34] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:35:34,071 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:35:34,122 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:34] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:34,122 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:34] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:34,168 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:35:44,043 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:44] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:35:44,084 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:44] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:49,047 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:49] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:35:54,082 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:54] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:35:54,103 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:35:54] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:36:04,087 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:04] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:36:04,104 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:04] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:36:04,123 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:04] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:36:14,100 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:14] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:36:14,133 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:14] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:36:19,034 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:19] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:36:24,064 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:24] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:36:24,124 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:24] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:36:34,073 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:36:34,173 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:36:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:37:33,060 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:37:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:37:33,060 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:37:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:37:33,091 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:37:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:37:34,083 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:37:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:37:34,162 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:37:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:38:33,050 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:38:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:38:33,084 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:38:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:38:33,136 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:38:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:38:34,067 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:38:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:38:34,178 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:38:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:39:33,057 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:39:33,107 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:39:33,107 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:39:34,050 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:34] "GET /api/dashboard/cumulative-pnl?day_only=true HTTP/1.1" 200 -
+2025-12-27 09:39:34,050 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:39:34,082 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:39:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:40:33,072 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:40:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:40:33,072 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:40:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:40:33,106 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:40:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:40:34,070 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:40:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:40:34,182 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:40:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:41:33,031 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:41:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:41:33,058 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:41:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:41:33,105 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:41:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:42:33,072 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:42:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:42:33,088 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:42:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:42:33,104 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:42:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:42:33,167 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:42:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:42:33,231 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:42:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:43:33,042 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:43:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:43:33,090 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:43:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:43:33,090 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:43:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:09,517 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:09] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:44:09,517 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:09] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:44:09,533 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:09] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:09,573 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:09] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:09,607 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:09] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:44:13,914 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:13] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:18,835 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:18] "POST /api/dashboard/sync-orders HTTP/1.1" 200 -
+2025-12-27 09:44:18,899 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:44:19,961 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:19] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:19,975 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:19] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:23,914 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:26,220 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:26] "GET /api/dashboard/trade-history?all=true HTTP/1.1" 200 -
+2025-12-27 09:44:33,863 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:33,863 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:44:33,880 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:44:33,913 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:44:33,979 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:33] "GET /api/dashboard/trade-history?all=true HTTP/1.1" 200 -
+2025-12-27 09:44:35,320 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:35] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:44,047 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:44] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:44:44,083 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:44] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:48,323 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:48] "GET /api/dashboard/trade-history?date=2025-12-26 HTTP/1.1" 200 -
+2025-12-27 09:44:48,896 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:44:52,953 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:52] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:44:53,930 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:44:53] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:03,887 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:03] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:03,919 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:03] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:45:03,950 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:45:13,858 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:13] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:13,902 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:13] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:45:18,873 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:45:23,899 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:23,923 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:45:33,873 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:33,873 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:45:33,915 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:45:33,915 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:45:33,999 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:45:43,905 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:45:43,920 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:43] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:48,832 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:45:53,886 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:53] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:45:53,936 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:45:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:03,871 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:03] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:46:03,929 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:46:03,966 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:03] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:13,888 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:13] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:13,945 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:13] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:46:18,883 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:46:23,877 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:46:24,011 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:24] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:33,845 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:46:33,891 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:46:33,909 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:33,931 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:46:34,006 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:46:43,860 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:43] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:46:43,934 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:48,848 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:46:52,571 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:52] "POST /api/dashboard/sync-orders HTTP/1.1" 200 -
+2025-12-27 09:46:53,684 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:46:53,715 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:46:53] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:03,888 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:47:03,910 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:03] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:03,922 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:03] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:13,911 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:13] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:13,967 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:13] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:18,879 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:47:23,939 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:23,995 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:33,853 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:47:33,893 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:33,900 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:47:33,947 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:34,066 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:47:43,939 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:43] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:47:43,996 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:48,864 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:47:53,892 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:47:53,892 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:47:53] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:03,847 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:48:03,867 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:03] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:03,903 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:03] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:06,985 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:06] "POST /api/dashboard/sync-orders HTTP/1.1" 200 -
+2025-12-27 09:48:07,855 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:07] "GET /api/dashboard/trade-history?all=true HTTP/1.1" 200 -
+2025-12-27 09:48:08,149 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:08] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:11,629 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:11] "POST /api/dashboard/sync-orders HTTP/1.1" 200 -
+2025-12-27 09:48:12,748 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:12] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:13,861 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:13] "GET /api/dashboard/trade-history?all=true HTTP/1.1" 200 -
+2025-12-27 09:48:16,538 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:16] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:18,822 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:48:23,863 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:23] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:23,950 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:33,857 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:48:33,857 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:48:33,913 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:33,930 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:33,964 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:48:44,050 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:44] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:48:44,082 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:44] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:49,020 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:49] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:48:54,020 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:54] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:48:54,046 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:48:54] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:49:04,006 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:04] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:49:04,081 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:04] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:49:04,104 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:04] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:49:14,038 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:14] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:49:14,072 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:14] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:49:18,969 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:18] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:49:24,051 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:24] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:49:24,065 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:24] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:49:33,998 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:49:33,998 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:49:34,043 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:34] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:49:34,043 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:34] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:49:34,052 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:34] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:49:34,077 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:49:34] "GET /api/dashboard/cumulative-pnl?day_only=true HTTP/1.1" 200 -
+2025-12-27 09:50:32,995 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:50:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:50:33,027 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:50:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:50:33,057 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:50:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:51:32,979 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:51:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:51:33,011 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:51:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:51:33,042 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:51:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:51:33,106 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:51:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:51:33,153 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:51:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:52:32,994 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:52:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:52:33,054 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:52:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:52:33,087 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:52:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:53:33,020 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:53:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:53:33,054 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:53:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:53:33,062 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:53:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:53:33,086 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:53:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:53:33,134 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:53:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:54:32,967 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:54:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:54:32,983 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:54:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:54:33,080 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:54:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:54:33,964 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:54:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:55:33,028 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:55:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:55:33,063 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:55:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:55:33,067 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:55:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:55:33,067 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:55:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:55:33,149 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:55:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:56:32,992 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:56:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:56:33,021 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:56:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:56:33,049 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:56:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:57:32,985 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:57:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:57:33,009 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:57:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:57:33,026 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:57:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:57:33,027 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:57:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:57:33,095 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:57:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:58:32,976 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:58:32] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:58:32,987 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:58:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:58:33,017 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:58:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:59:33,001 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 09:59:33,009 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 09:59:33,009 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 09:59:33,017 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 09:59:33,173 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 09:59:33,922 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 09:59:33] "GET /api/dashboard/cumulative-pnl?day_only=true HTTP/1.1" 200 -
+2025-12-27 10:00:32,929 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:00:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 10:00:33,092 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:00:33] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 10:00:33,102 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:00:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 10:01:32,946 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:01:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 10:01:32,969 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:01:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 10:01:32,974 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:01:32] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 10:01:33,033 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:01:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 10:01:33,147 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:01:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 10:02:32,957 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:02:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 10:02:32,973 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:02:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 10:02:33,013 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:02:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 10:03:32,921 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:03:32] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 10:03:32,962 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:03:32] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 10:03:32,986 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:03:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 10:03:33,028 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:03:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 10:03:33,115 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 10:03:33] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 11:34:14,804 - root - WARNING - [CONNECTION] Validation attempt 1 failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')), retrying...
+2025-12-27 11:34:14,936 - root - WARNING - [CONNECTION] Validation attempt 1 failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')), retrying...
+2025-12-27 11:34:14,937 - root - WARNING - [CONNECTION] Validation attempt 1 failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')), retrying...
+2025-12-27 11:34:15,146 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 11:34:15] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 11:34:15,365 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 11:34:15] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 11:34:15,597 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 11:34:15] "GET /api/dashboard/cumulative-pnl?day_only=true HTTP/1.1" 200 -
+2025-12-27 11:34:15,660 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 11:34:15] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:11:40,767 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:40] "GET / HTTP/1.1" 200 -
+2025-12-27 12:11:40,783 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:40] "GET /static/css/dashboard.css HTTP/1.1" 200 -
+2025-12-27 12:11:40,800 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:40] "GET /static/js/dashboard.js HTTP/1.1" 200 -
+2025-12-27 12:11:41,501 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:41] "GET /api/dashboard/pnl-calendar?start_date=2025-06-27&end_date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:11:41,549 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:41] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:11:42,136 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-27 12:11:42,159 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:11:42,184 - root - WARNING - [CONNECTION] Validation attempt 1 failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')), retrying...
+2025-12-27 12:11:42,249 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:11:42,259 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "GET /api/dashboard/cumulative-pnl HTTP/1.1" 200 -
+2025-12-27 12:11:42,293 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:11:42,744 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:42] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:11:52,246 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:52] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:11:52,287 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:52] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:11:57,221 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:11:57] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:12:02,193 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:02] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:02,264 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:02] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:12,189 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:12] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:12:12,224 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:12] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:12,285 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:12] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:22,272 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:22] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:22,288 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:22] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:27,167 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:27] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:12:32,910 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:32,990 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:32] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:42,918 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:42] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:12:42,959 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:42] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:12:42,993 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:42] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:43,031 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:43,078 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:43] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:12:52,958 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:52] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:12:53,003 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:12:57,901 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:12:57] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:13:02,953 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:02] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:02,964 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:02] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:12,940 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:12] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:12,960 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:12] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:13:12,987 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:12] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:22,974 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:22] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:23,014 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:27,938 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:27] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:13:32,918 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:32,974 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:32] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:42,915 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:42] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:13:42,931 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:42] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:42,963 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:42] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:13:43,025 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:43] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:43,115 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:43] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:13:52,927 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:52] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:13:53,002 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:53] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:13:57,909 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:13:57] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:14:02,972 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:02] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:02,989 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:02] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:12,940 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:12] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:12,987 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:12] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:14:13,019 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:13] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:22,934 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:22] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:23,029 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:23] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:27,917 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:27] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:14:32,989 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:32] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:33,005 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:33] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:42,907 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:42] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:14:43,030 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:43] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:14:46,027 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:46] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:46,104 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:46] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:14:46,126 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:46] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:48,136 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET / HTTP/1.1" 200 -
+2025-12-27 12:14:48,206 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "[36mGET /static/css/dashboard.css HTTP/1.1[0m" 304 -
+2025-12-27 12:14:48,231 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /static/js/dashboard.js HTTP/1.1" 200 -
+2025-12-27 12:14:48,480 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/dashboard/pnl-calendar?start_date=2025-06-27&end_date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:48,523 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:14:48,680 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:14:48,759 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/dashboard/cumulative-pnl HTTP/1.1" 200 -
+2025-12-27 12:14:48,759 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:14:48,793 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:14:48,812 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:48] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:58,785 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:58] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:14:58,785 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:14:58] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:15:03,727 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:03] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:15:08,039 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:08] "[33mGET /admin/panel HTTP/1.1[0m" 404 -
+2025-12-27 12:15:10,514 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:10] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:15:10,595 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:10] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:15:12,277 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:12] "GET /live/ HTTP/1.1" 200 -
+2025-12-27 12:15:12,343 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 12:15:12,350 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 12:15:12,350 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:12] "GET /api/config/lot-size HTTP/1.1" 200 -
+2025-12-27 12:15:12,350 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 12:15:12,364 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 12:15:12,364 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 12:15:12,364 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 12:15:12,369 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 12:15:12,374 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:12] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 12:15:12,439 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:12] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:15:12,448 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:12] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 12:15:15,382 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 12:15:15,383 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 12:15:15,386 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 12:15:15,387 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 12:15:15,388 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 12:15:15,389 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 12:15:15,392 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 12:15:15,395 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:15] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 12:15:17,428 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:17] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:15:17,443 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:17] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 12:15:18,345 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 12:15:18,345 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 12:15:18,345 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 12:15:18,345 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 12:15:18,345 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 12:15:18,361 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 12:15:18,361 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 12:15:18,361 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:18] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 12:15:21,425 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 12:15:21,429 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 12:15:21,433 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 12:15:21,449 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 12:15:21,455 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 12:15:21,455 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 12:15:21,462 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 12:15:21,462 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:21] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 12:15:22,454 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:22] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:15:22,467 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:22] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 12:15:24,359 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 12:15:24,359 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 12:15:24,372 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 12:15:24,372 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 12:15:24,376 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 12:15:24,376 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 12:15:24,376 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 12:15:24,387 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:24] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 12:15:25,863 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:25] "GET / HTTP/1.1" 200 -
+2025-12-27 12:15:25,939 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:25] "[36mGET /static/css/dashboard.css HTTP/1.1[0m" 304 -
+2025-12-27 12:15:25,959 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:25] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+2025-12-27 12:15:26,202 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 12:15:26,222 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/dashboard/pnl-calendar?start_date=2025-06-27&end_date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:15:26,318 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 12:15:26,339 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 12:15:26,355 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 12:15:26,432 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 12:15:26,437 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:26] "GET /api/dashboard/cumulative-pnl HTTP/1.1" 200 -
+2025-12-27 12:15:29,398 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 12:15:29] "[33mGET /admin/panel HTTP/1.1[0m" 404 -
+2025-12-27 14:31:38,749 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:38] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 14:31:38,757 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:38] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:31:38,758 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:38] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 14:31:38,767 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:38] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:31:38,767 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:38] "GET /api/dashboard/cumulative-pnl HTTP/1.1" 200 -
+2025-12-27 14:31:48,722 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:48] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:31:48,746 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:48] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:31:51,506 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:51] "GET /api/auth/details HTTP/1.1" 200 -
+2025-12-27 14:31:53,632 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:53] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 14:31:58,660 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:58] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:31:58,709 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:31:58] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:08,689 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:08] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:08,689 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:08] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 14:32:08,753 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:08] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:32:18,711 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:18] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:18,711 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:18] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:32:23,684 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:23] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 14:32:28,633 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:28] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:28,690 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:28] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:32:38,647 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:38] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:32:38,665 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:38] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:32:38,682 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:38] "GET /api/connectivity HTTP/1.1" 200 -
+2025-12-27 14:32:38,698 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:38] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:38,747 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:38] "GET /api/user/profile HTTP/1.1" 200 -
+2025-12-27 14:32:48,665 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:48] "GET /api/dashboard/daily-stats HTTP/1.1" 200 -
+2025-12-27 14:32:48,741 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:48] "GET /api/dashboard/trade-history?date=2025-12-27 HTTP/1.1" 200 -
+2025-12-27 14:32:51,059 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:51] "GET /live/ HTTP/1.1" 200 -
+2025-12-27 14:32:51,147 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:51] "GET /api/config/lot-size HTTP/1.1" 200 -
+2025-12-27 14:32:51,181 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:32:51,181 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:32:51,190 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:32:51,190 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 14:32:51,190 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 14:32:51,190 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 14:32:51,198 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 14:32:51,198 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:51] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:32:51,266 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:51] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:32:51,281 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:51] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:32:54,155 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:32:54,155 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:32:54,155 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:32:54,155 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 14:32:54,155 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 14:32:54,155 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 14:32:54,155 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 14:32:54,155 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:54] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:32:56,250 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:56] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:32:56,263 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:56] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:32:56,832 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:56] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Credentials check - api_key: SET, api_secret: SET, access_token: SET
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Cleared output buffer for new strategy run
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Starting strategy with account name: Priti Sharma (will be used for log file matching)
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Strategy file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\Straddle10PointswithSL-Limit.py
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Working directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] File exists: True
+2025-12-27 14:32:56,840 - root - INFO - [LIVE TRADER] Python executable: C:\Users\SharmaS8\AppData\Local\Programs\Python\Python312\python.exe
+2025-12-27 14:32:57,154 - root - INFO - [LIVE TRADER] Process created successfully (PID: 10452)
+2025-12-27 14:32:57,164 - root - INFO - [LIVE TRADER] Strategy process started successfully
+2025-12-27 14:32:57,164 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:57] "POST /api/live-trader/start HTTP/1.1" 200 -
+2025-12-27 14:32:57,170 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:32:57,170 - root - INFO - [STRATEGY] Monitor thread started, reading subprocess output...
+2025-12-27 14:32:57,190 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:32:57,190 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:32:57,190 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 14:32:57,190 - root - INFO - [LOGS] Strategy process is running (PID: 10452) but no output in buffer yet
+2025-12-27 14:32:57,204 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 14:32:57,204 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 14:32:57,204 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 14:32:57,213 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:57] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] Strategy process is running (PID: 10452) but no output in buffer yet
+2025-12-27 14:32:57,236 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 14:32:57,236 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 14:32:57,236 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 14:32:57,236 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:57] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:32:57,303 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:57] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:32:57,303 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:32:57] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:00,186 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:00,186 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:00,191 - root - INFO - [LOGS] Today's log file does not exist: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:00,191 - root - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 14:33:00,191 - root - INFO - [LOGS] Strategy process is running (PID: 10452) but no output in buffer yet
+2025-12-27 14:33:00,191 - root - WARNING - [LOGS] No log files found for account: Priti Sharma, date: 2025-12-27
+2025-12-27 14:33:00,198 - root - WARNING - [LOGS] Checked directories: src_logs_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs, src_dir=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src, root=C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points
+2025-12-27 14:33:00,212 - root - INFO - [LOGS] Files in src/logs: ['config_monitoring.log']
+2025-12-27 14:33:00,214 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:00] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:01,201 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:01] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:01,201 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:01] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:01,488 - root - INFO - [STRATEGY] [ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py
+2025-12-27 14:33:01,488 - root - INFO - [STRATEGY] [ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py
+2025-12-27 14:33:01,876 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.876 - INFO - Script started
+2025-12-27 14:33:01,876 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,876 - root - INFO - [STRATEGY] API CREDENTIALS SETUP
+2025-12-27 14:33:01,876 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] Account: Api_key: Api_Secret: Request_Token: 2025-12-27 14:33:01.916 - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [STRATEGY] Starting logging setup for account: Priti Sharma
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [STRATEGY] Azure environment: False
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] Captured 10 lines so far, buffer size: 10
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [STRATEGY] [SETUP LOGGING] Starting logging setup - account_name=Priti Sharma, logger_name=root
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [LOG SETUP] SUCCESS: Log file created and writable: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [LOG SETUP] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [LOG SETUP] Root logger handlers: 2
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] [LOG SETUP] Named logger handlers: 2
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,916 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 14:33:01,932 - root - INFO - [STRATEGY] Captured 20 lines so far, buffer size: 20
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] [LOG] Log file exists, size: 841 bytes
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [LOG] Log file exists, size: 841 bytes
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] [OK] API credentials set successfully
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - [OK] API credentials set successfully
+2025-12-27 14:33:01,934 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.916 - INFO - today_sl: 30, Saturday
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] TRADING QUANTITY SETUP
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] Captured 30 lines so far, buffer size: 30
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] Enter Call Quantity: Enter Put Quantity: [OK] Call Quantity: 150
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] [OK] Put Quantity: 150
+2025-12-27 14:33:01,950 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [IST TIME] Current UTC: 09:03:01, Current IST: 14:33:01.934170, IST timezone offset: +5:30
+2025-12-27 14:33:01,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [STARTUP] Strategy started at IST time: 14:33:01.934170
+2025-12-27 14:33:01,981 - root - INFO - [STRATEGY] Captured 40 lines so far, buffer size: 40
+2025-12-27 14:33:01,981 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:33:01,989 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 14:33:01.934170
+2025-12-27 14:33:01,989 - root - INFO - [STRATEGY] 2025-12-27 14:33:01.934 - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 14:33:02,027 - root - INFO - [STRATEGY] 2025-12-27 14:33:02.027 - INFO - Underlying price: 26042.3
+2025-12-27 14:33:02,027 - root - INFO - [STRATEGY] 2025-12-27 14:33:02.027 - INFO - [TIME CHECK] Current IST time: 14:33:01.934170, Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:33:02,027 - root - INFO - [STRATEGY] 2025-12-27 14:33:02.027 - INFO - [TIME CHECK] Time comparison: 14:33:01.934170 >= 09:40:00 = True
+2025-12-27 14:33:02,027 - root - INFO - [STRATEGY] 2025-12-27 14:33:02.027 - INFO - [TRADING START] Executing trade at IST time: 14:33:01.934170 (target: 09:40:00)
+2025-12-27 14:33:03,174 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:03,174 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:03,183 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:03,183 - root - INFO - [LOGS] Found 47 lines in subprocess output buffer
+2025-12-27 14:33:03,183 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:03,183 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:03,183 - root - INFO - [LOGS] Log file size: 2706 bytes
+2025-12-27 14:33:03,192 - root - INFO - [LOGS] Successfully read 21 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 21)
+2025-12-27 14:33:03,208 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:03,216 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:03] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:03,995 - root - INFO - [STRATEGY] 2025-12-27 14:33:03.995 - INFO - Fetched India VIX: 9.15 at 2025-12-27 14:33:02.027362
+2025-12-27 14:33:04,049 - root - INFO - [STRATEGY] 2025-12-27 14:33:04.049 - INFO - [CALENDAR STRATEGY] Average VIX 9.59 < 13, using wider delta range with next week hedges
+2025-12-27 14:33:04,049 - root - INFO - [STRATEGY] 2025-12-27 14:33:04.049 - INFO - Using delta range: 0.30 - 0.40, hedge points: 16, next week expiry: True
+2025-12-27 14:33:04,049 - root - INFO - [STRATEGY] Captured 50 lines so far, buffer size: 50
+2025-12-27 14:33:05,946 - root - INFO - [STRATEGY] 2025-12-27 14:33:05.946 - INFO - Fetching option chain data
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] Found 51 lines in subprocess output buffer
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:06,186 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:06,199 - root - INFO - [LOGS] Log file size: 3113 bytes
+2025-12-27 14:33:06,199 - root - INFO - [LOGS] Successfully read 25 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 25)
+2025-12-27 14:33:06,205 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:06,205 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:06] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:06,265 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:06] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:06,449 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:06] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:09,181 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:09,181 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:09,181 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:09,185 - root - INFO - [LOGS] Found 51 lines in subprocess output buffer
+2025-12-27 14:33:09,191 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:09,203 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:09,209 - root - INFO - [LOGS] Log file size: 3113 bytes
+2025-12-27 14:33:09,214 - root - INFO - [LOGS] Successfully read 25 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 25)
+2025-12-27 14:33:09,231 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:09,231 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:09] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:10,540 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.540 - INFO - Fetched 1492 options
+2025-12-27 14:33:10,564 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.564 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:10,564 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.564 - INFO - ATM strike: 26050
+2025-12-27 14:33:10,564 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.564 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:10,564 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.564 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:10,564 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.564 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:10,708 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.708 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:10,713 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.708 - INFO -
+2025-12-27 14:33:10,724 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:10,739 - root - INFO - [STRATEGY] Captured 60 lines so far, buffer size: 60
+2025-12-27 14:33:10,745 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.708 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:10,746 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.712 - INFO - best_pair exists: False
+2025-12-27 14:33:10,746 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.712 - WARNING - No suitable trading pair found.
+2025-12-27 14:33:10,746 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:10,746 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - INFO -
+2025-12-27 14:33:10,756 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:10,763 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:10,779 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - INFO - Returning best_pair: None
+2025-12-27 14:33:10,780 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - INFO - best_pair type: None
+2025-12-27 14:33:10,797 - root - INFO - [STRATEGY] 2025-12-27 14:33:10.713 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:10,805 - root - INFO - [STRATEGY] Captured 70 lines so far, buffer size: 70
+2025-12-27 14:33:11,241 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:11] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:11,248 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:11] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:12,175 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:12,175 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:12,175 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:12,175 - root - INFO - [LOGS] Found 70 lines in subprocess output buffer
+2025-12-27 14:33:12,175 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:12,191 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:12,196 - root - INFO - [LOGS] Log file size: 4623 bytes
+2025-12-27 14:33:12,196 - root - INFO - [LOGS] Successfully read 44 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 44)
+2025-12-27 14:33:12,196 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:12,196 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:12] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:15,180 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:15,185 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:15,186 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:15,186 - root - INFO - [LOGS] Found 70 lines in subprocess output buffer
+2025-12-27 14:33:15,194 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:15,195 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:15,196 - root - INFO - [LOGS] Log file size: 4623 bytes
+2025-12-27 14:33:15,202 - root - INFO - [LOGS] Successfully read 44 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 44)
+2025-12-27 14:33:15,202 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:15,203 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:15] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:16,244 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:16] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:16,259 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:16] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:18,177 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:18,177 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:18,177 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:18,177 - root - INFO - [LOGS] Found 70 lines in subprocess output buffer
+2025-12-27 14:33:18,177 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:18,191 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:18,193 - root - INFO - [LOGS] Log file size: 4623 bytes
+2025-12-27 14:33:18,193 - root - INFO - [LOGS] Successfully read 44 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 44)
+2025-12-27 14:33:18,193 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:18,193 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:18] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:20,715 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.715 - INFO - Using cached option chain data (age: 10s)
+2025-12-27 14:33:20,715 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.715 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:20,760 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.760 - INFO - ATM strike: 26050
+2025-12-27 14:33:20,760 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.760 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:20,760 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.760 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:20,760 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.760 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:20,949 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:20,949 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO -
+2025-12-27 14:33:20,957 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:20,957 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:20,957 - root - INFO - [STRATEGY] Captured 80 lines so far, buffer size: 80
+2025-12-27 14:33:20,957 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO - best_pair exists: False
+2025-12-27 14:33:20,964 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - WARNING - No suitable trading pair found.
+2025-12-27 14:33:20,965 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:20,965 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.949 - INFO -
+2025-12-27 14:33:20,965 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:20,980 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.957 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:20,980 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.957 - INFO - Returning best_pair: None
+2025-12-27 14:33:20,980 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.957 - INFO - best_pair type: None
+2025-12-27 14:33:20,980 - root - INFO - [STRATEGY] 2025-12-27 14:33:20.957 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:21,174 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:21,174 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:21,174 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:21,188 - root - INFO - [LOGS] Found 89 lines in subprocess output buffer
+2025-12-27 14:33:21,201 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:21,208 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:21,208 - root - INFO - [LOGS] Log file size: 6154 bytes
+2025-12-27 14:33:21,224 - root - INFO - [LOGS] Successfully read 63 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 63)
+2025-12-27 14:33:21,225 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:21,233 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:21] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:21,241 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:21] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:21,259 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:21] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] Found 89 lines in subprocess output buffer
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:24,189 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:24,198 - root - INFO - [LOGS] Log file size: 6154 bytes
+2025-12-27 14:33:24,206 - root - INFO - [LOGS] Successfully read 63 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 63)
+2025-12-27 14:33:24,206 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:24,206 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:24] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:26,238 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:26] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:26,251 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:26] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:27,184 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:27,188 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:27,188 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:27,188 - root - INFO - [LOGS] Found 89 lines in subprocess output buffer
+2025-12-27 14:33:27,188 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:27,214 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:27,221 - root - INFO - [LOGS] Log file size: 6154 bytes
+2025-12-27 14:33:27,221 - root - INFO - [LOGS] Successfully read 63 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 63)
+2025-12-27 14:33:27,237 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:27,240 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:27] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:30,185 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:30,185 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:30,185 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:30,185 - root - INFO - [LOGS] Found 89 lines in subprocess output buffer
+2025-12-27 14:33:30,185 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:30,200 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:30,200 - root - INFO - [LOGS] Log file size: 6154 bytes
+2025-12-27 14:33:30,200 - root - INFO - [LOGS] Successfully read 63 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 63)
+2025-12-27 14:33:30,200 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:30,200 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:30] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:30,960 - root - INFO - [STRATEGY] 2025-12-27 14:33:30.959 - INFO - Using cached option chain data (age: 20s)
+2025-12-27 14:33:30,960 - root - INFO - [STRATEGY] Captured 90 lines so far, buffer size: 90
+2025-12-27 14:33:30,960 - root - INFO - [STRATEGY] 2025-12-27 14:33:30.960 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:31,036 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.036 - INFO - ATM strike: 26050
+2025-12-27 14:33:31,045 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.036 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:31,045 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.036 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:31,045 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.036 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:31,203 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:31,203 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO -
+2025-12-27 14:33:31,203 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:31,203 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:31,203 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - best_pair exists: False
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] Captured 100 lines so far, buffer size: 100
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - WARNING - No suitable trading pair found.
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO -
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - Returning best_pair: None
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - INFO - best_pair type: None
+2025-12-27 14:33:31,219 - root - INFO - [STRATEGY] 2025-12-27 14:33:31.203 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:31,235 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:31] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:31,250 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:31] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:33,184 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:33,184 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:33,184 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:33,184 - root - INFO - [LOGS] Found 108 lines in subprocess output buffer
+2025-12-27 14:33:33,184 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:33,201 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:33,203 - root - INFO - [LOGS] Log file size: 7685 bytes
+2025-12-27 14:33:33,204 - root - INFO - [LOGS] Successfully read 82 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 82)
+2025-12-27 14:33:33,204 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:33,204 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:33] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:36,187 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:36,187 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:36,187 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:36,187 - root - INFO - [LOGS] Found 108 lines in subprocess output buffer
+2025-12-27 14:33:36,187 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:36,202 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:36,202 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:36] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:36,218 - root - INFO - [LOGS] Log file size: 7685 bytes
+2025-12-27 14:33:36,227 - root - INFO - [LOGS] Successfully read 82 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 82)
+2025-12-27 14:33:36,233 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:36,233 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:36] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:36,247 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:36] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Found 108 lines in subprocess output buffer
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Log file size: 7685 bytes
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Successfully read 82 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 82)
+2025-12-27 14:33:39,181 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:39,181 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:39] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:41,215 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.215 - INFO - Using cached option chain data (age: 31s)
+2025-12-27 14:33:41,215 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.215 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:41,215 - root - INFO - [STRATEGY] Captured 110 lines so far, buffer size: 110
+2025-12-27 14:33:41,246 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:41] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:41,263 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:41] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:41,312 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.296 - INFO - ATM strike: 26050
+2025-12-27 14:33:41,324 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.296 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:41,327 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.296 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:41,327 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.296 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:41,446 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.446 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.446 - INFO -
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.446 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.446 - INFO - best_pair exists: False
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.446 - WARNING - No suitable trading pair found.
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] Captured 120 lines so far, buffer size: 120
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - INFO -
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - INFO - Returning best_pair: None
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - INFO - best_pair type: None
+2025-12-27 14:33:41,451 - root - INFO - [STRATEGY] 2025-12-27 14:33:41.451 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:42,191 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:42,191 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:42,191 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:42,191 - root - INFO - [LOGS] Found 127 lines in subprocess output buffer
+2025-12-27 14:33:42,204 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:42,204 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:42,204 - root - INFO - [LOGS] Log file size: 9216 bytes
+2025-12-27 14:33:42,222 - root - INFO - [LOGS] Successfully read 101 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 101)
+2025-12-27 14:33:42,222 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:42,235 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:42] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Found 127 lines in subprocess output buffer
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Log file size: 9216 bytes
+2025-12-27 14:33:45,188 - root - INFO - [LOGS] Successfully read 101 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 101)
+2025-12-27 14:33:45,198 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:45,201 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:45] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:46,230 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:46] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:46,249 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:46] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:48,193 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:48,193 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:48,193 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:48,193 - root - INFO - [LOGS] Found 127 lines in subprocess output buffer
+2025-12-27 14:33:48,193 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:48,201 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:48,201 - root - INFO - [LOGS] Log file size: 9216 bytes
+2025-12-27 14:33:48,201 - root - INFO - [LOGS] Successfully read 101 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 101)
+2025-12-27 14:33:48,201 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:48,201 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:48] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:51,180 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:51,180 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:51,185 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:51,186 - root - INFO - [LOGS] Found 127 lines in subprocess output buffer
+2025-12-27 14:33:51,186 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:51,190 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:51,190 - root - INFO - [LOGS] Log file size: 9216 bytes
+2025-12-27 14:33:51,190 - root - INFO - [LOGS] Successfully read 101 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 101)
+2025-12-27 14:33:51,190 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:51,190 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:51] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:51,232 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:51] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:51,248 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:51] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:51,454 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.454 - INFO - Using cached option chain data (age: 41s)
+2025-12-27 14:33:51,455 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.454 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:51,533 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.533 - INFO - ATM strike: 26050
+2025-12-27 14:33:51,533 - root - INFO - [STRATEGY] Captured 130 lines so far, buffer size: 130
+2025-12-27 14:33:51,533 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.533 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:51,533 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.533 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:51,533 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.533 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:51,675 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:51,675 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO -
+2025-12-27 14:33:51,675 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:51,685 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - best_pair exists: False
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - WARNING - No suitable trading pair found.
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] Captured 140 lines so far, buffer size: 140
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO -
+2025-12-27 14:33:51,687 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:33:51,700 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:51,701 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - Returning best_pair: None
+2025-12-27 14:33:51,701 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - INFO - best_pair type: None
+2025-12-27 14:33:51,707 - root - INFO - [STRATEGY] 2025-12-27 14:33:51.675 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:54,183 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:54,183 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:54,192 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:54,193 - root - INFO - [LOGS] Found 146 lines in subprocess output buffer
+2025-12-27 14:33:54,193 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:54,193 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:54,193 - root - INFO - [LOGS] Log file size: 10747 bytes
+2025-12-27 14:33:54,206 - root - INFO - [LOGS] Successfully read 120 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 120)
+2025-12-27 14:33:54,207 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:54,219 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:54] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:33:56,229 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:56] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:33:56,255 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:56] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Found 146 lines in subprocess output buffer
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Log file size: 10747 bytes
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Successfully read 120 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 120)
+2025-12-27 14:33:57,181 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:33:57,197 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:33:57] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:00,185 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:00,185 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:00,185 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:00,185 - root - INFO - [LOGS] Found 146 lines in subprocess output buffer
+2025-12-27 14:34:00,185 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:00,197 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:00,202 - root - INFO - [LOGS] Log file size: 10747 bytes
+2025-12-27 14:34:00,202 - root - INFO - [LOGS] Successfully read 120 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 120)
+2025-12-27 14:34:00,213 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:00,220 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:00] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:01,235 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:01] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:34:01,244 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:01] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:34:01,680 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.680 - INFO - Using cached option chain data (age: 51s)
+2025-12-27 14:34:01,680 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.680 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:34:01,770 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.770 - INFO - ATM strike: 26050
+2025-12-27 14:34:01,770 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.770 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:34:01,770 - root - INFO - [STRATEGY] Captured 150 lines so far, buffer size: 150
+2025-12-27 14:34:01,770 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.770 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:34:01,770 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.770 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:34:01,926 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:34:01,926 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO -
+2025-12-27 14:34:01,926 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:01,932 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:34:01,932 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - best_pair exists: False
+2025-12-27 14:34:01,932 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - WARNING - No suitable trading pair found.
+2025-12-27 14:34:01,932 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:34:01,947 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO -
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] Captured 160 lines so far, buffer size: 160
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - Returning best_pair: None
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - INFO - best_pair type: None
+2025-12-27 14:34:01,951 - root - INFO - [STRATEGY] 2025-12-27 14:34:01.916 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Found 165 lines in subprocess output buffer
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Log file size: 12278 bytes
+2025-12-27 14:34:03,180 - root - INFO - [LOGS] Successfully read 139 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 139)
+2025-12-27 14:34:03,196 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:03,201 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:03] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:06,183 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:06,183 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:06,183 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Found 165 lines in subprocess output buffer
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Log file size: 12278 bytes
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Successfully read 139 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 139)
+2025-12-27 14:34:06,199 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:06,216 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:06] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:06,249 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:06] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:34:06,267 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:06] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:34:09,181 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:09,181 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:09,181 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:09,181 - root - INFO - [LOGS] Found 165 lines in subprocess output buffer
+2025-12-27 14:34:09,181 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:09,193 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:09,193 - root - INFO - [LOGS] Log file size: 12278 bytes
+2025-12-27 14:34:09,193 - root - INFO - [LOGS] Successfully read 139 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 139)
+2025-12-27 14:34:09,193 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:09,193 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:09] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:11,262 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:11] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:34:11,279 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:11] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:34:11,926 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.926 - INFO - Using cached option chain data (age: 61s)
+2025-12-27 14:34:11,926 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.926 - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:34:11,995 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.979 - INFO - ATM strike: 26050
+2025-12-27 14:34:11,995 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.979 - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:34:11,995 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.979 - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:34:11,995 - root - INFO - [STRATEGY] Captured 170 lines so far, buffer size: 170
+2025-12-27 14:34:11,995 - root - INFO - [STRATEGY] 2025-12-27 14:34:11.979 - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:34:12,128 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.122 - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:34:12,128 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.122 - INFO -
+2025-12-27 14:34:12,128 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:12,128 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:34:12,138 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - best_pair exists: False
+2025-12-27 14:34:12,138 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - WARNING - No suitable trading pair found.
+2025-12-27 14:34:12,138 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:34:12,145 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO -
+2025-12-27 14:34:12,145 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:12,145 - root - INFO - [STRATEGY] Captured 180 lines so far, buffer size: 180
+2025-12-27 14:34:12,148 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:34:12,148 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - Returning best_pair: None
+2025-12-27 14:34:12,148 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - INFO - best_pair type: None
+2025-12-27 14:34:12,148 - root - INFO - [STRATEGY] 2025-12-27 14:34:12.128 - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:34:12,186 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:12,186 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:12,186 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:12,195 - root - INFO - [LOGS] Found 184 lines in subprocess output buffer
+2025-12-27 14:34:12,195 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:12,195 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:12,197 - root - INFO - [LOGS] Log file size: 13809 bytes
+2025-12-27 14:34:12,197 - root - INFO - [LOGS] Successfully read 158 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 158)
+2025-12-27 14:34:12,197 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:12,202 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:12] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:15,779 - root - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 14:34:15,779 - root - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 14:34:15,779 - root - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:15,779 - root - INFO - [LOGS] Found 184 lines in subprocess output buffer
+2025-12-27 14:34:15,779 - root - INFO - [LOGS] Buffer preview (first 5 lines): ['[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '[ENVIRONMENT] Successfully imported AzureBlobHandler from azure_blob_logger.py', '2025-12-27 14:33:01.876 - INFO - Script started', '============================================================', 'API CREDENTIALS SETUP']
+2025-12-27 14:34:15,794 - root - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:15,794 - root - INFO - [LOGS] Log file size: 13809 bytes
+2025-12-27 14:34:15,794 - root - INFO - [LOGS] Successfully read 158 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 158)
+2025-12-27 14:34:15,794 - root - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 14:34:15,794 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:15] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 14:34:16,866 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:16] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 14:34:16,882 - werkzeug - INFO - 127.0.0.1 - - [27/Dec/2025 14:34:16] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - [CONFIG MONITOR] Shutting down gracefully...
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - [CONFIG MONITOR] Stopped monitoring config file
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - [CONFIG MONITOR] Config monitoring stopped
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - api_key : 14vxzgvarfrfxs5k
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - api_secret : 6wiefl80trb7t8psih5badkwlpijo1gd
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - request_token : cm231oOL4tU8O47o7Y6lbUMphOxtBftW
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] Captured 190 lines so far, buffer size: 190
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.504 - INFO - Account : Priti Sharma
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] [VIX ANALYSIS]
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,504 - root - INFO - [STRATEGY] [CURRENT] VIX: 9.15
+2025-12-27 14:34:18,583 - root - INFO - [STRATEGY] [AVERAGE] VIX (10 days): 9.59
+2025-12-27 14:34:18,583 - root - INFO - [STRATEGY] [TREND] [DOWN] Below Average
+2025-12-27 14:34:18,583 - root - INFO - [STRATEGY] [DIFF] -0.44 (-4.6%)
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] [HISTORY] Last 10 days VIX: 10.25, 10.06, 9.84, 9.71, 9.52, 9.68, 9.38, 9.19, 9.15, 9.15
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] [VIX-BASED DELTA RECOMMENDATION]
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] Captured 200 lines so far, buffer size: 200
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] Strategy: [CALENDAR] CALENDAR STRATEGY
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] Delta Range: 0.30 - 0.40 (VIX-based)
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] Hedge Points: 16
+2025-12-27 14:34:18,598 - root - INFO - [STRATEGY] Hedge Expiry: Next Week
+2025-12-27 14:34:18,606 - root - INFO - [STRATEGY] Reason: VIX 9.59 < 13 - using wider delta range with next week hedges
+2025-12-27 14:34:18,606 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,607 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.583 - INFO - Script started
+2025-12-27 14:34:18,608 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,608 - root - INFO - [STRATEGY] API CREDENTIALS SETUP
+2025-12-27 14:34:18,608 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,614 - root - INFO - [STRATEGY] Captured 210 lines so far, buffer size: 210
+2025-12-27 14:34:18,614 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.598 - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 14:34:18,614 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.598 - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 14:34:18,614 - root - INFO - [STRATEGY] [STRATEGY] Starting logging setup for account: Priti Sharma
+2025-12-27 14:34:18,614 - root - INFO - [STRATEGY] [STRATEGY] Azure environment: False
+2025-12-27 14:34:18,630 - root - INFO - [STRATEGY] [STRATEGY] [SETUP LOGGING] Starting logging setup - account_name=Priti Sharma, logger_name=root
+2025-12-27 14:34:18,630 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.598 - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,630 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.598 - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:34:18,630 - root - INFO - [STRATEGY] [LOG SETUP] SUCCESS: Log file created and writable: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,630 - root - INFO - [STRATEGY] [LOG SETUP] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] Captured 220 lines so far, buffer size: 220
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] [LOG SETUP] Root logger handlers: 2
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] [LOG SETUP] Named logger handlers: 2
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,646 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] [LOG] Log file exists, size: 15462 bytes
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - [LOG] Log file exists, size: 15462 bytes
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] [OK] API credentials set successfully
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - [OK] API credentials set successfully
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] Captured 230 lines so far, buffer size: 230
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.608 - INFO - today_sl: 30, Saturday
+2025-12-27 14:34:18,661 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,693 - root - INFO - [STRATEGY] TRADING QUANTITY SETUP
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] Enter Call Quantity: Enter Call Quantity (default 150): [OK] Call Quantity: 150
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] [OK] Put Quantity: 150
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] ============================================================
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.614 - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 14:34:18,708 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.614 - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 14:34:18,771 - root - INFO - [STRATEGY] Captured 240 lines so far, buffer size: 240
+2025-12-27 14:34:18,818 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.614 - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 14:34:18,862 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.630 - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 14:34:18,866 - root - INFO - [STRATEGY] 2025-12-27 14:34:18.630 - INFO - [IST TIME] Current UTC: 09:04:18, Current IST: 14:34:18.630645, IST timezone offset: +5:30

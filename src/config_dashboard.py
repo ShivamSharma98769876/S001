@@ -77,7 +77,13 @@ except (ImportError, AttributeError) as e:
         DASHBOARD_PORT = 8080
     print(f"[CONFIG] Using default config (import error: {e}): host={DASHBOARD_HOST}, port={DASHBOARD_PORT}")
 
-app = Flask(__name__)
+# Initialize Flask app with static folder support
+import os
+# Static folder is in src/static relative to this file
+static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+if not os.path.exists(static_folder):
+    os.makedirs(static_folder, exist_ok=True)
+app = Flask(__name__, static_folder=static_folder, static_url_path='/static')
 
 # Setup logging with Azure Blob Storage support
 logging.basicConfig(
@@ -257,6 +263,32 @@ def validate_kite_connection(kite_client, retry_count=2):
                     return False, f"Connection error: {str(e)[:100]}"
     
     return False, "Connection validation failed"
+
+def get_broker_id_from_auth():
+    """
+    Get broker_id from authenticated user.
+    Returns user_id or user_name from Kite profile, or falls back to account_holder_name or 'DEFAULT'.
+    """
+    global kite_client_global, account_holder_name
+    
+    # First, try to get from authenticated kite client
+    if kite_client_global and hasattr(kite_client_global, 'kite'):
+        try:
+            is_valid, profile = validate_kite_connection(kite_client_global)
+            if is_valid and profile:
+                # Prefer user_id, then user_name, then account_holder_name
+                broker_id = profile.get('user_id') or profile.get('user_name')
+                if broker_id:
+                    return str(broker_id)
+        except Exception as e:
+            logger.debug(f"Error getting broker_id from profile: {e}")
+    
+    # Fallback to account_holder_name if available
+    if account_holder_name:
+        return str(account_holder_name)
+    
+    # Final fallback to DEFAULT
+    return 'DEFAULT'
 
 def reconnect_kite_client():
     """Attempt to reconnect using saved token"""
@@ -908,9 +940,8 @@ def get_trade_history():
             db_manager = DatabaseManager()
             trade_repo = TradeRepository(db_manager)
             
-            # Get broker_id (default to 'DEFAULT' for now)
-            broker_id = 'DEFAULT'
-            # TODO: Get broker_id from authentication if available
+            # Get broker_id from authenticated user
+            broker_id = get_broker_id_from_auth()
             
             # Parse dates
             start_datetime = None
@@ -985,7 +1016,12 @@ def get_trade_history():
             }
             
             try:
-                pnl_data_path = os.path.join('src', 'pnl_data', 'daily_pnl.json')
+                # Determine pnl_data path based on environment
+                is_azure = any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME', 'WEBSITE_RESOURCE_GROUP'])
+                if is_azure:
+                    pnl_data_path = os.path.join('/tmp', 'pnl_data', 'daily_pnl.json')
+                else:
+                    pnl_data_path = os.path.join('src', 'pnl_data', 'daily_pnl.json')
                 if os.path.exists(pnl_data_path):
                     with open(pnl_data_path, 'r') as f:
                         pnl_data = json.load(f)
@@ -1035,69 +1071,182 @@ def get_trade_history():
 @app.route('/api/dashboard/cumulative-pnl')
 def get_cumulative_pnl():
     """Get cumulative P&L for different time periods"""
+    db_manager = None
     try:
         from src.database.models import DatabaseManager
         from src.database.repository import TradeRepository
         from datetime import datetime, timedelta
         
-        db_manager = DatabaseManager()
-        trade_repo = TradeRepository(db_manager)
+        # Check if day_only parameter is requested
+        day_only = request.args.get('day_only', 'false').lower() == 'true'
         
-        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        try:
+            db_manager = DatabaseManager()
+            trade_repo = TradeRepository(db_manager)
+        except Exception as db_error:
+            logger.error(f"Error initializing database: {db_error}")
+            # Return empty data if database is not available
+            if day_only:
+                return jsonify({
+                    'success': True,
+                    'metrics': {
+                        'day': {
+                            'value': 0.0,
+                            'label': 'Day'
+                        }
+                    }
+                })
+            return jsonify({
+                'success': True,
+                'metrics': {
+                    'all_time': {'value': 0.0, 'label': 'Cumulative Profit'},
+                    'year': {'value': 0.0, 'label': f'Year ({datetime.now().year})'},
+                    'month': {'value': 0.0, 'label': f'Month ({datetime.now().strftime("%b")})'},
+                    'week': {'value': 0.0, 'label': 'Week'},
+                    'day': {'value': 0.0, 'label': 'Day'}
+                }
+            })
+        
+        # Get broker_id from authenticated user
+        try:
+            broker_id = get_broker_id_from_auth()
+        except Exception as auth_error:
+            logger.warning(f"Error getting broker_id: {auth_error}, using DEFAULT")
+            broker_id = 'DEFAULT'
         
         # Calculate cumulative P&L for different periods
         now = datetime.now()
         
+        # Day-to-date (always calculated)
+        try:
+            day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            dtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=day_start)
+        except Exception as e:
+            logger.error(f"Error calculating day P&L: {e}")
+            dtd_pnl = 0.0
+        
+        if day_only:
+            # Return only day metric for frequent updates
+            if db_manager:
+                db_manager.close()
+            return jsonify({
+                'success': True,
+                'metrics': {
+                    'day': {
+                        'value': round(dtd_pnl, 2),
+                        'label': 'Day'
+                    }
+                }
+            })
+        
         # All-time cumulative
-        all_time_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id)
+        try:
+            all_time_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id)
+        except Exception as e:
+            logger.error(f"Error calculating all-time P&L: {e}")
+            all_time_pnl = 0.0
         
         # Year-to-date
-        year_start = datetime(now.year, 1, 1)
-        ytd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=year_start)
+        try:
+            year_start = datetime(now.year, 1, 1)
+            ytd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=year_start)
+        except Exception as e:
+            logger.error(f"Error calculating year P&L: {e}")
+            ytd_pnl = 0.0
         
         # Month-to-date
-        month_start = datetime(now.year, now.month, 1)
-        mtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=month_start)
+        try:
+            month_start = datetime(now.year, now.month, 1)
+            mtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=month_start)
+        except Exception as e:
+            logger.error(f"Error calculating month P&L: {e}")
+            mtd_pnl = 0.0
         
         # Week-to-date (Monday)
-        today = now.date()
-        week_start = today - timedelta(days=today.weekday())
-        week_start_datetime = datetime.combine(week_start, datetime.min.time())
-        wtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=week_start_datetime)
+        try:
+            today = now.date()
+            week_start = today - timedelta(days=today.weekday())
+            week_start_datetime = datetime.combine(week_start, datetime.min.time())
+            wtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=week_start_datetime)
+        except Exception as e:
+            logger.error(f"Error calculating week P&L: {e}")
+            wtd_pnl = 0.0
         
-        # Day-to-date
-        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        dtd_pnl = trade_repo.get_cumulative_pnl(broker_id=broker_id, start_date=day_start)
+        if db_manager:
+            db_manager.close()
         
-        db_manager.close()
-        
+        # Format response to match JavaScript expectations
         return jsonify({
-            'status': 'success',
-            'cumulativePnl': {
-                'allTime': all_time_pnl,
-                'year': ytd_pnl,
-                'month': mtd_pnl,
-                'week': wtd_pnl,
-                'day': dtd_pnl
+            'success': True,
+            'metrics': {
+                'all_time': {
+                    'value': round(all_time_pnl, 2),
+                    'label': 'Cumulative Profit'
+                },
+                'year': {
+                    'value': round(ytd_pnl, 2),
+                    'label': f'Year ({now.year})'
+                },
+                'month': {
+                    'value': round(mtd_pnl, 2),
+                    'label': f'Month ({now.strftime("%b")})'
+                },
+                'week': {
+                    'value': round(wtd_pnl, 2),
+                    'label': 'Week'
+                },
+                'day': {
+                    'value': round(dtd_pnl, 2),
+                    'label': 'Day'
+                }
             }
         })
     except ImportError:
         # Fallback if database not available
+        day_only = request.args.get('day_only', 'false').lower() == 'true'
+        if day_only:
+            return jsonify({
+                'success': True,
+                'metrics': {
+                    'day': {
+                        'value': 0.0,
+                        'label': 'Day'
+                    }
+                }
+            })
         return jsonify({
-            'status': 'success',
-            'cumulativePnl': {
-                'allTime': 0.0,
-                'year': 0.0,
-                'month': 0.0,
-                'week': 0.0,
-                'day': 0.0
+            'success': True,
+            'metrics': {
+                'all_time': {
+                    'value': 0.0,
+                    'label': 'Cumulative Profit'
+                },
+                'year': {
+                    'value': 0.0,
+                    'label': f'Year ({datetime.now().year})'
+                },
+                'month': {
+                    'value': 0.0,
+                    'label': f'Month ({datetime.now().strftime("%b")})'
+                },
+                'week': {
+                    'value': 0.0,
+                    'label': 'Week'
+                },
+                'day': {
+                    'value': 0.0,
+                    'label': 'Day'
+                }
             }
         })
     except Exception as e:
-        logger.error(f"Error in get_cumulative_pnl: {e}")
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error in get_cumulative_pnl: {e}\n{error_trace}")
         return jsonify({
-            'status': 'error',
-            'message': str(e)
+            'success': False,
+            'error': str(e),
+            'details': error_trace if logger.level <= logging.DEBUG else None
         }), 500
 
 @app.route('/api/dashboard/daily-stats')
@@ -1111,7 +1260,8 @@ def get_daily_stats():
         db_manager = DatabaseManager()
         stats_repo = DailyStatsRepository(db_manager)
         
-        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        # Get broker_id from authenticated user
+        broker_id = get_broker_id_from_auth()
         
         # Get today's stats
         today_stat = stats_repo.get_today_stats(broker_id=broker_id)
@@ -1156,6 +1306,329 @@ def get_daily_stats():
             'message': str(e)
         }), 500
 
+@app.route('/api/dashboard/sync-orders', methods=['POST'])
+def sync_orders():
+    """Sync orders from Zerodha to database"""
+    db_manager = None
+    try:
+        from src.database.models import DatabaseManager
+        from src.database.repository import TradeRepository
+        from datetime import datetime
+        
+        global kite_client_global
+        
+        if not kite_client_global or not hasattr(kite_client_global, 'kite'):
+            return jsonify({
+                'success': False,
+                'error': 'Not authenticated. Please authenticate first.'
+            }), 401
+        
+        # Get orders from Zerodha
+        try:
+            orders_response = kite_client_global.kite.orders()
+            # Handle both dict and list responses
+            if isinstance(orders_response, dict):
+                orders_list = orders_response.get('data', [])
+            elif isinstance(orders_response, list):
+                orders_list = orders_response
+            else:
+                orders_list = []
+        except Exception as e:
+            logger.error(f"Error fetching orders from Zerodha: {e}")
+            return jsonify({
+                'success': False,
+                'error': f'Failed to fetch orders from Zerodha: {str(e)}'
+            }), 500
+        
+        try:
+            db_manager = DatabaseManager()
+            trade_repo = TradeRepository(db_manager)
+        except Exception as db_error:
+            logger.error(f"Error initializing database: {db_error}")
+            return jsonify({
+                'success': False,
+                'error': f'Database error: {str(db_error)}'
+            }), 500
+        
+        # Get broker_id from authenticated user
+        try:
+            broker_id = get_broker_id_from_auth()
+        except Exception as auth_error:
+            logger.warning(f"Error getting broker_id: {auth_error}, using DEFAULT")
+            broker_id = 'DEFAULT'
+        
+        synced_count = 0
+        skipped_count = 0
+        error_count = 0
+        
+        # Process orders and create trade records
+        for order in orders_list:
+            try:
+                # Only process completed orders
+                order_status = order.get('status', '').upper()
+                if order_status not in ['COMPLETE', 'FILLED']:
+                    skipped_count += 1
+                    continue
+                
+                # Parse timestamps safely
+                try:
+                    order_timestamp = order.get('order_timestamp')
+                    if order_timestamp:
+                        if isinstance(order_timestamp, str):
+                            # Try different date formats
+                            try:
+                                entry_time = datetime.fromisoformat(order_timestamp.replace('Z', '+00:00'))
+                            except:
+                                try:
+                                    entry_time = datetime.strptime(order_timestamp, '%Y-%m-%d %H:%M:%S')
+                                except:
+                                    entry_time = datetime.strptime(order_timestamp, '%Y-%m-%dT%H:%M:%S')
+                        else:
+                            entry_time = datetime.fromtimestamp(order_timestamp)
+                    else:
+                        entry_time = datetime.now()
+                    
+                    fill_timestamp = order.get('fill_timestamp') or order.get('exchange_timestamp')
+                    if fill_timestamp:
+                        if isinstance(fill_timestamp, str):
+                            try:
+                                exit_time = datetime.fromisoformat(fill_timestamp.replace('Z', '+00:00'))
+                            except:
+                                try:
+                                    exit_time = datetime.strptime(fill_timestamp, '%Y-%m-%d %H:%M:%S')
+                                except:
+                                    exit_time = datetime.strptime(fill_timestamp, '%Y-%m-%dT%H:%M:%S')
+                        else:
+                            exit_time = datetime.fromtimestamp(fill_timestamp)
+                    else:
+                        exit_time = entry_time
+                except Exception as time_error:
+                    logger.warning(f"Error parsing timestamps for order {order.get('order_id', 'unknown')}: {time_error}")
+                    entry_time = datetime.now()
+                    exit_time = datetime.now()
+                
+                # Get required fields
+                instrument_token = str(order.get('instrument_token', order.get('instrument_token', '')))
+                trading_symbol = order.get('tradingsymbol', '')
+                exchange = order.get('exchange', 'NFO')
+                
+                if not trading_symbol:
+                    logger.warning(f"Skipping order {order.get('order_id', 'unknown')}: missing trading_symbol")
+                    skipped_count += 1
+                    continue
+                
+                # Get prices
+                entry_price = float(order.get('price', order.get('average_price', 0.0)))
+                exit_price = float(order.get('average_price', order.get('price', entry_price)))
+                
+                # Get quantity
+                filled_quantity = order.get('filled_quantity', order.get('quantity', 0))
+                quantity = abs(int(filled_quantity)) if filled_quantity else 0
+                
+                if quantity == 0:
+                    logger.warning(f"Skipping order {order.get('order_id', 'unknown')}: zero quantity")
+                    skipped_count += 1
+                    continue
+                
+                # Get transaction type
+                transaction_type = order.get('transaction_type', 'SELL').upper()
+                if transaction_type not in ['BUY', 'SELL']:
+                    transaction_type = 'SELL'
+                
+                # Calculate P&L if available, otherwise 0
+                realized_pnl = float(order.get('pnl', 0.0))
+                
+                # Check for duplicate trades (same symbol, date, and price)
+                # This is a simple check - you might want to enhance it
+                existing_trades = trade_repo.get_trades(
+                    broker_id=broker_id,
+                    start_date=entry_time.replace(hour=0, minute=0, second=0, microsecond=0),
+                    end_date=entry_time.replace(hour=23, minute=59, second=59, microsecond=999999),
+                    symbol=trading_symbol
+                )
+                
+                # Check if similar trade already exists
+                is_duplicate = False
+                for existing_trade in existing_trades:
+                    if (existing_trade.trading_symbol == trading_symbol and
+                        abs(existing_trade.entry_price - entry_price) < 0.01 and
+                        existing_trade.exit_time.date() == exit_time.date()):
+                        is_duplicate = True
+                        break
+                
+                if is_duplicate:
+                    logger.debug(f"Skipping duplicate order {order.get('order_id', 'unknown')}: {trading_symbol}")
+                    skipped_count += 1
+                    continue
+                
+                # Create trade record
+                trade_repo.create_trade(
+                    instrument_token=instrument_token,
+                    trading_symbol=trading_symbol,
+                    exchange=exchange,
+                    entry_time=entry_time,
+                    exit_time=exit_time,
+                    entry_price=entry_price,
+                    exit_price=exit_price,
+                    quantity=quantity if transaction_type == 'BUY' else -quantity,
+                    transaction_type=transaction_type,
+                    realized_pnl=realized_pnl,
+                    exit_type='synced',
+                    broker_id=broker_id
+                )
+                synced_count += 1
+                
+            except Exception as e:
+                error_count += 1
+                logger.warning(f"Error syncing order {order.get('order_id', 'unknown')}: {e}")
+                import traceback
+                logger.debug(traceback.format_exc())
+                continue
+        
+        if db_manager:
+            db_manager.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Synced {synced_count} orders',
+            'synced_count': synced_count,
+            'skipped_count': skipped_count,
+            'error_count': error_count,
+            'trades_created': synced_count
+        })
+    except ImportError as e:
+        if db_manager:
+            db_manager.close()
+        return jsonify({
+            'success': False,
+            'error': 'Database not available'
+        }), 500
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error syncing orders: {e}\n{error_trace}")
+        if db_manager:
+            db_manager.close()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/admin/panel')
+def admin_panel():
+    """Admin panel to display all configuration parameters"""
+    try:
+        import src.config as config_module
+        from datetime import time
+        
+        # Organize config parameters by category
+        config_categories = {
+            'Trading Parameters': {
+                'TARGET_DELTA_LOW': getattr(config_module, 'TARGET_DELTA_LOW', None),
+                'TARGET_DELTA_HIGH': getattr(config_module, 'TARGET_DELTA_HIGH', None),
+                'MAX_STOP_LOSS_TRIGGER': getattr(config_module, 'MAX_STOP_LOSS_TRIGGER', None),
+            },
+            'Lot Size Configuration': {
+                'LOT_SIZE': getattr(config_module, 'LOT_SIZE', None),
+            },
+            'Expiry Configuration': {
+                'NIFTY_EXPIRY_DAY': getattr(config_module, 'NIFTY_EXPIRY_DAY', None),
+                'EXPIRY_DAY': getattr(config_module, 'EXPIRY_DAY', None),
+            },
+            'Market Hours': {
+                'MARKET_START_TIME': str(getattr(config_module, 'MARKET_START_TIME', None)),
+                'MARKET_END_TIME': str(getattr(config_module, 'MARKET_END_TIME', None)),
+                'TRADING_START_TIME': str(getattr(config_module, 'TRADING_START_TIME', None)),
+            },
+            'Stop Loss Configuration': {
+                'STOP_LOSS_CONFIG': getattr(config_module, 'STOP_LOSS_CONFIG', None),
+            },
+            'API Configuration': {
+                'KITE_API_BASE_URL': getattr(config_module, 'KITE_API_BASE_URL', None),
+            },
+            'Logging Configuration': {
+                'LOG_FORMAT': getattr(config_module, 'LOG_FORMAT', None),
+                'LOG_LEVEL': getattr(config_module, 'LOG_LEVEL', None),
+            },
+            'VIX Configuration': {
+                'VIX_INSTRUMENT_TOKEN': getattr(config_module, 'VIX_INSTRUMENT_TOKEN', None),
+                'VIX_FETCH_INTERVAL': getattr(config_module, 'VIX_FETCH_INTERVAL', None),
+                'VIX_HISTORICAL_DAYS': getattr(config_module, 'VIX_HISTORICAL_DAYS', None),
+            },
+            'VIX-Based Delta Range Configuration': {
+                'VIX_DELTA_THRESHOLD': getattr(config_module, 'VIX_DELTA_THRESHOLD', None),
+                'VIX_DELTA_LOW': getattr(config_module, 'VIX_DELTA_LOW', None),
+                'VIX_DELTA_HIGH': getattr(config_module, 'VIX_DELTA_HIGH', None),
+                'VIX_HEDGE_POINTS': getattr(config_module, 'VIX_HEDGE_POINTS', None),
+                'VIX_HEDGE_POINTS_CANDR': getattr(config_module, 'VIX_HEDGE_POINTS_CANDR', None),
+            },
+            'VWAP Configuration': {
+                'VWAP_MINUTES': getattr(config_module, 'VWAP_MINUTES', None),
+                'VWAP_ENABLED': getattr(config_module, 'VWAP_ENABLED', None),
+                'VWAP_PRIORITY': getattr(config_module, 'VWAP_PRIORITY', None),
+            },
+            'Enhanced VWAP Safety Configuration': {
+                'VWAP_MIN_CANDLES': getattr(config_module, 'VWAP_MIN_CANDLES', None),
+                'VWAP_MAX_PRICE_DIFF_PERCENT': getattr(config_module, 'VWAP_MAX_PRICE_DIFF_PERCENT', None),
+                'VWAP_USE_PREVIOUS_DAY': getattr(config_module, 'VWAP_USE_PREVIOUS_DAY', None),
+                'VWAP_MAX_DAYS_BACK': getattr(config_module, 'VWAP_MAX_DAYS_BACK', None),
+            },
+            'IV Configuration': {
+                'MIN_IV_THRESHOLD': getattr(config_module, 'MIN_IV_THRESHOLD', None),
+            },
+            'Delta Range Configuration': {
+                'DELTA_MIN': getattr(config_module, 'DELTA_MIN', None),
+                'DELTA_MAX': getattr(config_module, 'DELTA_MAX', None),
+                'DELTA_MONITORING_THRESHOLD': getattr(config_module, 'DELTA_MONITORING_THRESHOLD', None),
+                'DELTA_MONITORING_ENABLED': getattr(config_module, 'DELTA_MONITORING_ENABLED', None),
+            },
+            'IV Display Configuration': {
+                'IV_DISPLAY_ENABLED': getattr(config_module, 'IV_DISPLAY_ENABLED', None),
+                'IV_CALCULATION_METHOD': getattr(config_module, 'IV_CALCULATION_METHOD', None),
+            },
+            'Hedge Configuration': {
+                'HEDGE_POINTS_DIFFERENCE': getattr(config_module, 'HEDGE_POINTS_DIFFERENCE', None),
+                'HEDGE_TRIGGER_POINTS': getattr(config_module, 'HEDGE_TRIGGER_POINTS', None),
+                'HEDGE_TRIGGER_POINTS_STRANGLE': getattr(config_module, 'HEDGE_TRIGGER_POINTS_STRANGLE', None),
+            },
+            'Price Difference Threshold': {
+                'MAX_PRICE_DIFFERENCE_PERCENTAGE': getattr(config_module, 'MAX_PRICE_DIFFERENCE_PERCENTAGE', None),
+            },
+            'Automatic Trading Configuration': {
+                'AUTO_TRADE_ENABLED': getattr(config_module, 'AUTO_TRADE_ENABLED', None),
+                'AUTO_TRADE_MIN_SCORE': getattr(config_module, 'AUTO_TRADE_MIN_SCORE', None),
+                'AUTO_TRADE_CONFIRMATION': getattr(config_module, 'AUTO_TRADE_CONFIRMATION', None),
+            },
+            'Rate Limiting and API Management': {
+                'API_RATE_LIMIT_DELAY': getattr(config_module, 'API_RATE_LIMIT_DELAY', None),
+                'API_MAX_RETRIES': getattr(config_module, 'API_MAX_RETRIES', None),
+                'API_RETRY_DELAY': getattr(config_module, 'API_RETRY_DELAY', None),
+                'OPTION_CHAIN_CACHE_DURATION': getattr(config_module, 'OPTION_CHAIN_CACHE_DURATION', None),
+                'LTP_CACHE_DURATION': getattr(config_module, 'LTP_CACHE_DURATION', None),
+                'VWAP_CACHE_DURATION': getattr(config_module, 'VWAP_CACHE_DURATION', None),
+            },
+            'Profit Booking Configuration': {
+                'INITIAL_PROFIT_BOOKING': getattr(config_module, 'INITIAL_PROFIT_BOOKING', None),
+                'SECOND_PROFIT_BOOKING': getattr(config_module, 'SECOND_PROFIT_BOOKING', None),
+            },
+            'Dashboard Configuration': {
+                'DASHBOARD_HOST': getattr(config_module, 'DASHBOARD_HOST', None),
+                'DASHBOARD_PORT': getattr(config_module, 'DASHBOARD_PORT', None),
+            },
+            'Azure Blob Storage Configuration': {
+                'AZURE_BLOB_ACCOUNT_NAME': getattr(config_module, 'AZURE_BLOB_ACCOUNT_NAME', '') or 'Not Set',
+                'AZURE_BLOB_STORAGE_KEY': '***' if getattr(config_module, 'AZURE_BLOB_STORAGE_KEY', '') else 'Not Set',
+                'AZURE_BLOB_CONTAINER_NAME': getattr(config_module, 'AZURE_BLOB_CONTAINER_NAME', '') or 'Not Set',
+                'AZURE_BLOB_LOGGING_ENABLED': getattr(config_module, 'AZURE_BLOB_LOGGING_ENABLED', False),
+            },
+        }
+        
+        return render_template('admin_panel.html', config_categories=config_categories)
+    except Exception as e:
+        logger.error(f"Error loading admin panel: {e}")
+        import traceback
+        return f"Error loading admin panel: {str(e)}<br><pre>{traceback.format_exc()}</pre>", 500
+
 @app.route('/api/dashboard/pnl-calendar')
 def get_pnl_calendar():
     """Get P&L data for calendar heatmap"""
@@ -1167,7 +1640,8 @@ def get_pnl_calendar():
         db_manager = DatabaseManager()
         trade_repo = TradeRepository(db_manager)
         
-        broker_id = 'DEFAULT'  # TODO: Get from authentication
+        # Get broker_id from authenticated user
+        broker_id = get_broker_id_from_auth()
         
         # Get date range from query params
         start_date_str = request.args.get('start_date')
@@ -1202,9 +1676,23 @@ def get_pnl_calendar():
         
         db_manager.close()
         
+        # Convert daily_pnl to the format expected by JavaScript
+        # JavaScript expects: { success: true, data: [{ date, paper_pnl, live_pnl, paper_trades, live_trades }] }
+        calendar_data = []
+        for item in daily_pnl:
+            # For now, all P&L is treated as "live" since we don't have paper/live distinction
+            calendar_data.append({
+                'date': item['date'],
+                'paper_pnl': 0.0,  # Not implemented yet
+                'live_pnl': item['pnl'],
+                'paper_trades': 0,  # Not implemented yet
+                'live_trades': item['trades_count']
+            })
+        
         return jsonify({
-            'status': 'success',
-            'pnlByDate': pnl_by_date,
+            'success': True,
+            'data': calendar_data,
+            'pnlByDate': pnl_by_date,  # Keep for backward compatibility
             'summary': {
                 'realisedPnl': round(total_realized_pnl, 2),
                 'paperPnl': 0.0,  # Not implemented yet
@@ -1218,7 +1706,8 @@ def get_pnl_calendar():
         })
     except ImportError:
         return jsonify({
-            'status': 'success',
+            'success': True,
+            'data': [],
             'pnlByDate': {},
             'summary': {
                 'realisedPnl': 0.0,
@@ -1228,10 +1717,13 @@ def get_pnl_calendar():
             }
         })
     except Exception as e:
-        logger.error(f"Error in get_pnl_calendar: {e}")
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error in get_pnl_calendar: {e}\n{error_trace}")
         return jsonify({
-            'status': 'error',
-            'message': str(e)
+            'success': False,
+            'error': str(e),
+            'data': []
         }), 500
 
 @app.route('/api/dashboard/pnl-chart')
@@ -2279,6 +2771,89 @@ def auth_status():
         logging.error(f"[AUTH] Error checking auth status: {e}")
         return jsonify({
             'authenticated': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/auth/details', methods=['GET'])
+def get_auth_details():
+    """Get authentication details for display in widget"""
+    try:
+        global kite_api_key, kite_api_secret, kite_client_global, account_holder_name
+        
+        details = {
+            'api_key': kite_api_key or 'Not set',
+            'api_secret': '••••••••' if kite_api_secret else 'Not set',
+            'access_token': '••••••••' if (kite_client_global and hasattr(kite_client_global, 'access_token') and kite_client_global.access_token) else 'Not set',
+            'user_id': None,
+            'account_name': account_holder_name or 'Not set'
+        }
+        
+        # Try to get user ID from profile
+        if kite_client_global and hasattr(kite_client_global, 'kite'):
+            try:
+                is_valid, profile = validate_kite_connection(kite_client_global)
+                if is_valid and profile:
+                    details['user_id'] = profile.get('user_id') or profile.get('user_name') or 'Not available'
+                    details['account_name'] = profile.get('user_name') or account_holder_name or 'Not set'
+            except:
+                pass
+        
+        return jsonify({
+            'success': True,
+            'details': details
+        })
+    except Exception as e:
+        logger.error(f"Error getting auth details: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/user/profile', methods=['GET'])
+def get_user_profile():
+    """Get user profile information (user ID and name)"""
+    try:
+        global kite_client_global, account_holder_name
+        
+        # Check authentication
+        if not kite_client_global or not hasattr(kite_client_global, 'kite'):
+            return jsonify({
+                'success': False,
+                'error': 'Not authenticated'
+            }), 401
+        
+        # Get profile from Kite
+        try:
+            is_valid, profile = validate_kite_connection(kite_client_global)
+            if is_valid and profile:
+                user_id = profile.get('user_id') or profile.get('user_name') or 'Not available'
+                user_name = profile.get('user_name') or account_holder_name or 'Not set'
+                
+                return jsonify({
+                    'success': True,
+                    'profile': {
+                        'user_id': user_id,
+                        'user_name': user_name,
+                        'user_shortname': user_name.split()[0] if user_name else 'User',
+                        'email': profile.get('email', 'N/A')
+                    },
+                    'raw_profile': profile
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to get profile'
+                }), 401
+        except Exception as e:
+            logger.error(f"Error getting user profile: {e}")
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+    except Exception as e:
+        logger.error(f"Error in get_user_profile: {e}")
+        return jsonify({
+            'success': False,
             'error': str(e)
         }), 500
 

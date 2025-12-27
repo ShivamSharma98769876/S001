@@ -366,7 +366,22 @@ class DailyStatsRepository:
         """Update daily stat fields"""
         session = self.db_manager.get_session()
         try:
-            daily_stat = self.get_or_create_daily_stat(stat_date, broker_id)
+            # Query the object in the current session (don't use get_or_create_daily_stat)
+            daily_stat = session.query(DailyStats).filter(
+                and_(
+                    DailyStats.broker_id == broker_id,
+                    DailyStats.date == stat_date
+                )
+            ).first()
+            
+            if not daily_stat:
+                # Create new if it doesn't exist
+                daily_stat = DailyStats(
+                    broker_id=broker_id,
+                    date=stat_date,
+                    daily_loss_limit=5000.0
+                )
+                session.add(daily_stat)
             
             # Update fields from kwargs
             for key, value in kwargs.items():

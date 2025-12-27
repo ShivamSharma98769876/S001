@@ -471,7 +471,7 @@ Currently, Strangle10Points uses **file-based storage** (JSON/CSV), while discip
 - ❌ No efficient filtering or aggregation
 
 **Required State:**
-- ✅ SQLite database (`data/risk_management.db`)
+- ✅ SQLite database (`data/strangle.db`)
 - ✅ SQLAlchemy ORM models
 - ✅ Tables: `trades`, `positions`, `daily_stats`, `audit_logs`
 - ✅ Efficient queries for cumulative P&L, filtering, date ranges

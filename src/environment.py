@@ -119,6 +119,41 @@ def is_azure_environment():
     ]
     return any(os.getenv(var) for var in azure_indicators)
 
+def get_data_directory(subdir: str = 'data') -> str:
+    """
+    Get the appropriate data directory based on environment.
+    Returns a writable directory path for both local and Azure environments.
+    
+    Args:
+        subdir: Subdirectory name (e.g., 'data', 'pnl_data', 'logs')
+        
+    Returns:
+        Full path to the data directory
+    """
+    if is_azure_environment():
+        # Azure: Use /tmp directory (writable in Azure App Service)
+        data_dir = os.path.join('/tmp', subdir)
+    else:
+        # Local: Use project-relative path
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        data_dir = os.path.join(parent_dir, subdir)
+    
+    # Create directory if it doesn't exist
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+    except (OSError, PermissionError) as e:
+        # Fallback to current directory if creation fails
+        logging.warning(f"Could not create data directory {data_dir}: {e}. Using current directory.")
+        data_dir = os.path.join(os.getcwd(), subdir)
+        try:
+            os.makedirs(data_dir, exist_ok=True)
+        except Exception:
+            # Last resort: use current directory
+            data_dir = os.getcwd()
+    
+    return data_dir
+
 def sanitize_account_name_for_filename(account_name):
     """
     Sanitize account name for use in filenames

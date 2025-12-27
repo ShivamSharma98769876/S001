@@ -1,0 +1,391 @@
+2025-12-27 14:33:01.916 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01.916 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:33:01.916 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01.916 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 14:33:01.916 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:33:01.916 - root - INFO - [LOG] Log file exists, size: 841 bytes
+2025-12-27 14:33:01.916 - root - INFO - [OK] API credentials set successfully
+2025-12-27 14:33:01.916 - root - INFO - today_sl: 30, Saturday
+2025-12-27 14:33:01.934 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 14:33:01.934 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 14:33:01.934 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 14:33:01.934 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 14:33:01.934 - root - INFO - [IST TIME] Current UTC: 09:03:01, Current IST: 14:33:01.934170, IST timezone offset: +5:30
+2025-12-27 14:33:01.934 - root - INFO - [STARTUP] Strategy started at IST time: 14:33:01.934170
+2025-12-27 14:33:01.934 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:33:01.934 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 14:33:01.934170
+2025-12-27 14:33:01.934 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 14:33:02.027 - root - INFO - Underlying price: 26042.3
+2025-12-27 14:33:02.027 - root - INFO - [TIME CHECK] Current IST time: 14:33:01.934170, Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:33:02.027 - root - INFO - [TIME CHECK] Time comparison: 14:33:01.934170 >= 09:40:00 = True
+2025-12-27 14:33:02.027 - root - INFO - [TRADING START] Executing trade at IST time: 14:33:01.934170 (target: 09:40:00)
+2025-12-27 14:33:03.995 - root - INFO - Fetched India VIX: 9.15 at 2025-12-27 14:33:02.027362
+2025-12-27 14:33:04.049 - root - INFO - [CALENDAR STRATEGY] Average VIX 9.59 < 13, using wider delta range with next week hedges
+2025-12-27 14:33:04.049 - root - INFO - Using delta range: 0.30 - 0.40, hedge points: 16, next week expiry: True
+2025-12-27 14:33:05.946 - root - INFO - Fetching option chain data
+2025-12-27 14:33:10.540 - root - INFO - Fetched 1492 options
+2025-12-27 14:33:10.564 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:10.564 - root - INFO - ATM strike: 26050
+2025-12-27 14:33:10.564 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:10.564 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:10.564 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:10.708 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:10.708 - root - INFO - 
+============================================================
+2025-12-27 14:33:10.708 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:10.712 - root - INFO - best_pair exists: False
+2025-12-27 14:33:10.712 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:33:10.713 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:10.713 - root - INFO - 
+============================================================
+2025-12-27 14:33:10.713 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:10.713 - root - INFO - Returning best_pair: None
+2025-12-27 14:33:10.713 - root - INFO - best_pair type: None
+2025-12-27 14:33:10.713 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:20.715 - root - INFO - Using cached option chain data (age: 10s)
+2025-12-27 14:33:20.715 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:20.760 - root - INFO - ATM strike: 26050
+2025-12-27 14:33:20.760 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:20.760 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:20.760 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:20.949 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:20.949 - root - INFO - 
+============================================================
+2025-12-27 14:33:20.949 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:20.949 - root - INFO - best_pair exists: False
+2025-12-27 14:33:20.949 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:33:20.949 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:20.949 - root - INFO - 
+============================================================
+2025-12-27 14:33:20.957 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:20.957 - root - INFO - Returning best_pair: None
+2025-12-27 14:33:20.957 - root - INFO - best_pair type: None
+2025-12-27 14:33:20.957 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:30.959 - root - INFO - Using cached option chain data (age: 20s)
+2025-12-27 14:33:30.960 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:31.036 - root - INFO - ATM strike: 26050
+2025-12-27 14:33:31.036 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:31.036 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:31.036 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:31.203 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:31.203 - root - INFO - 
+============================================================
+2025-12-27 14:33:31.203 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:31.203 - root - INFO - best_pair exists: False
+2025-12-27 14:33:31.203 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:33:31.203 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:31.203 - root - INFO - 
+============================================================
+2025-12-27 14:33:31.203 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:31.203 - root - INFO - Returning best_pair: None
+2025-12-27 14:33:31.203 - root - INFO - best_pair type: None
+2025-12-27 14:33:31.203 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:41.215 - root - INFO - Using cached option chain data (age: 31s)
+2025-12-27 14:33:41.215 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:41.296 - root - INFO - ATM strike: 26050
+2025-12-27 14:33:41.296 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:41.296 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:41.296 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:41.446 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:41.446 - root - INFO - 
+============================================================
+2025-12-27 14:33:41.446 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:41.446 - root - INFO - best_pair exists: False
+2025-12-27 14:33:41.446 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:33:41.451 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:41.451 - root - INFO - 
+============================================================
+2025-12-27 14:33:41.451 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:41.451 - root - INFO - Returning best_pair: None
+2025-12-27 14:33:41.451 - root - INFO - best_pair type: None
+2025-12-27 14:33:41.451 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:33:51.454 - root - INFO - Using cached option chain data (age: 41s)
+2025-12-27 14:33:51.454 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:33:51.533 - root - INFO - ATM strike: 26050
+2025-12-27 14:33:51.533 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:33:51.533 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:33:51.533 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:33:51.675 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:33:51.675 - root - INFO - 
+============================================================
+2025-12-27 14:33:51.675 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:33:51.675 - root - INFO - best_pair exists: False
+2025-12-27 14:33:51.675 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:33:51.675 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:33:51.675 - root - INFO - 
+============================================================
+2025-12-27 14:33:51.675 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:33:51.675 - root - INFO - Returning best_pair: None
+2025-12-27 14:33:51.675 - root - INFO - best_pair type: None
+2025-12-27 14:33:51.675 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:34:01.680 - root - INFO - Using cached option chain data (age: 51s)
+2025-12-27 14:34:01.680 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:34:01.770 - root - INFO - ATM strike: 26050
+2025-12-27 14:34:01.770 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:34:01.770 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:34:01.770 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:34:01.916 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:34:01.916 - root - INFO - 
+============================================================
+2025-12-27 14:34:01.916 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:34:01.916 - root - INFO - best_pair exists: False
+2025-12-27 14:34:01.916 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:34:01.916 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:34:01.916 - root - INFO - 
+============================================================
+2025-12-27 14:34:01.916 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:34:01.916 - root - INFO - Returning best_pair: None
+2025-12-27 14:34:01.916 - root - INFO - best_pair type: None
+2025-12-27 14:34:01.916 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:34:11.926 - root - INFO - Using cached option chain data (age: 61s)
+2025-12-27 14:34:11.926 - root - INFO - [EXPIRY] Using current Tuesday expiry: 2025-12-30
+2025-12-27 14:34:11.979 - root - INFO - ATM strike: 26050
+2025-12-27 14:34:11.979 - root - INFO - Finding strikes with initial delta range 0.3 to 0.4 within 25550 to 26550
+2025-12-27 14:34:11.979 - root - INFO - Enhanced VWAP analysis enabled (Min Candles: 150, Max Diff: 15%)
+2025-12-27 14:34:11.979 - root - INFO - Delta monitoring threshold: 0.225 (will modify SL if delta goes below this)
+2025-12-27 14:34:12.122 - root - INFO - SKIPPED: NIFTY25DEC26150CE | NIFTY25DEC25950PE Price:| 32 24.5 | Price Diff: 26.55% > 1.5%
+2025-12-27 14:34:12.122 - root - INFO - 
+============================================================
+2025-12-27 14:34:12.128 - root - INFO - [FLOW] CHECKING BEST PAIR SELECTION:
+2025-12-27 14:34:12.128 - root - INFO - best_pair exists: False
+2025-12-27 14:34:12.128 - root - WARNING - No suitable trading pair found.
+2025-12-27 14:34:12.128 - root - INFO - [FLOW] best_pair_info was None - this is why auto-trade didn't execute
+2025-12-27 14:34:12.128 - root - INFO - 
+============================================================
+2025-12-27 14:34:12.128 - root - INFO - [FLOW] RETURNING FROM find_strikes:
+2025-12-27 14:34:12.128 - root - INFO - Returning best_pair: None
+2025-12-27 14:34:12.128 - root - INFO - best_pair type: None
+2025-12-27 14:34:12.128 - root - WARNING - No suitable strikes found. Retrying...
+2025-12-27 14:34:18.504 - root - INFO - [CONFIG MONITOR] Shutting down gracefully...
+2025-12-27 14:34:18.504 - root - INFO - [CONFIG MONITOR] Stopped monitoring config file
+2025-12-27 14:34:18.504 - root - INFO - [CONFIG MONITOR] Config monitoring stopped
+2025-12-27 14:34:18.504 - root - INFO - api_key : 14vxzgvarfrfxs5k
+2025-12-27 14:34:18.504 - root - INFO - api_secret : 6wiefl80trb7t8psih5badkwlpijo1gd
+2025-12-27 14:34:18.504 - root - INFO - request_token : cm231oOL4tU8O47o7Y6lbUMphOxtBftW
+2025-12-27 14:34:18.504 - root - INFO - Account : Priti Sharma
+2025-12-27 14:34:18.583 - root - INFO - Script started
+2025-12-27 14:34:18.598 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 14:34:18.598 - root - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 14:34:18.598 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18.598 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 14:34:18.608 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18.608 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 14:34:18.608 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 14:34:18.608 - root - INFO - [LOG] Log file exists, size: 15462 bytes
+2025-12-27 14:34:18.608 - root - INFO - [OK] API credentials set successfully
+2025-12-27 14:34:18.608 - root - INFO - today_sl: 30, Saturday
+2025-12-27 14:34:18.614 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 14:34:18.614 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 14:34:18.614 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 14:34:18.630 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 14:34:18.630 - root - INFO - [IST TIME] Current UTC: 09:04:18, Current IST: 14:34:18.630645, IST timezone offset: +5:30
+2025-12-27 14:34:18.630 - root - INFO - [STARTUP] Strategy started at IST time: 14:34:18.630645
+2025-12-27 14:34:18.630 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:34:18.630 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 14:34:18.630645
+2025-12-27 14:34:18.630 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 14:34:18.630 - root - INFO - Underlying price: 26042.3
+2025-12-27 14:34:18.630 - root - INFO - [TIME CHECK] Current IST time: 14:34:18.630645, Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 14:34:18.630 - root - INFO - [TIME CHECK] Time comparison: 14:34:18.630645 >= 09:40:00 = True
+2025-12-27 14:34:18.630 - root - INFO - [TRADING START] Executing trade at IST time: 14:34:18.630645 (target: 09:40:00)
+2025-12-27 20:28:06.786 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:06.787 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:28:06.791 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:06.791 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:28:06.791 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:06.791 - root - INFO - [LOG] Log file exists, size: 18170 bytes
+2025-12-27 20:28:06.791 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:28:06.791 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:28:06.804 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:28:06.817 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:28:06.818 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:28:06.819 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:28:06.819 - root - INFO - [IST TIME] Current UTC: 14:58:06, Current IST: 20:28:06.819622, IST timezone offset: +5:30
+2025-12-27 20:28:06.819 - root - INFO - [STARTUP] Strategy started at IST time: 20:28:06.819622
+2025-12-27 20:28:06.820 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:28:06.820 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:28:06.819622
+2025-12-27 20:28:06.821 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:28:06.939 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:28:06.939 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:28:06.952 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:28:07.052 - src.database.repository - ERROR - Error updating daily stat: Instance '<DailyStats at 0x1b9aa137ce0>' is not persistent within this Session
+2025-12-27 20:28:07.053 - root - ERROR - Error saving to database: Instance '<DailyStats at 0x1b9aa137ce0>' is not persistent within this Session
+2025-12-27 20:28:07.053 - root - ERROR - Error saving to database: Instance '<DailyStats at 0x1b9aa137ce0>' is not persistent within this Session
+2025-12-27 20:28:07.057 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:28:07.057 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:28:07.057 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:28:07.057 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:28:07.057 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:28:07.124 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:28:07.124 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:28:07.225 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed
+2025-12-27 20:28:07.225 - root - INFO - [CONFIG MONITOR] Stopped monitoring config file
+2025-12-27 20:28:07.225 - root - INFO - api_key : 14vxzgvarfrfxs5k
+2025-12-27 20:28:07.225 - root - INFO - api_secret : 6wiefl80trb7t8psih5badkwlpijo1gd
+2025-12-27 20:28:07.225 - root - INFO - request_token : cm231oOL4tU8O47o7Y6lbUMphOxtBftW
+2025-12-27 20:28:07.225 - root - INFO - Account : Priti Sharma
+2025-12-27 20:28:08.867 - root - INFO - Fetched India VIX: 9.15 at 2025-12-27 20:28:07.225314
+2025-12-27 20:28:08.955 - root - INFO - Script started
+2025-12-27 20:28:08.955 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:28:08.955 - root - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 20:28:08.955 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:08.955 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:28:08.972 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:08.972 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:28:08.972 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:28:08.972 - root - INFO - [LOG] Log file exists, size: 22680 bytes
+2025-12-27 20:28:08.972 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:28:08.972 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:28:08.972 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:28:08.972 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:28:08.982 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:28:08.982 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:28:08.982 - root - INFO - [STARTUP] Strategy started at IST time: 20:28:08.982129
+2025-12-27 20:28:08.983 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:28:08.983 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:28:08.982129
+2025-12-27 20:28:08.984 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:28:08.984 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:28:08.984 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:28:08.988 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:28:09.121 - src.database.repository - ERROR - Error updating daily stat: Instance '<DailyStats at 0x1b9aa30a8a0>' is not persistent within this Session
+2025-12-27 20:28:09.121 - root - ERROR - Error saving to database: Instance '<DailyStats at 0x1b9aa30a8a0>' is not persistent within this Session
+2025-12-27 20:28:09.121 - root - ERROR - Error saving to database: Instance '<DailyStats at 0x1b9aa30a8a0>' is not persistent within this Session
+2025-12-27 20:28:09.128 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:28:09.131 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:28:09.131 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:28:09.132 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:28:09.132 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:28:09.198 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:28:09.198 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:28:09.254 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed
+2025-12-27 20:35:09.373 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:09.373 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:35:09.389 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:09.389 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:35:09.389 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:09.389 - root - INFO - [LOG] Log file exists, size: 26321 bytes
+2025-12-27 20:35:09.389 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:35:09.389 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:35:09.389 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:35:09.406 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:35:09.406 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:35:09.406 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:35:09.406 - root - INFO - [IST TIME] Current UTC: 15:05:09, Current IST: 20:35:09.406677, IST timezone offset: +5:30
+2025-12-27 20:35:09.406 - root - INFO - [STARTUP] Strategy started at IST time: 20:35:09.406677
+2025-12-27 20:35:09.406 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:35:09.406 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:35:09.406677
+2025-12-27 20:35:09.406 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:35:09.556 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:35:09.556 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:35:09.561 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:35:09.684 - root - INFO - [P&L RECORD] Saved to database: DEFAULT
+2025-12-27 20:35:09.687 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:35:09.690 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:35:09.690 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:35:09.691 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:35:09.691 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:35:09.744 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:35:09.744 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:35:09.823 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed
+2025-12-27 20:35:09.824 - root - INFO - [CONFIG MONITOR] Stopped monitoring config file
+2025-12-27 20:35:09.824 - root - INFO - api_key : 14vxzgvarfrfxs5k
+2025-12-27 20:35:09.824 - root - INFO - api_secret : 6wiefl80trb7t8psih5badkwlpijo1gd
+2025-12-27 20:35:09.824 - root - INFO - request_token : cm231oOL4tU8O47o7Y6lbUMphOxtBftW
+2025-12-27 20:35:09.824 - root - INFO - Account : Priti Sharma
+2025-12-27 20:35:11.457 - root - INFO - Fetched India VIX: 9.15 at 2025-12-27 20:35:09.824871
+2025-12-27 20:35:11.493 - root - INFO - Script started
+2025-12-27 20:35:11.493 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:35:11.493 - root - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 20:35:11.503 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:11.503 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:35:11.510 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:11.510 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:35:11.510 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:35:11.510 - root - INFO - [LOG] Log file exists, size: 30451 bytes
+2025-12-27 20:35:11.510 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:35:11.510 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:35:11.510 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:35:11.510 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:35:11.510 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:35:11.510 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:35:11.510 - root - INFO - [STARTUP] Strategy started at IST time: 20:35:11.510170
+2025-12-27 20:35:11.510 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:35:11.510 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:35:11.510170
+2025-12-27 20:35:11.510 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:35:11.510 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:35:11.510 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:35:11.510 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:35:11.657 - root - INFO - [P&L RECORD] Saved to database: DEFAULT
+2025-12-27 20:35:11.658 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:35:11.659 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:35:11.659 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:35:11.659 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:35:11.659 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:35:11.726 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:35:11.727 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:35:11.790 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed
+2025-12-27 20:40:19.175 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:19.175 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:40:19.175 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:19.175 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:40:19.175 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:19.175 - root - INFO - [LOG] Log file exists, size: 33712 bytes
+2025-12-27 20:40:19.175 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:40:19.175 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:40:19.190 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:40:19.192 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:40:19.192 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:40:19.192 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:40:19.192 - root - INFO - [IST TIME] Current UTC: 15:10:19, Current IST: 20:40:19.192148, IST timezone offset: +5:30
+2025-12-27 20:40:19.192 - root - INFO - [STARTUP] Strategy started at IST time: 20:40:19.192148
+2025-12-27 20:40:19.192 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:40:19.192 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:40:19.192148
+2025-12-27 20:40:19.192 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:40:19.292 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:40:19.292 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:40:19.303 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:40:19.442 - root - INFO - [P&L RECORD] Saved to database: DEFAULT
+2025-12-27 20:40:19.442 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:40:19.442 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:40:19.442 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:40:19.442 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:40:19.442 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:40:19.508 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:40:19.508 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:40:19.608 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed
+2025-12-27 20:40:19.608 - root - INFO - [CONFIG MONITOR] Stopped monitoring config file
+2025-12-27 20:40:19.608 - root - INFO - api_key : 14vxzgvarfrfxs5k
+2025-12-27 20:40:19.608 - root - INFO - api_secret : 6wiefl80trb7t8psih5badkwlpijo1gd
+2025-12-27 20:40:19.608 - root - INFO - request_token : cm231oOL4tU8O47o7Y6lbUMphOxtBftW
+2025-12-27 20:40:19.608 - root - INFO - Account : Priti Sharma
+2025-12-27 20:40:21.274 - root - INFO - Fetched India VIX: 9.15 at 2025-12-27 20:40:19.608342
+2025-12-27 20:40:21.353 - root - INFO - Script started
+2025-12-27 20:40:21.357 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:40:21.357 - root - INFO - [P&L RECORDER] Initialized - will save daily P&L before market close
+2025-12-27 20:40:21.357 - root - INFO - [LOG SETUP] Log file created at: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:21.357 - root - INFO - [LOG SETUP] Log directory: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs
+2025-12-27 20:40:21.357 - root - INFO - [ENV] Running locally - Log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:21.357 - root - INFO - [ENV] Account name: Priti Sharma
+2025-12-27 20:40:21.357 - root - INFO - [LOG] Log file path: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:40:21.357 - root - INFO - [LOG] Log file exists, size: 37842 bytes
+2025-12-27 20:40:21.357 - root - INFO - [OK] API credentials set successfully
+2025-12-27 20:40:21.357 - root - INFO - today_sl: 30, Saturday
+2025-12-27 20:40:21.357 - root - INFO - [CONFIG MONITOR] Backed up 12 parameters
+2025-12-27 20:40:21.357 - root - INFO - [CONFIG MONITOR] Started monitoring: config.py
+2025-12-27 20:40:21.367 - root - INFO - [CONFIG MONITOR] Monitored parameters: VIX_HEDGE_POINTS_CANDR, HEDGE_TRIGGER_POINTS_STRANGLE, TARGET_DELTA_LOW, TARGET_DELTA_HIGH, VIX_DELTA_LOW, VIX_DELTA_HIGH, VIX_DELTA_THRESHOLD, STOP_LOSS_CONFIG, VWAP_MAX_PRICE_DIFF_PERCENT, DELTA_MONITORING_THRESHOLD, INITIAL_PROFIT_BOOKING, SECOND_PROFIT_BOOKING
+2025-12-27 20:40:21.367 - root - INFO - [CONFIG MONITOR] Real-time config monitoring enabled
+2025-12-27 20:40:21.367 - root - INFO - [STARTUP] Strategy started at IST time: 20:40:21.367633
+2025-12-27 20:40:21.367 - root - INFO - [STARTUP] Trading start time: 09:40:00, Market end time: 14:50:00
+2025-12-27 20:40:21.367 - root - WARNING - [STARTUP] Strategy started AFTER trading start time (09:40:00). Current time: 20:40:21.367633
+2025-12-27 20:40:21.367 - root - WARNING - [STARTUP] Will proceed to execute trade immediately if market is still open
+2025-12-27 20:40:21.368 - root - INFO - Underlying price: 26042.3
+2025-12-27 20:40:21.368 - root - WARNING - [MARKET CLOSED] Skipping new trade execution - market end time reached
+2025-12-27 20:40:21.372 - root - INFO - [P&L RECORDER] Database mode enabled
+2025-12-27 20:40:21.457 - root - INFO - [P&L RECORD] Saved to database: DEFAULT
+2025-12-27 20:40:21.457 - root - INFO - [P&L RECORD] Saved to JSON: pnl_data\daily_pnl.json
+2025-12-27 20:40:21.457 - root - INFO - [P&L  RECORD] Saved to CSV: pnl_data\daily_pnl.csv
+2025-12-27 20:40:21.457 - root - INFO - [P&L RECORD] Saved daily P&L: Non-Equity: ₹0.00, Total: ₹0.00, Positions: 0
+2025-12-27 20:40:21.457 - root - INFO - [MARKET CLOSE] Daily P&L saved successfully
+2025-12-27 20:40:21.457 - root - INFO - [MARKET CLOSE] Starting to cancel all SL orders...
+2025-12-27 20:40:21.557 - root - INFO - [MARKET CLOSE] No orders found to cancel
+2025-12-27 20:40:21.557 - root - INFO - [MARKET CLOSE] Starting to square off all non-equity positions...
+2025-12-27 20:40:21.618 - root - INFO - [MARKET CLOSE] Square off complete: 0 positions squared off, 0 failed

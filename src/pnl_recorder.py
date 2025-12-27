@@ -5,6 +5,7 @@ Saves daily P&L data for non-equity trades to local files and/or database
 import json
 import csv
 import logging
+import os
 from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -22,17 +23,32 @@ except ImportError:
 class PnLRecorder:
     """Records and manages daily P&L data"""
     
-    def __init__(self, data_dir: str = "pnl_data", use_database: bool = True, broker_id: str = 'DEFAULT'):
+    def __init__(self, data_dir: str = None, use_database: bool = True, broker_id: str = 'DEFAULT'):
         """
         Initialize P&L Recorder
         
         Args:
-            data_dir: Directory to store P&L data files (for backward compatibility)
+            data_dir: Directory to store P&L data files (for backward compatibility). 
+                     If None, uses 'pnl_data' (local) or '/tmp/pnl_data' (Azure)
             use_database: If True, save to database. If False, save to files only.
             broker_id: Broker ID for database records (default: 'DEFAULT')
         """
+        # Determine data directory based on environment
+        if data_dir is None:
+            # Check if running in Azure environment
+            is_azure = any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME', 'WEBSITE_RESOURCE_GROUP'])
+            if is_azure:
+                data_dir = '/tmp/pnl_data'
+            else:
+                data_dir = 'pnl_data'
+        
         self.data_dir = Path(data_dir)
-        self.data_dir.mkdir(exist_ok=True)
+        try:
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            logging.warning(f"Could not create data directory {data_dir}: {e}. Using current directory.")
+            self.data_dir = Path('.')
+        
         self.json_file = self.data_dir / "daily_pnl.json"
         self.csv_file = self.data_dir / "daily_pnl.csv"
         

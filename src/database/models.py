@@ -126,26 +126,48 @@ class DatabaseManager:
         Initialize database manager
         
         Args:
-            db_path: Path to SQLite database file. Defaults to 'data/risk_management.db'
+            db_path: Path to SQLite database file. Defaults to 'data/strangle.db' (local) or '/tmp/data/strangle.db' (Azure)
         """
         if db_path is None:
-            # Default to data/risk_management.db in project root
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            data_dir = os.path.join(project_root, 'data')
-            os.makedirs(data_dir, exist_ok=True)
-            db_path = os.path.join(data_dir, 'risk_management.db')
+            # Check if running in Azure environment
+            is_azure = any(os.getenv(var) for var in ['WEBSITE_INSTANCE_ID', 'WEBSITE_SITE_NAME', 'WEBSITE_RESOURCE_GROUP'])
+            
+            if is_azure:
+                # Azure: Use /tmp directory (writable in Azure App Service)
+                data_dir = '/tmp/data'
+                try:
+                    os.makedirs(data_dir, exist_ok=True)
+                    db_path = os.path.join(data_dir, 'strangle.db')
+                except (OSError, PermissionError) as e:
+                    logger.warning(f"Could not create /tmp/data directory: {e}. Using /tmp/strangle.db")
+                    db_path = '/tmp/strangle.db'
+            else:
+                # Local: Use data/strangle.db in project root
+                try:
+                    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    data_dir = os.path.join(project_root, 'data')
+                    os.makedirs(data_dir, exist_ok=True)
+                    db_path = os.path.join(data_dir, 'strangle.db')
+                except (OSError, PermissionError) as e:
+                    logger.warning(f"Could not create data directory: {e}. Using current directory.")
+                    db_path = os.path.join(os.getcwd(), 'strangle.db')
         
         self.db_path = db_path
-        self.engine = create_engine(f'sqlite:///{db_path}', echo=False)
-        self.SessionLocal = sessionmaker(bind=self.engine)
-        self._create_tables()
-        self._run_migrations()
+        try:
+            self.engine = create_engine(f'sqlite:///{db_path}', echo=False)
+            self.SessionLocal = sessionmaker(bind=self.engine)
+            self._create_tables()
+            self._run_migrations()
+        except Exception as e:
+            logger.error(f"Error initializing database at {db_path}: {e}")
+            raise
     
     def _create_tables(self):
         """Create all database tables"""
         try:
             Base.metadata.create_all(self.engine)
-            logger.info(f"Database tables created/verified at: {self.db_path}")
+            # Use DEBUG level to reduce log verbosity (tables are created/verified automatically)
+            logger.debug(f"Database tables created/verified at: {self.db_path}")
         except Exception as e:
             logger.error(f"Error creating database tables: {e}")
             raise
