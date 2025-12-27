@@ -2221,3 +2221,360 @@
 2025-12-27 20:41:18,773 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:18] "GET /api/live-trader/logs HTTP/1.1" 200 -
 2025-12-27 20:41:19,827 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:19] "GET /api/auth/status HTTP/1.1" 200 -
 2025-12-27 20:41:19,841 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:19] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:21,749 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:21,749 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:21,749 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:21,749 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:21,749 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:21,749 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:21,749 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:21,749 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:21,765 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:21] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:24,766 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:24,766 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:24,766 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:24,766 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:24,766 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:24,782 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:24,798 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:24,798 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:24,798 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:24] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:24,813 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:24] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:24,861 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:24] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:27,754 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:27,754 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:27,754 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:27,754 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:27,754 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:27,754 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:27,754 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:27,754 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:27,770 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:27] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:29,799 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:29] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:29,799 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:29] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:30,760 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:30,760 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:30,760 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:30,760 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:30,760 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:30,760 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:30,760 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:30,760 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:30,760 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:30] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:33,749 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:33,749 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:33,749 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:33,749 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:33,749 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:33,749 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:33,749 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:33,749 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:33,767 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:33] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:34,833 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:34,842 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:34] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:36,754 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:36,754 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:36,754 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:36,754 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:36,754 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:36,754 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:36,754 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:36,754 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:36,754 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:36] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:39,757 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:39,757 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:39,757 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:39,757 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:39,757 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:39,757 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:39,757 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:39,773 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:39,773 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:39] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:39,836 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:39] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:39,843 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:39] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:42,748 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:42,748 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:42,748 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:42,748 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:42,748 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:42,748 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:42,748 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:42,748 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:42,764 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:42] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:44,855 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:44] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:44,855 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:44] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:45,753 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:45,753 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:45,753 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:45,753 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:45,753 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:45,753 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:45,753 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:45,753 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:45,753 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:45] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:48,759 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:48,759 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:48,759 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:48,759 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:48,759 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:48,759 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:48,759 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:48,759 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:48,775 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:48] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:49,797 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:49] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:49,797 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:49] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:51,755 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:51,755 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:51,755 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:51,755 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:51,755 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:51,755 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:51,755 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:51,755 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:51,755 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:51] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:54,760 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:54,761 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:54,762 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:54,763 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:54,763 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:54,764 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:54,765 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:54,766 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:54,768 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:54] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:41:54,804 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:54] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:41:54,811 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:54] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:41:57,754 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:41:57,754 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:41:57,754 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:57,754 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:41:57,754 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:41:57,754 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:41:57,754 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:41:57,754 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:41:57,754 - INFO - 127.0.0.1 - - [27/Dec/2025 20:41:57] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:22,760 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:22,760 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:22,760 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:22,760 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:22,760 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:22,760 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:22,760 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:22,760 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:22,776 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:22] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:22,807 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:22] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:42:22,823 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:22] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:42:45,616 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:45,616 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:45,616 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:45,616 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:45,616 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:45,616 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:45,616 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:45,616 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:45,616 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:45] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:45,663 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:45] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:42:45,682 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:45] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:42:48,652 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:48,652 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:48,654 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:48,656 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:48,659 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:48,662 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:48,671 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:48,672 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:48,677 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:48] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:49,805 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:49] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:42:49,812 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:49] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:42:51,765 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:51,766 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:51,770 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:51,778 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:51,781 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:51,783 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:51,786 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:51,800 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:51,804 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:51] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:54,764 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:54,765 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:54,766 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:54,766 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:54,767 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:54,768 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:54,769 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:54,769 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:54,771 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:54] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:54,844 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:54] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:42:54,852 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:54] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:42:57,764 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:42:57,765 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:42:57,767 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:57,768 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:42:57,770 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:42:57,772 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:42:57,776 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:42:57,777 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:42:57,783 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:57] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:42:59,839 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:59] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:42:59,857 - INFO - 127.0.0.1 - - [27/Dec/2025 20:42:59] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:00,756 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:00,756 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:00,756 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:00,756 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:00,756 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:00,756 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:00,769 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:00,769 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:00,772 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:00] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:03,755 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:03,755 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:03,755 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:03,755 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:03,755 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:03,755 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:03,755 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:03,755 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:03,755 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:03] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:04,802 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:04] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:04,807 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:04] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:06,754 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:06,754 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:06,754 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:06,754 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:06,754 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:06,754 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:06,754 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:06,754 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:06,772 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:06] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:09,759 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:09,759 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:09,759 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:09,759 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:09,768 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:09,768 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:09,768 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:09,768 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:09,774 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:09] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:09,838 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:09] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:09,838 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:09] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:12,756 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:12,757 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:12,759 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:12,760 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:12,760 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:12,761 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:12,762 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:12,763 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:12,765 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:12] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:14,816 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:14] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:14,828 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:14] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:15,776 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:15,776 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:15,782 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:15,785 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:15,787 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:15,789 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:15,794 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:15,795 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:15,801 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:15] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:18,762 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:18,762 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:18,762 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:18,762 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:18,762 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:18,762 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:18,762 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:18,762 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:18,762 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:18] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:19,800 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:19] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:19,800 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:19] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:21,758 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:21,759 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:21,760 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:21,762 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:21,763 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:21,764 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:21,765 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:21,765 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:21,768 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:21] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:24,790 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:24,791 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:24,798 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:24,800 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:24,803 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:24,804 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:24,818 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:24,819 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:24,828 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:24] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:24,870 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:24] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:24,880 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:24] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:27,764 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:27,764 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:27,764 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:27,764 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:27,764 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:27,764 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:27,777 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:27,777 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:27,794 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:27] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:29,808 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:29] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:29,810 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:29] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:30,759 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:30,759 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:30,759 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:30,759 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:30,759 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:30,759 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:30,759 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:30,759 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:30,759 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:30] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:33,757 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:33,757 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:33,757 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:33,757 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:33,757 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:33,757 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:33,757 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:33,757 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:33,757 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:33] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:34,832 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:34] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:34,840 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:34] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:36,758 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:36,759 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:36,762 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:36,762 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:36,763 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:36,767 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:36,770 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:36,775 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:36,775 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:36] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:39,763 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:39,766 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:39,770 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:39,774 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:39,790 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:39,793 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:39,801 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:39,805 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:39,809 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:39] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:39,811 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:39] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:39,831 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:39] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:42,760 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:42,761 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:42,762 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:42,763 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:42,764 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:42,768 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:42,772 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:42,773 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:42,777 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:42] "GET /api/live-trader/logs HTTP/1.1" 200 -
+2025-12-27 20:43:44,808 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:44] "GET /api/auth/status HTTP/1.1" 200 -
+2025-12-27 20:43:44,817 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:44] "GET /api/live-trader/status HTTP/1.1" 200 -
+2025-12-27 20:43:45,768 - INFO - [LOGS] Using strategy account name for log matching: Priti Sharma
+2025-12-27 20:43:45,768 - INFO - [LOGS] Looking for today's log file: 'Priti_2025Dec27.log' for account: 'Priti Sharma' (sanitized: 'Priti')
+2025-12-27 20:43:45,771 - INFO - [LOGS] ✓ Found today's log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:45,772 - INFO - [LOGS] No subprocess output in buffer yet (strategy may be starting or not running)
+2025-12-27 20:43:45,774 - INFO - [LOGS] Attempting to read log file: C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log
+2025-12-27 20:43:45,777 - INFO - [LOGS] Log file size: 40262 bytes
+2025-12-27 20:43:45,779 - INFO - [LOGS] Successfully read 391 lines from C:\Users\SharmaS8\OneDrive - Unisys\Shivam Imp Documents-2024 June\PythonProgram\Strangle10Points\src\logs\Priti_2025Dec27.log (total lines in file: 391)
+2025-12-27 20:43:45,779 - INFO - [LOGS] Successfully read from 1 log file(s): ['C:\\Users\\SharmaS8\\OneDrive - Unisys\\Shivam Imp Documents-2024 June\\PythonProgram\\Strangle10Points\\src\\logs\\Priti_2025Dec27.log']
+2025-12-27 20:43:45,782 - INFO - 127.0.0.1 - - [27/Dec/2025 20:43:45] "GET /api/live-trader/logs HTTP/1.1" 200 -
